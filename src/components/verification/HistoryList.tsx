@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import type { VeracityLevel } from '@/lib/types';
 import { VERACITY_CONFIG } from '@/lib/types';
-import { Clock, FileText, Link, Search } from 'lucide-react';
+import { Clock, FileText, Link, Search } from '@/lib/icons';
 
 interface HistoryItem {
   id: string;

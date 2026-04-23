@@ -10,7 +10,7 @@ import {
   GEOPOLITICAL_LABELS,
   RELATION_LABELS,
 } from '@/lib/types';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink } from '@/lib/icons';
 
 interface SourceCardProps {
   source: SourceResult;

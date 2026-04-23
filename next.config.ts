@@ -9,19 +9,9 @@ const nextConfig: NextConfig = {
     unoptimized: true,
   },
   serverExternalPackages: [
-    '@prisma/client',
-    '@prisma/adapter-libsql',
     '@libsql/client',
     'z-ai-web-dev-sdk',
   ],
-  experimental: {
-    serverComponentsExternalPackages: [
-      '@prisma/client',
-      '@prisma/adapter-libsql',
-      '@libsql/client',
-      'z-ai-web-dev-sdk',
-    ],
-  },
 };
 
 export default nextConfig;

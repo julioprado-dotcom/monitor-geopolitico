@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import type { VerificationResult } from '@/lib/types';
 import { VERACITY_CONFIG, SOURCE_CATEGORY_LABELS } from '@/lib/types';
-import { Share2, Check, Copy, Twitter, MessageCircle } from 'lucide-react';
+import { Share2, Check, Copy, Twitter, MessageCircle } from '@/lib/icons';
 
 interface ShareResultProps {
   result: VerificationResult;

@@ -23,7 +23,7 @@ import {
   FileText,
   Moon,
   Sun,
-} from 'lucide-react';
+} from '@/lib/icons';
 import type {
   InputType,
   VerificationResult,

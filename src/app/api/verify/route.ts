@@ -523,20 +523,26 @@ RESPONDE SOLO con un JSON con esta estructura exacta, sin texto adicional:
           ));
 
           try {
-            await db.verification.create({
-              data: {
+            const id = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+            await db.execute({
+              sql: `INSERT INTO Verification (id, inputType, inputContent, extractedText, overallScore, veracityLevel,
+                    sourceCredibility, internalCoherence, externalCorroboration, sensationalism,
+                    factualAccuracy, biasManipulation, dimensionDetails, sourcesFound, silencedVoices, summary)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+              args: [
+                id,
                 inputType,
-                inputContent: content.slice(0, 2000),
-                extractedText: extractedText.slice(0, 3000),
-                overallScore: analysisResult.overallScore,
-                veracityLevel: analysisResult.veracityLevel,
-                sourceCredibility: analysisResult.sourceCredibility.score,
-                internalCoherence: analysisResult.internalCoherence.score,
-                externalCorroboration: analysisResult.externalCorroboration.score,
-                sensationalism: analysisResult.sensationalism.score,
-                factualAccuracy: analysisResult.factualAccuracy.score,
-                biasManipulation: analysisResult.biasManipulation.score,
-                dimensionDetails: JSON.stringify({
+                content.slice(0, 2000),
+                extractedText.slice(0, 3000),
+                analysisResult.overallScore,
+                analysisResult.veracityLevel,
+                analysisResult.sourceCredibility.score,
+                analysisResult.internalCoherence.score,
+                analysisResult.externalCorroboration.score,
+                analysisResult.sensationalism.score,
+                analysisResult.factualAccuracy.score,
+                analysisResult.biasManipulation.score,
+                JSON.stringify({
                   sourceCredibility: analysisResult.sourceCredibility,
                   internalCoherence: analysisResult.internalCoherence,
                   externalCorroboration: analysisResult.externalCorroboration,
@@ -544,10 +550,10 @@ RESPONDE SOLO con un JSON con esta estructura exacta, sin texto adicional:
                   factualAccuracy: analysisResult.factualAccuracy,
                   biasManipulation: analysisResult.biasManipulation,
                 }),
-                sourcesFound: JSON.stringify(analysisResult.sourcesFound),
-                silencedVoices: JSON.stringify(analysisResult.silencedVoices),
-                summary: analysisResult.summary,
-              },
+                JSON.stringify(analysisResult.sourcesFound),
+                JSON.stringify(analysisResult.silencedVoices),
+                analysisResult.summary,
+              ],
             });
             send(sendLog(encoder, 'saving',
               'Resultados guardados correctamente',

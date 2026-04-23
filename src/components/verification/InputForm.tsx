@@ -5,7 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Search, FileText, Link, ChevronRight } from 'lucide-react';
+import { Search, FileText, Link, ChevronRight } from '@/lib/icons';
 import type { InputType } from '@/lib/types';
 
 interface InputFormProps {

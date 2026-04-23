@@ -7,29 +7,29 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '10');
     const offset = parseInt(searchParams.get('offset') || '0');
 
-    const verifications = await db.verification.findMany({
-      take: limit,
-      skip: offset,
-      orderBy: { createdAt: 'desc' },
+    const result = await db.execute({
+      sql: 'SELECT * FROM Verification ORDER BY createdAt DESC LIMIT ? OFFSET ?',
+      args: [limit, offset],
     });
 
-    const total = await db.verification.count();
+    const countResult = await db.execute('SELECT COUNT(*) as total FROM Verification');
+    const total = Number(countResult.rows[0]?.total ?? 0);
 
-    const formatted = verifications.map((v) => ({
-      id: v.id,
-      inputType: v.inputType,
-      inputContent: v.inputContent,
-      overallScore: v.overallScore,
-      veracityLevel: v.veracityLevel,
-      summary: v.summary,
-      createdAt: v.createdAt,
+    const formatted = result.rows.map((v) => ({
+      id: v.id as string,
+      inputType: v.inputType as string,
+      inputContent: v.inputContent as string,
+      overallScore: v.overallScore as number,
+      veracityLevel: v.veracityLevel as string,
+      summary: v.summary as string,
+      createdAt: v.createdAt as string,
       dimensionScores: {
-        sourceCredibility: v.sourceCredibility,
-        internalCoherence: v.internalCoherence,
-        externalCorroboration: v.externalCorroboration,
-        sensationalism: v.sensationalism,
-        factualAccuracy: v.factualAccuracy,
-        biasManipulation: v.biasManipulation,
+        sourceCredibility: v.sourceCredibility as number,
+        internalCoherence: v.internalCoherence as number,
+        externalCorroboration: v.externalCorroboration as number,
+        sensationalism: v.sensationalism as number,
+        factualAccuracy: v.factualAccuracy as number,
+        biasManipulation: v.biasManipulation as number,
       },
     }));
 
@@ -52,7 +52,10 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'ID requerido' }, { status: 400 });
     }
 
-    await db.verification.delete({ where: { id } });
+    await db.execute({
+      sql: 'DELETE FROM Verification WHERE id = ?',
+      args: [id],
+    });
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Delete error:', error);

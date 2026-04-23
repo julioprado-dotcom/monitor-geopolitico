@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { SilencedVoice } from '@/lib/types';
-import { VolumeX } from 'lucide-react';
+import { VolumeX } from '@/lib/icons';
 
 interface SilencedVoicesProps {
   voices: SilencedVoice[];

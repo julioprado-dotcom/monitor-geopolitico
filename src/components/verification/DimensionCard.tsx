@@ -10,7 +10,7 @@ import {
   AlertTriangle,
   CircleCheckBig,
   Brain,
-} from 'lucide-react';
+} from '@/lib/icons';
 
 interface DimensionCardProps {
   dimensionKey: string;

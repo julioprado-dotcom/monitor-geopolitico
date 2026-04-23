@@ -7,7 +7,7 @@ import {
   SOURCE_CATEGORY_LABELS,
   SOURCE_CATEGORY_ICONS,
 } from '@/lib/types';
-import { BarChart3 } from 'lucide-react';
+import { BarChart3 } from '@/lib/icons';
 
 interface SourceSummaryProps {
   sources: SourceResult[];
