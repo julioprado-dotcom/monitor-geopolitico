@@ -28,16 +28,16 @@ const DIMENSION_ICONS: Record<string, React.ReactNode> = {
 
 function getScoreColor(score: number, inverse = false): string {
   const effectiveScore = inverse ? 100 - score : score;
-  if (effectiveScore >= 70) return 'bg-emerald-500';
-  if (effectiveScore >= 40) return 'bg-amber-500';
-  return 'bg-red-500';
+  if (effectiveScore >= 70) return 'bg-neon';
+  if (effectiveScore >= 40) return 'bg-trend';
+  return 'bg-alert';
 }
 
 function getScoreTextColor(score: number, inverse = false): string {
   const effectiveScore = inverse ? 100 - score : score;
-  if (effectiveScore >= 70) return 'text-emerald-600 dark:text-emerald-400';
-  if (effectiveScore >= 40) return 'text-amber-600 dark:text-amber-400';
-  return 'text-red-600 dark:text-red-400';
+  if (effectiveScore >= 70) return 'text-neon';
+  if (effectiveScore >= 40) return 'text-trend';
+  return 'text-alert';
 }
 
 // For sensationalism and bias, higher score = worse (inverse)
@@ -48,7 +48,7 @@ export function DimensionCard({ dimensionKey, dimension }: DimensionCardProps) {
   const effectiveScore = isInverse ? 100 - dimension.score : dimension.score;
 
   return (
-    <Card className="border-border/50 hover:border-border transition-colors">
+    <Card className="border-border/50 hover:border-neon/30 transition-colors">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -76,10 +76,10 @@ export function DimensionCard({ dimensionKey, dimension }: DimensionCardProps) {
           variant="outline"
           className={`text-xs ${
             effectiveScore >= 70
-              ? 'border-emerald-500 text-emerald-600'
+              ? 'border-neon text-neon'
               : effectiveScore >= 40
-              ? 'border-amber-500 text-amber-600'
-              : 'border-red-500 text-red-600'
+              ? 'border-trend text-trend'
+              : 'border-alert text-alert'
           }`}
         >
           {isInverse
@@ -107,7 +107,7 @@ export function DimensionCard({ dimensionKey, dimension }: DimensionCardProps) {
             <ul className="space-y-1">
               {dimension.evidence.map((ev, idx) => (
                 <li key={idx} className="text-xs text-muted-foreground flex gap-1.5">
-                  <span className="text-emerald-500 mt-0.5 shrink-0">•</span>
+                  <span className="text-neon mt-0.5 shrink-0">•</span>
                   <span>{ev}</span>
                 </li>
               ))}

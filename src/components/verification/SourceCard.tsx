@@ -17,15 +17,15 @@ interface SourceCardProps {
 }
 
 const RELATION_COLORS: Record<string, string> = {
-  confirma: 'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800',
-  contradice: 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800',
-  matiza: 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800',
-  sin_relacion: 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-900/30 dark:text-gray-400 dark:border-gray-800',
+  confirma: 'bg-neon/15 text-neon border-neon/30',
+  contradice: 'bg-alert/15 text-alert border-alert/30',
+  matiza: 'bg-trend/15 text-trend border-trend/30',
+  sin_relacion: 'bg-muted text-muted-foreground border-border',
 };
 
 export function SourceCard({ source }: SourceCardProps) {
   return (
-    <Card className="border-border/50 hover:border-border transition-colors overflow-hidden">
+    <Card className="border-border/50 hover:border-neon/30 transition-colors overflow-hidden">
       <CardContent className="p-4 space-y-3">
         {/* Header */}
         <div className="flex items-start justify-between gap-2">
@@ -36,7 +36,7 @@ export function SourceCard({ source }: SourceCardProps) {
                 href={source.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm font-semibold hover:text-emerald-600 transition-colors truncate flex items-center gap-1"
+                className="text-sm font-semibold hover:text-neon transition-colors truncate flex items-center gap-1"
               >
                 {source.name}
                 <ExternalLink className="w-3 h-3 shrink-0" />

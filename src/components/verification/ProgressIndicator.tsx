@@ -33,7 +33,7 @@ export function ProgressIndicator({ stage }: ProgressIndicatorProps) {
     <div className="w-full max-w-3xl mx-auto">
       <div className="bg-card border border-border rounded-2xl p-6 shadow-lg">
         <div className="flex items-center justify-center gap-3 mb-6">
-          <div className="w-8 h-8 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-neon/30 border-t-neon rounded-full animate-spin" />
           <span className="text-sm font-medium">{STAGE_LABELS[stage]}</span>
         </div>
 
@@ -42,7 +42,6 @@ export function ProgressIndicator({ stage }: ProgressIndicatorProps) {
           {STAGES.map((s, idx) => {
             const isCompleted = idx < currentIndex;
             const isCurrent = idx === currentIndex;
-            const isPending = idx > currentIndex;
 
             return (
               <div key={s} className="flex items-center flex-1 last:flex-none">
@@ -50,9 +49,9 @@ export function ProgressIndicator({ stage }: ProgressIndicatorProps) {
                   <div
                     className={`w-10 h-10 rounded-full flex items-center justify-center text-sm transition-all duration-500 ${
                       isCompleted
-                        ? 'bg-emerald-500 text-white'
+                        ? 'bg-neon text-deep'
                         : isCurrent
-                        ? 'bg-emerald-100 text-emerald-700 border-2 border-emerald-500 dark:bg-emerald-900/30 dark:text-emerald-400'
+                        ? 'bg-neon/10 text-neon border-2 border-neon'
                         : 'bg-muted text-muted-foreground'
                     }`}
                   >
@@ -61,7 +60,7 @@ export function ProgressIndicator({ stage }: ProgressIndicatorProps) {
                   <span
                     className={`text-xs font-medium text-center whitespace-nowrap ${
                       isCompleted
-                        ? 'text-emerald-600 dark:text-emerald-400'
+                        ? 'text-neon'
                         : isCurrent
                         ? 'text-foreground'
                         : 'text-muted-foreground'
@@ -79,7 +78,7 @@ export function ProgressIndicator({ stage }: ProgressIndicatorProps) {
                 {idx < STAGES.length - 1 && (
                   <div
                     className={`flex-1 h-0.5 mx-2 rounded-full transition-all duration-500 ${
-                      isCompleted ? 'bg-emerald-500' : 'bg-muted'
+                      isCompleted ? 'bg-neon' : 'bg-muted'
                     }`}
                   />
                 )}

@@ -41,75 +41,95 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  /* Custom VeriNews colors */
+  --color-neon: var(--neon);
+  --color-alert: var(--alert);
+  --color-analysis: var(--analysis);
+  --color-trend: var(--trend);
+  --color-deep: var(--deep);
 }
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  /* Light Mode - #F4F4F9 base */
+  --background: #F4F4F9;
+  --foreground: #0A0E1A;
+  --card: #FFFFFF;
+  --card-foreground: #0A0E1A;
+  --popover: #FFFFFF;
+  --popover-foreground: #0A0E1A;
+  --primary: #0A0E1A;
+  --primary-foreground: #FFFFFF;
+  --secondary: #E8E8F0;
+  --secondary-foreground: #0A0E1A;
+  --muted: #E8E8F0;
+  --muted-foreground: #6B6B80;
+  --accent: #E8E8F0;
+  --accent-foreground: #0A0E1A;
+  --destructive: #FF406A;
+  --border: #D4D4E0;
+  --input: #D4D4E0;
+  --ring: #00E5A0;
+  --chart-1: #00E5A0;
+  --chart-2: #3882F6;
+  --chart-3: #F59E0B;
+  --chart-4: #FF406A;
+  --chart-5: #8B8B9E;
+  /* VeriNews custom */
+  --neon: #00E5A0;
+  --alert: #FF406A;
+  --analysis: #3882F6;
+  --trend: #F59E0B;
+  --deep: #0A0E1A;
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #0A0E1A;
+  --sidebar-primary: #0A0E1A;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #E8E8F0;
+  --sidebar-accent-foreground: #0A0E1A;
+  --sidebar-border: #D4D4E0;
+  --sidebar-ring: #00E5A0;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Dark Mode - #0A0E1A base */
+  --background: #0A0E1A;
+  --foreground: #FFFFFF;
+  --card: #12162A;
+  --card-foreground: #FFFFFF;
+  --popover: #12162A;
+  --popover-foreground: #FFFFFF;
+  --primary: #FFFFFF;
+  --primary-foreground: #0A0E1A;
+  --secondary: #1A1F38;
+  --secondary-foreground: #FFFFFF;
+  --muted: #1A1F38;
+  --muted-foreground: #8B8B9E;
+  --accent: #1A1F38;
+  --accent-foreground: #FFFFFF;
+  --destructive: #FF406A;
+  --border: rgba(255, 255, 255, 0.08);
+  --input: rgba(255, 255, 255, 0.12);
+  --ring: #00E5A0;
+  --chart-1: #00E5A0;
+  --chart-2: #3882F6;
+  --chart-3: #F59E0B;
+  --chart-4: #FF406A;
+  --chart-5: #8B8B9E;
+  /* VeriNews custom */
+  --neon: #00E5A0;
+  --alert: #FF406A;
+  --analysis: #3882F6;
+  --trend: #F59E0B;
+  --deep: #0A0E1A;
+  --sidebar: #12162A;
+  --sidebar-foreground: #FFFFFF;
+  --sidebar-primary: #00E5A0;
+  --sidebar-primary-foreground: #0A0E1A;
+  --sidebar-accent: #1A1F38;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-ring: #00E5A0;
 }
 
 @layer base {

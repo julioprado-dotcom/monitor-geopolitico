@@ -10,7 +10,7 @@ interface ScoreGaugeProps {
 
 export function ScoreGauge({ score, veracityLevel }: ScoreGaugeProps) {
   const config = VERACITY_CONFIG[veracityLevel];
-  
+
   // SVG gauge calculation
   const radius = 80;
   const circumference = 2 * Math.PI * radius;
@@ -18,15 +18,9 @@ export function ScoreGauge({ score, veracityLevel }: ScoreGaugeProps) {
   const offset = circumference - progress;
 
   const getGaugeColor = () => {
-    if (score >= 80) return '#10b981'; // emerald
-    if (score >= 50) return '#f59e0b'; // amber
-    return '#ef4444'; // red
-  };
-
-  const getGaugeGradient = () => {
-    if (score >= 80) return 'from-emerald-400 to-emerald-600';
-    if (score >= 50) return 'from-amber-400 to-amber-600';
-    return 'from-red-400 to-red-600';
+    if (score >= 80) return '#00E5A0'; // neon
+    if (score >= 50) return '#F59E0B'; // trend/amber
+    return '#FF406A'; // alert
   };
 
   return (
@@ -58,7 +52,10 @@ export function ScoreGauge({ score, veracityLevel }: ScoreGaugeProps) {
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className={`text-4xl font-bold ${getGaugeGradient().includes('emerald') ? 'text-emerald-600' : getGaugeGradient().includes('amber') ? 'text-amber-600' : 'text-red-600'}`}>
+          <span
+            className="text-4xl font-bold"
+            style={{ color: getGaugeColor() }}
+          >
             {score}
           </span>
           <span className="text-xs text-muted-foreground mt-1">de 100</span>
@@ -66,13 +63,15 @@ export function ScoreGauge({ score, veracityLevel }: ScoreGaugeProps) {
       </div>
 
       <div className="text-center">
-        <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold ${
-          veracityLevel === 'verified' 
-            ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
-            : veracityLevel === 'dubious'
-            ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
-            : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-        }`}>
+        <span
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold ${
+            veracityLevel === 'verified'
+              ? 'bg-neon/15 text-neon'
+              : veracityLevel === 'dubious'
+              ? 'bg-trend/15 text-trend'
+              : 'bg-alert/15 text-alert'
+          }`}
+        >
           <span className="w-2.5 h-2.5 rounded-full bg-current" />
           {config.label}
         </span>

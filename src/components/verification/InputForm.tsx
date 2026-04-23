@@ -57,21 +57,21 @@ export function InputForm({ onSubmit, isLoading }: InputFormProps) {
           <TabsList className="w-full rounded-none border-b bg-transparent h-auto p-0">
             <TabsTrigger
               value="text"
-              className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-emerald-500 data-[state=active]:bg-transparent data-[state=active]:shadow-none py-3 px-4 gap-2 text-sm"
+              className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-neon data-[state=active]:bg-transparent data-[state=active]:shadow-none py-3 px-4 gap-2 text-sm"
             >
               <FileText className="w-4 h-4" />
               Texto completo
             </TabsTrigger>
             <TabsTrigger
               value="url"
-              className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-emerald-500 data-[state=active]:bg-transparent data-[state=active]:shadow-none py-3 px-4 gap-2 text-sm"
+              className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-neon data-[state=active]:bg-transparent data-[state=active]:shadow-none py-3 px-4 gap-2 text-sm"
             >
               <Link className="w-4 h-4" />
               URL
             </TabsTrigger>
             <TabsTrigger
               value="claim"
-              className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-emerald-500 data-[state=active]:bg-transparent data-[state=active]:shadow-none py-3 px-4 gap-2 text-sm"
+              className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-neon data-[state=active]:bg-transparent data-[state=active]:shadow-none py-3 px-4 gap-2 text-sm"
             >
               <Search className="w-4 h-4" />
               Afirmación
@@ -118,7 +118,7 @@ export function InputForm({ onSubmit, isLoading }: InputFormProps) {
           <Button
             onClick={handleSubmit}
             disabled={isLoading || !getCurrentContent().trim()}
-            className="w-full h-12 text-base font-semibold gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
+            className="w-full h-12 text-base font-semibold gap-2 bg-neon hover:bg-neon/90 text-deep"
           >
             {isLoading ? (
               <>

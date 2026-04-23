@@ -29,7 +29,7 @@ export function SourceSummary({ sources }: SourceSummaryProps) {
     <Card className="border-border/50">
       <CardHeader className="pb-3">
         <div className="flex items-center gap-2">
-          <BarChart3 className="w-5 h-5 text-emerald-600" />
+          <BarChart3 className="w-5 h-5 text-neon" />
           <CardTitle className="text-sm font-semibold">
             Resumen de Fuentes ({total} encontradas)
           </CardTitle>
@@ -49,7 +49,7 @@ export function SourceSummary({ sources }: SourceSummaryProps) {
                 </span>
                 <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
                   <div
-                    className="h-full rounded-full bg-emerald-500 transition-all duration-500"
+                    className="h-full rounded-full bg-neon transition-all duration-500"
                     style={{ width: `${(count / total) * 100}%` }}
                   />
                 </div>
@@ -68,12 +68,12 @@ export function SourceSummary({ sources }: SourceSummaryProps) {
                 variant="outline"
                 className={`text-xs ${
                   relation === 'confirma'
-                    ? 'border-emerald-500 text-emerald-600'
+                    ? 'border-neon text-neon'
                     : relation === 'contradice'
-                    ? 'border-red-500 text-red-600'
+                    ? 'border-alert text-alert'
                     : relation === 'matiza'
-                    ? 'border-amber-500 text-amber-600'
-                    : 'border-gray-400 text-gray-600'
+                    ? 'border-trend text-trend'
+                    : 'border-muted-foreground text-muted-foreground'
                 }`}
               >
                 {relation === 'confirma'

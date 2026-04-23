@@ -22,8 +22,3 @@ export async function webSearch(query: string, num: number = 10) {
   const zai = await getZAI();
   return zai.functions.invoke("web_search", { query, num });
 }
-
-export async function webRead(url: string) {
-  const zai = await getZAI();
-  return zai.functions.invoke("web_reader", { url });
-}

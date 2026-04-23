@@ -11,9 +11,9 @@ interface SilencedVoicesProps {
 export function SilencedVoices({ voices }: SilencedVoicesProps) {
   if (voices.length === 0) {
     return (
-      <Card className="border-emerald-200 dark:border-emerald-800/50 bg-emerald-50/50 dark:bg-emerald-950/20">
+      <Card className="border-neon/20 bg-neon/5">
         <CardContent className="p-4">
-          <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
+          <div className="flex items-center gap-2 text-neon">
             <VolumeX className="w-4 h-4" />
             <span className="text-sm">No se detectaron voces silenciadas significativas</span>
           </div>
@@ -23,10 +23,10 @@ export function SilencedVoices({ voices }: SilencedVoicesProps) {
   }
 
   return (
-    <Card className="border-amber-200 dark:border-amber-800/50">
+    <Card className="border-trend/30">
       <CardHeader className="pb-3">
         <div className="flex items-center gap-2">
-          <VolumeX className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+          <VolumeX className="w-5 h-5 text-trend" />
           <CardTitle className="text-sm font-semibold">
             Voces Silenciadas / Perspectivas Omitidas
           </CardTitle>
@@ -36,20 +36,20 @@ export function SilencedVoices({ voices }: SilencedVoicesProps) {
         {voices.map((voice, idx) => (
           <div
             key={idx}
-            className="p-3 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/30"
+            className="p-3 rounded-lg bg-trend/5 border border-trend/20"
           >
             <div className="flex items-start gap-2">
-              <span className="text-amber-600 dark:text-amber-400 font-bold text-sm mt-0.5">
+              <span className="text-trend font-bold text-sm mt-0.5">
                 {idx + 1}.
               </span>
               <div className="space-y-1">
-                <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">
+                <p className="text-sm font-semibold text-trend">
                   {voice.perspective}
                 </p>
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   {voice.description}
                 </p>
-                <p className="text-xs text-amber-700 dark:text-amber-400/80 italic">
+                <p className="text-xs text-trend/80 italic">
                   Contexto: {voice.context}
                 </p>
               </div>

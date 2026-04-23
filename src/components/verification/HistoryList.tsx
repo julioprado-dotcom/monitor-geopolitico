@@ -27,6 +27,12 @@ const INPUT_TYPE_ICONS: Record<string, React.ReactNode> = {
   claim: <Search className="w-4 h-4" />,
 };
 
+const LEVEL_COLORS: Record<string, string> = {
+  verified: 'border-neon text-neon',
+  dubious: 'border-trend text-trend',
+  false: 'border-alert text-alert',
+};
+
 export function HistoryList({ items, onSelect }: HistoryListProps) {
   if (items.length === 0) {
     return (
@@ -48,7 +54,7 @@ export function HistoryList({ items, onSelect }: HistoryListProps) {
         return (
           <Card
             key={item.id}
-            className="cursor-pointer border-border/50 hover:border-emerald-500/50 hover:shadow-md transition-all"
+            className="cursor-pointer border-border/50 hover:border-neon/50 hover:shadow-md transition-all"
             onClick={() => onSelect(item.id)}
           >
             <CardContent className="p-3 md:p-4">
@@ -67,15 +73,9 @@ export function HistoryList({ items, onSelect }: HistoryListProps) {
                   <div className="flex items-center gap-2">
                     <Badge
                       variant="outline"
-                      className={`text-xs ${
-                        level === 'verified'
-                          ? 'border-emerald-500 text-emerald-600'
-                          : level === 'dubious'
-                          ? 'border-amber-500 text-amber-600'
-                          : 'border-red-500 text-red-600'
-                      }`}
+                      className={`text-xs ${LEVEL_COLORS[level] || 'border-muted text-muted-foreground'}`}
                     >
-                      {item.overallScore}/100 — {config.label}
+                      {item.overallScore}/100 — {config?.label || level}
                     </Badge>
                     <span className="text-xs text-muted-foreground">
                       {date.toLocaleDateString('es', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}

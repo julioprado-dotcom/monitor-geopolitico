@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { chatCompletion, webSearch, webRead } from '@/lib/zai';
+import { chatCompletion, webSearch } from '@/lib/zai';
 import { db } from '@/lib/db';
 import type {
   VerificationRequest,
@@ -87,24 +87,38 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Step 1: Extract content from URL if needed
+    // Step 1: For URL input, use web search to find the article content
     let extractedText = content;
     if (inputType === 'url') {
+      // Search for the URL to get contextual snippets
       try {
-        const webContent = await webRead(content.trim());
-        if (webContent && webContent.html) {
-          // Extract text from HTML (simple extraction)
-          const textFromHtml = webContent.html
-            .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
-            .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
-            .replace(/<[^>]+>/g, ' ')
-            .replace(/\s+/g, ' ')
-            .trim()
-            .slice(0, 5000);
-          extractedText = textFromHtml || content;
+        const urlSearchResults = await webSearch(content.trim(), 5);
+        if (Array.isArray(urlSearchResults) && urlSearchResults.length > 0) {
+          // Combine snippets as the extracted text
+          const combinedSnippets = urlSearchResults
+            .map((r: { name: string; snippet: string }) => `${r.name}: ${r.snippet}`)
+            .join('\n\n');
+          extractedText = combinedSnippets || content;
         }
       } catch {
         extractedText = content;
+      }
+
+      // Also use LLM to identify what the URL article is about based on search results
+      try {
+        const urlContextResponse = await chatCompletion([
+          { role: 'system', content: 'Eres un asistente que reconstruye el contenido de un artículo a partir de resultados de búsqueda. Responde en español.' },
+          {
+            role: 'user',
+            content: `A partir de los siguientes resultados de búsqueda sobre una URL, reconstruye el contenido principal del artículo original. URL: ${content}\n\nResultados:\n${extractedText.slice(0, 2000)}\n\nReconstruye el artículo:`,
+          },
+        ]);
+        const reconstructed = urlContextResponse.choices[0]?.message?.content;
+        if (reconstructed && reconstructed.length > 100) {
+          extractedText = reconstructed;
+        }
+      } catch {
+        // Keep whatever we have
       }
     }
 
@@ -122,6 +136,7 @@ export async function POST(request: NextRequest) {
       const claimsText = claimsResponse.choices[0]?.message?.content || '[]';
       const cleaned = claimsText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
       keyClaims = JSON.parse(cleaned);
+      if (!Array.isArray(keyClaims)) keyClaims = [extractedText.slice(0, 200)];
     } catch {
       keyClaims = [extractedText.slice(0, 200)];
     }
@@ -135,15 +150,20 @@ export async function POST(request: NextRequest) {
       host_name: string;
     }> = [];
 
-    for (const query of searchQueries) {
+    // Search in parallel for speed
+    const searchPromises = searchQueries.map(async (query) => {
       try {
         const results = await webSearch(query, 8);
-        if (Array.isArray(results)) {
-          allSearchResults.push(...results);
-        }
+        if (Array.isArray(results)) return results;
       } catch {
-        // Continue with what we have
+        // Continue
       }
+      return [];
+    });
+
+    const searchResultsArrays = await Promise.all(searchPromises);
+    for (const results of searchResultsArrays) {
+      allSearchResults.push(...results);
     }
 
     // Also search for counter-narratives
@@ -174,57 +194,62 @@ export async function POST(request: NextRequest) {
       )
       .join('\n\n');
 
-    const classificationResponse = await chatCompletion([
-      { role: 'system', content: SYSTEM_PROMPT },
-      {
-        role: 'user',
-        content: `Clasifica cada una de las siguientes fuentes encontradas durante la verificación de esta noticia. Para cada fuente, determina:\n\n- category: una de [colectivo_occidental, sur_global, independiente, academico, resistencia]\n- orientation: una de [estatal, corporativo, comunitario, independiente, academico]\n- geopoliticalPerspective: una de [alineado_otan, alineado_usa, alineado_ue, no_alineado, critico_orden_global, multipolar]\n- relationToNews: una de [confirma, contradice, matiza, sin_relacion] basándote en el fragmento y la noticia analizada\n\nNoticia analizada: ${extractedText.slice(0, 1000)}\n\nFuentes:\n${sourcesFormatted}\n\nResponde SOLO con un JSON array donde cada elemento tenga: {index, category, orientation, geopoliticalPerspective, relationToNews}. Sin texto adicional.`,
-      },
-    ]);
-
     let classifiedSources: SourceResult[] = [];
-    try {
-      const classText = classificationResponse.choices[0]?.message?.content || '[]';
-      const cleanedClass = classText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-      const parsed = JSON.parse(cleanedClass);
 
-      classifiedSources = uniqueResults.slice(0, 15).map((result, idx) => {
-        const classification = parsed.find(
-          (c: { index?: number }) => c.index === idx + 1
-        ) || parsed[idx] || {};
+    if (uniqueResults.length > 0) {
+      try {
+        const classificationResponse = await chatCompletion([
+          { role: 'system', content: SYSTEM_PROMPT },
+          {
+            role: 'user',
+            content: `Clasifica cada una de las siguientes fuentes encontradas durante la verificación de esta noticia. Para cada fuente, determina:\n\n- category: una de [colectivo_occidental, sur_global, independiente, academico, resistencia]\n- orientation: una de [estatal, corporativo, comunitario, independiente, academico]\n- geopoliticalPerspective: una de [alineado_otan, alineado_usa, alineado_ue, no_alineado, critico_orden_global, multipolar]\n- relationToNews: una de [confirma, contradice, matiza, sin_relacion] basándote en el fragmento y la noticia analizada\n\nNoticia analizada: ${extractedText.slice(0, 1000)}\n\nFuentes:\n${sourcesFormatted}\n\nResponde SOLO con un JSON array donde cada elemento tenga: {index, category, orientation, geopoliticalPerspective, relationToNews}. Sin texto adicional.`,
+          },
+        ]);
 
-        return {
+        const classText = classificationResponse.choices[0]?.message?.content || '[]';
+        const cleanedClass = classText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        const parsed = JSON.parse(cleanedClass);
+
+        classifiedSources = uniqueResults.slice(0, 15).map((result, idx) => {
+          const classification = parsed.find(
+            (c: { index?: number }) => c.index === idx + 1
+          ) || parsed[idx] || {};
+
+          return {
+            name: result.name,
+            url: result.url,
+            snippet: result.snippet,
+            category: (classification.category as SourceCategory) || 'independiente',
+            orientation: (classification.orientation as SourceOrientation) || 'independiente',
+            geopoliticalPerspective:
+              (classification.geopoliticalPerspective as GeopoliticalPerspective) || 'no_alineado',
+            relationToNews: (classification.relationToNews as SourceRelation) || 'sin_relacion',
+            hostName: result.host_name,
+          };
+        });
+      } catch {
+        classifiedSources = uniqueResults.slice(0, 15).map((result) => ({
           name: result.name,
           url: result.url,
           snippet: result.snippet,
-          category: (classification.category as SourceCategory) || 'independiente',
-          orientation: (classification.orientation as SourceOrientation) || 'independiente',
-          geopoliticalPerspective:
-            (classification.geopoliticalPerspective as GeopoliticalPerspective) || 'no_alineado',
-          relationToNews: (classification.relationToNews as SourceRelation) || 'sin_relacion',
+          category: 'independiente' as SourceCategory,
+          orientation: 'independiente' as SourceOrientation,
+          geopoliticalPerspective: 'no_alineado' as GeopoliticalPerspective,
+          relationToNews: 'sin_relacion' as SourceRelation,
           hostName: result.host_name,
-        };
-      });
-    } catch {
-      classifiedSources = uniqueResults.slice(0, 15).map((result) => ({
-        name: result.name,
-        url: result.url,
-        snippet: result.snippet,
-        category: 'independiente' as SourceCategory,
-        orientation: 'independiente' as SourceOrientation,
-        geopoliticalPerspective: 'no_alineado' as GeopoliticalPerspective,
-        relationToNews: 'sin_relacion' as SourceRelation,
-        hostName: result.host_name,
-      }));
+        }));
+      }
     }
 
     // Step 5: Full analysis with LLM
-    const sourcesSummary = classifiedSources
-      .map(
-        (s) =>
-          `- ${s.name} [${s.category}/${s.orientation}/${s.geopoliticalPerspective}]: ${s.relationToNews} - "${s.snippet.slice(0, 150)}"`
-      )
-      .join('\n');
+    const sourcesSummary = classifiedSources.length > 0
+      ? classifiedSources
+          .map(
+            (s) =>
+              `- ${s.name} [${s.category}/${s.orientation}/${s.geopoliticalPerspective}]: ${s.relationToNews} - "${s.snippet.slice(0, 150)}"`
+          )
+          .join('\n')
+      : 'No se encontraron fuentes adicionales mediante búsqueda web.';
 
     const analysisResponse = await chatCompletion([
       { role: 'system', content: SYSTEM_PROMPT },

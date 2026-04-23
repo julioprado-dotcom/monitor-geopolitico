@@ -10,8 +10,6 @@ import { SilencedVoices } from '@/components/verification/SilencedVoices';
 import { ProgressIndicator } from '@/components/verification/ProgressIndicator';
 import { HistoryList } from '@/components/verification/HistoryList';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import {
@@ -22,6 +20,8 @@ import {
   Eye,
   Scale,
   FileText,
+  Moon,
+  Sun,
 } from 'lucide-react';
 import type {
   InputType,
@@ -36,6 +36,31 @@ export default function Home() {
   const [history, setHistory] = useState<Array<any>>([]);
   const [showHistory, setShowHistory] = useState(false);
   const [activeSourceFilter, setActiveSourceFilter] = useState<string>('all');
+  const [isDark, setIsDark] = useState(true);
+
+  // Initialize dark mode
+  useEffect(() => {
+    const saved = localStorage.getItem('verinews-theme');
+    if (saved === 'light') {
+      setIsDark(false);
+      document.documentElement.classList.remove('dark');
+    } else {
+      setIsDark(true);
+      document.documentElement.classList.add('dark');
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const next = !isDark;
+    setIsDark(next);
+    if (next) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('verinews-theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('verinews-theme', 'light');
+    }
+  };
 
   // Fetch history on mount
   useEffect(() => {
@@ -75,7 +100,8 @@ export default function Home() {
         clearTimeout(stageTimer3);
 
         if (!res.ok) {
-          throw new Error('Error en la verificación');
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error || 'Error en la verificación');
         }
 
         const data: VerificationResult = await res.json();
@@ -105,13 +131,13 @@ export default function Home() {
       : result?.sourcesFound.filter((s) => s.category === activeSourceFilter) || [];
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-background text-foreground">
       {/* Header */}
       <header className="border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-emerald-600 flex items-center justify-center">
-              <Shield className="w-5 h-5 text-white" />
+            <div className="w-9 h-9 rounded-xl bg-neon flex items-center justify-center">
+              <Shield className="w-5 h-5 text-deep" />
             </div>
             <div>
               <h1 className="text-lg font-bold leading-tight">VeriNews</h1>
@@ -122,6 +148,17 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Theme toggle */}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="gap-2 text-muted-foreground"
+              onClick={toggleTheme}
+            >
+              {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              <span className="hidden sm:inline">{isDark ? 'Claro' : 'Oscuro'}</span>
+            </Button>
+
             <Button
               variant="ghost"
               size="sm"
@@ -148,13 +185,13 @@ export default function Home() {
               {/* Hero text */}
               <div className="text-center space-y-4 max-w-2xl mx-auto">
                 <div className="flex items-center justify-center gap-2 mb-4">
-                  <Badge variant="outline" className="border-emerald-500/50 text-emerald-600 text-xs">
+                  <Badge variant="outline" className="border-neon/50 text-neon text-xs">
                     Enfoque Crítico-Pluralista
                   </Badge>
                 </div>
                 <h1 className="text-3xl md:text-5xl font-bold tracking-tight">
                   Desenmascara la
-                  <span className="text-emerald-600"> desinformación</span>
+                  <span className="text-neon"> desinformación</span>
                 </h1>
                 <p className="text-muted-foreground text-base md:text-lg leading-relaxed">
                   Verifica noticias con un análisis que no solo detecta datos falsos, sino que
@@ -167,33 +204,27 @@ export default function Home() {
 
               {/* Features */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto mt-8">
-                <Card className="border-border/50 bg-card/50">
-                  <CardContent className="p-5 text-center space-y-2">
-                    <Eye className="w-8 h-8 mx-auto text-emerald-600" />
-                    <h3 className="font-semibold text-sm">6 Dimensiones de Análisis</h3>
-                    <p className="text-xs text-muted-foreground">
-                      Credibilidad, coherencia, corroboración, sensacionalismo, veracidad y sesgo
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card className="border-border/50 bg-card/50">
-                  <CardContent className="p-5 text-center space-y-2">
-                    <Scale className="w-8 h-8 mx-auto text-emerald-600" />
-                    <h3 className="font-semibold text-sm">Fuentes Diversas</h3>
-                    <p className="text-xs text-muted-foreground">
-                      Colectivo Occidental, Sur Global, independientes, académicos y resistencia
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card className="border-border/50 bg-card/50">
-                  <CardContent className="p-5 text-center space-y-2">
-                    <FileText className="w-8 h-8 mx-auto text-emerald-600" />
-                    <h3 className="font-semibold text-sm">Voces Silenciadas</h3>
-                    <p className="text-xs text-muted-foreground">
-                      Detectamos qué perspectivas se omiten y qué contexto falta
-                    </p>
-                  </CardContent>
-                </Card>
+                <div className="bg-card border border-border/50 rounded-xl p-5 text-center space-y-2">
+                  <Eye className="w-8 h-8 mx-auto text-neon" />
+                  <h3 className="font-semibold text-sm">6 Dimensiones de Análisis</h3>
+                  <p className="text-xs text-muted-foreground">
+                    Credibilidad, coherencia, corroboración, sensacionalismo, veracidad y sesgo
+                  </p>
+                </div>
+                <div className="bg-card border border-border/50 rounded-xl p-5 text-center space-y-2">
+                  <Scale className="w-8 h-8 mx-auto text-analysis" />
+                  <h3 className="font-semibold text-sm">Fuentes Diversas</h3>
+                  <p className="text-xs text-muted-foreground">
+                    Colectivo Occidental, Sur Global, independientes, académicos y resistencia
+                  </p>
+                </div>
+                <div className="bg-card border border-border/50 rounded-xl p-5 text-center space-y-2">
+                  <FileText className="w-8 h-8 mx-auto text-trend" />
+                  <h3 className="font-semibold text-sm">Voces Silenciadas</h3>
+                  <p className="text-xs text-muted-foreground">
+                    Detectamos qué perspectivas se omiten y qué contexto falta
+                  </p>
+                </div>
               </div>
 
               {/* History inline (when toggled) */}
@@ -202,7 +233,7 @@ export default function Home() {
                   <Separator className="my-6" />
                   <div className="space-y-4">
                     <div className="flex items-center gap-2">
-                      <History className="w-5 h-5 text-emerald-600" />
+                      <History className="w-5 h-5 text-neon" />
                       <h2 className="text-lg font-semibold">Historial de Verificaciones</h2>
                     </div>
                     <HistoryList
@@ -221,14 +252,14 @@ export default function Home() {
           {/* Error state */}
           {stage === 'error' && !isLoading && (
             <div className="max-w-3xl mx-auto text-center space-y-4">
-              <div className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mx-auto">
+              <div className="w-16 h-16 rounded-full bg-alert/15 flex items-center justify-center mx-auto">
                 <span className="text-3xl">❌</span>
               </div>
               <h2 className="text-xl font-bold">Error en la verificación</h2>
               <p className="text-muted-foreground">
                 No se pudo completar el análisis. Por favor, intenta de nuevo.
               </p>
-              <Button onClick={handleReset} variant="outline" className="gap-2">
+              <Button onClick={handleReset} variant="outline" className="gap-2 border-alert text-alert hover:bg-alert/10">
                 <ArrowLeft className="w-4 h-4" />
                 Volver a intentar
               </Button>
@@ -250,42 +281,40 @@ export default function Home() {
               </Button>
 
               {/* Score + Summary */}
-              <Card className="border-border/50 overflow-hidden">
-                <CardContent className="p-6 md:p-8">
-                  <div className="flex flex-col md:flex-row items-center gap-6 md:gap-10">
-                    <ScoreGauge
-                      score={result.overallScore}
-                      veracityLevel={result.veracityLevel}
-                    />
-                    <div className="flex-1 text-center md:text-left space-y-3">
-                      <h2 className="text-xl md:text-2xl font-bold">
-                        Resultado del Análisis
-                      </h2>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        {result.summary}
-                      </p>
-                      {result.keyClaims.length > 0 && (
-                        <div className="space-y-1.5">
-                          <p className="text-xs font-medium text-foreground/70">
-                            Afirmaciones clave verificadas:
+              <div className="bg-card border border-border rounded-2xl p-6 md:p-8">
+                <div className="flex flex-col md:flex-row items-center gap-6 md:gap-10">
+                  <ScoreGauge
+                    score={result.overallScore}
+                    veracityLevel={result.veracityLevel}
+                  />
+                  <div className="flex-1 text-center md:text-left space-y-3">
+                    <h2 className="text-xl md:text-2xl font-bold">
+                      Resultado del Análisis
+                    </h2>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      {result.summary}
+                    </p>
+                    {result.keyClaims.length > 0 && (
+                      <div className="space-y-1.5">
+                        <p className="text-xs font-medium text-foreground/70">
+                          Afirmaciones clave verificadas:
+                        </p>
+                        {result.keyClaims.map((claim, idx) => (
+                          <p key={idx} className="text-xs text-muted-foreground flex gap-1.5">
+                            <span className="text-neon shrink-0">•</span>
+                            {claim}
                           </p>
-                          {result.keyClaims.map((claim, idx) => (
-                            <p key={idx} className="text-xs text-muted-foreground flex gap-1.5">
-                              <span className="text-emerald-500 shrink-0">•</span>
-                              {claim}
-                            </p>
-                          ))}
-                        </div>
-                      )}
-                    </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
 
               {/* 6 Dimensions Grid */}
               <div>
                 <div className="flex items-center gap-2 mb-4">
-                  <Eye className="w-5 h-5 text-emerald-600" />
+                  <Eye className="w-5 h-5 text-neon" />
                   <h2 className="text-lg font-semibold">Análisis por Dimensiones</h2>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -322,7 +351,7 @@ export default function Home() {
               {/* Sources Section */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <BookOpen className="w-5 h-5 text-emerald-600" />
+                  <BookOpen className="w-5 h-5 text-analysis" />
                   <h2 className="text-lg font-semibold">Fuentes Encontradas</h2>
                 </div>
 
@@ -335,7 +364,7 @@ export default function Home() {
                     variant={activeSourceFilter === 'all' ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => setActiveSourceFilter('all')}
-                    className={activeSourceFilter === 'all' ? 'bg-emerald-600 hover:bg-emerald-700' : ''}
+                    className={activeSourceFilter === 'all' ? 'bg-neon text-deep hover:bg-neon/90' : ''}
                   >
                     Todas ({result.sourcesFound.length})
                   </Button>
@@ -353,7 +382,7 @@ export default function Home() {
                           onClick={() => setActiveSourceFilter(cat)}
                           className={
                             activeSourceFilter === cat
-                              ? 'bg-emerald-600 hover:bg-emerald-700'
+                              ? 'bg-neon text-deep hover:bg-neon/90'
                               : ''
                           }
                         >
@@ -396,13 +425,13 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <Shield className="w-4 h-4 text-emerald-600" />
+              <Shield className="w-4 h-4 text-neon" />
               <span className="text-xs text-muted-foreground">
                 VeriNews — Verificación Crítico-Pluralista
               </span>
             </div>
             <p className="text-xs text-muted-foreground text-center">
-              Enfoque que visibiliza sesgos, omisiones y voces silenciadas por las narrativas hegemónicas
+              Visibiliza sesgos, omisiones y voces silenciadas por las narrativas hegemónicas
             </p>
           </div>
         </div>
