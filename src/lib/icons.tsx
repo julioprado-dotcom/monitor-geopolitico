@@ -449,6 +449,68 @@ export function Clock({ className, size = 24 }: IconProps) {
   );
 }
 
+// ─── Collapsible sections ──────────────────────────────────
+
+export function ChevronDown({ className, size = 24 }: IconProps) {
+  return (
+    <svg
+      {...iconDefaults}
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      className={className}
+    >
+      <path d="m6 9 6 6 6-6" />
+    </svg>
+  );
+}
+
+export function MapPin({ className, size = 24 }: IconProps) {
+  return (
+    <svg
+      {...iconDefaults}
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      className={className}
+    >
+      <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+      <circle cx="12" cy="10" r="3" />
+    </svg>
+  );
+}
+
+export function Tag({ className, size = 24 }: IconProps) {
+  return (
+    <svg
+      {...iconDefaults}
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      className={className}
+    >
+      <path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z" />
+      <path d="M7 7h.01" />
+    </svg>
+  );
+}
+
+export function Layers({ className, size = 24 }: IconProps) {
+  return (
+    <svg
+      {...iconDefaults}
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      className={className}
+    >
+      <path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z" />
+      <path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65" />
+      <path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65" />
+    </svg>
+  );
+}
+
 // ─── toast.tsx ──────────────────────────────────────────────
 
 export function X({ className, size = 24 }: IconProps) {
