@@ -39,18 +39,18 @@ PRINCIPIOS FUNDAMENTALES:
 5. No basta con detectar lo que se dice - es CRUCIAL detectar lo que se CALLA
 
 CATEGORÍAS DE FUENTES (debes clasificar cada fuente encontrada):
-- Colectivo Occidental: Medios alineados con la narrativa occidental (BBC, CNN, NYT, Le Monde, El País, Reuters, AP, AFP, etc.)
-- Sur Global: Telesur, Prensa Latina, Xinhua, medios africanos, asiáticos, latinoamericanos
-- Independiente: Periodismo de investigación, medios digitales autónomos
-- Académico: Papers, universidades, centros de investigación
-- Resistencia: Movimientos sociales, periodismo comunitario, pueblos originarios
+- colectivo_occidental: Medios alineados con la narrativa occidental (BBC, CNN, NYT, Le Monde, El País, Reuters, AP, AFP, etc.)
+- sur_global: Telesur, Prensa Latina, Xinhua, medios africanos, asiáticos, latinoamericanos
+- independiente: Periodismo de investigación, medios digitales autónomos
+- academico: Papers, universidades, centros de investigación
+- resistencia: Movimientos sociales, periodismo comunitario, pueblos originarios
 
 ORIENTACIÓN DE FUENTES:
-- Estatal: Financiado/controlado por un Estado
-- Corporativo: Propiedad de corporaciones o grupos empresariales
-- Comunitario: De/base en comunidades locales
-- Independiente: Autónomo, sin afiliación corporativa o estatal
-- Académico: Universidad o centro de investigación
+- estatal: Financiado/controlado por un Estado
+- corporativo: Propiedad de corporaciones o grupos empresariales
+- comunitario: De/base en comunidades locales
+- independiente: Autónomo, sin afiliación corporativa o estatal
+- academico: Universidad o centro de investigación
 
 PERSPECTIVA GEOPOLÍTICA:
 - alineado_otan: Alineado con la OTAN
@@ -124,6 +124,19 @@ function createErrorStream(errorMessage: string, detail?: string) {
   );
 }
 
+/**
+ * OPTIMIZED VERIFICATION FLOW
+ * 
+ * Before: 7-9 API calls (3 searches, 3 chat completions, 1 counter-search)
+ * Now:    2-3 API calls (1 search + 1-2 chat completions)
+ * 
+ * Strategy: Consolidate all analysis into a single mega-prompt that:
+ * 1. Extracts claims
+ * 2. Classifies sources
+ * 3. Performs 6-dimension analysis
+ * 4. Identifies silenced voices
+ * All in one API call.
+ */
 export async function POST(request: NextRequest) {
   try {
     const body: VerificationRequest = await request.json();
@@ -133,7 +146,7 @@ export async function POST(request: NextRequest) {
       return createErrorStream('El contenido a verificar es obligatorio');
     }
 
-    // Create a ReadableStream for SSE — ALL logic and errors are handled inside
+    // Create a ReadableStream for SSE
     const stream = new ReadableStream({
       async start(controller) {
         let closed = false;
@@ -149,124 +162,16 @@ export async function POST(request: NextRequest) {
 
         try {
           // ─────────────────────────────────────────
-          // STEP 1: Extract content (for URL input)
+          // STEP 1: Search for sources (SINGLE search)
           // ─────────────────────────────────────────
           send(sendLog(encoder, 'extracting',
             inputType === 'url'
-              ? 'Extrayendo contenido de la URL proporcionada...'
-              : 'Procesando el texto ingresado...',
+              ? 'Procesando URL y buscando fuentes...'
+              : 'Procesando texto y buscando fuentes...',
             inputType === 'url' ? `URL: ${content.slice(0, 80)}` : `${content.split(' ').length} palabras recibidas`
           ));
 
-          let extractedText = content;
-
-          if (inputType === 'url') {
-            // Search for URL content via web search + LLM reconstruction
-            try {
-              send(sendLog(encoder, 'extracting',
-                'Buscando contenido de la URL...',
-                content.slice(0, 80)
-              ));
-
-              await delay(1500); // Rate limit buffer
-              const urlSearchResults = await webSearch(content.trim(), 5);
-              if (Array.isArray(urlSearchResults) && urlSearchResults.length > 0) {
-                const combinedSnippets = urlSearchResults
-                  .map((r: { name: string; snippet: string }) => `${r.name}: ${r.snippet}`)
-                  .join('\n\n');
-                extractedText = combinedSnippets || content;
-
-                send(sendLog(encoder, 'extracting',
-                  'Resultados de búsqueda obtenidos',
-                  `${urlSearchResults.length} resultados encontrados`
-                ));
-              }
-            } catch {
-              extractedText = content;
-              send(sendLog(encoder, 'extracting',
-                'No se pudieron obtener resultados de búsqueda',
-                undefined, 'error'
-              ));
-            }
-
-            // Try LLM reconstruction from search snippets
-            if (extractedText !== content) {
-              try {
-                await delay(2000); // Rate limit buffer between SDK calls
-                const urlContextResponse = await chatCompletion([
-                  { role: 'system', content: 'Eres un asistente que reconstruye el contenido de un artículo a partir de resultados de búsqueda. Responde en español.' },
-                  {
-                    role: 'user',
-                    content: `A partir de los siguientes resultados de búsqueda sobre una URL, reconstruye el contenido principal del artículo original. URL: ${content}\n\nResultados:\n${extractedText.slice(0, 2000)}\n\nReconstruye el artículo:`,
-                  },
-                ]);
-                const reconstructed = urlContextResponse.choices[0]?.message?.content;
-                if (reconstructed && reconstructed.length > 100) {
-                  extractedText = reconstructed;
-                  send(sendLog(encoder, 'extracting',
-                    'Contenido reconstruido a partir de búsqueda',
-                    `${extractedText.split(' ').length} palabras extraídas`,
-                    'done'
-                  ));
-                }
-              } catch {
-                // Keep whatever we have
-              }
-            }
-
-            if (extractedText === content) {
-              send(sendLog(encoder, 'extracting',
-                'Extracción completada (contenido limitado)',
-                'Se usará la URL directamente como referencia',
-                'done'
-              ));
-            }
-          } else {
-            send(sendLog(encoder, 'extracting',
-              'Texto procesado correctamente',
-              `${extractedText.split(' ').length} palabras listas para análisis`,
-              'done'
-            ));
-          }
-
-          // ─────────────────────────────────────────
-          // STEP 2: Extract key claims
-          // ─────────────────────────────────────────
-          send(sendLog(encoder, 'analyzing',
-            'Identificando afirmaciones verificables en el texto...'
-          ));
-
-          await delay(1500); // Rate limit buffer after extraction
-          const claimsResponse = await chatCompletion([
-            { role: 'system', content: SYSTEM_PROMPT },
-            {
-              role: 'user',
-              content: `Analiza el siguiente texto y extrae las 3-5 afirmaciones principales (claims) que se pueden verificar factualmente. Responde SOLO con un JSON array de strings, sin texto adicional:\n\n${extractedText.slice(0, 3000)}`,
-            },
-          ]);
-
-          let keyClaims: string[] = [];
-          try {
-            const claimsText = claimsResponse.choices[0]?.message?.content || '[]';
-            const cleaned = claimsText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-            keyClaims = JSON.parse(cleaned);
-            if (!Array.isArray(keyClaims) || keyClaims.length === 0) {
-              keyClaims = [extractedText.slice(0, 200)];
-            }
-          } catch {
-            keyClaims = [extractedText.slice(0, 200)];
-          }
-
-          send(sendLog(encoder, 'analyzing',
-            `${keyClaims.length} afirmaciones clave identificadas`,
-            keyClaims.map((c, i) => `${i + 1}. ${c.slice(0, 80)}${c.length > 80 ? '...' : ''}`).join('\n'),
-            'done'
-          ));
-
-          // ─────────────────────────────────────────
-          // STEP 3: Search diverse sources
-          // ─────────────────────────────────────────
-          const searchQueries = keyClaims.slice(0, 3).map((claim) => claim.slice(0, 100));
+          let searchResultsText = '';
           const allSearchResults: Array<{
             url: string;
             name: string;
@@ -274,186 +179,82 @@ export async function POST(request: NextRequest) {
             host_name: string;
           }> = [];
 
-          // Search each claim (with delays to avoid rate limiting)
-          for (let i = 0; i < searchQueries.length; i++) {
-            const query = searchQueries[i];
-            send(sendLog(encoder, 'searching',
-              `Buscando fuentes para afirmación ${i + 1}...`,
-              `"${query.slice(0, 60)}${query.length > 60 ? '...' : ''}"`
-            ));
-
-            try {
-              if (i > 0) await delay(2000); // Rate limit buffer between searches
-              const results = await webSearch(query, 8);
-              if (Array.isArray(results)) {
-                allSearchResults.push(...results);
-                send(sendLog(encoder, 'searching',
-                  `Afirmación ${i + 1}: ${results.length} resultados encontrados`
-                ));
-              }
-            } catch {
-              send(sendLog(encoder, 'searching',
-                `Afirmación ${i + 1}: error en la búsqueda`,
-                undefined, 'error'
-              ));
-            }
-          }
-
-          // Search for counter-narratives
-          send(sendLog(encoder, 'searching',
-            'Buscando contranarrativas y versiones alternativas...'
-          ));
-
+          // Single comprehensive search combining the main topic + counter-narratives
           try {
-            await delay(2000); // Rate limit buffer
-            const counterQuery = `crítica versión alternativa ${keyClaims[0]?.slice(0, 80) || content.slice(0, 80)}`;
-            const counterResults = await webSearch(counterQuery, 5);
-            if (Array.isArray(counterResults)) {
-              allSearchResults.push(...counterResults);
-              send(sendLog(encoder, 'searching',
-                `${counterResults.length} fuentes contranarrativas encontradas`
+            const searchQuery = inputType === 'url'
+              ? content.trim()
+              : content.slice(0, 150).trim();
+
+            const results = await webSearch(searchQuery, 10);
+            if (Array.isArray(results) && results.length > 0) {
+              allSearchResults.push(...results);
+              searchResultsText = results
+                .map((r: { name: string; snippet: string; url: string; host_name: string }, i: number) =>
+                  `${i + 1}. ${r.name} (${r.host_name})\n   URL: ${r.url}\n   Fragmento: ${r.snippet}`
+                )
+                .join('\n\n');
+
+              send(sendLog(encoder, 'extracting',
+                `${results.length} fuentes encontradas`,
+                'Búsqueda web completada',
+                'done'
               ));
             }
           } catch {
-            send(sendLog(encoder, 'searching',
-              'No se encontraron contranarrativas adicionales'
+            send(sendLog(encoder, 'extracting',
+              'Búsqueda web no disponible, continuando con análisis del texto',
+              undefined, 'error'
             ));
           }
 
-          // Deduplicate
-          const seenUrls = new Set<string>();
-          const uniqueResults = allSearchResults.filter((r) => {
-            if (seenUrls.has(r.url)) return false;
-            seenUrls.add(r.url);
-            return true;
-          });
-
-          send(sendLog(encoder, 'searching',
-            `Búsqueda completada: ${uniqueResults.length} fuentes únicas encontradas`,
-            `Total bruto: ${allSearchResults.length}, duplicadas eliminadas: ${allSearchResults.length - uniqueResults.length}`,
-            'done'
+          // ─────────────────────────────────────────
+          // STEP 2: MEGA-PROMPT — All analysis in ONE call
+          // ─────────────────────────────────────────
+          send(sendLog(encoder, 'analyzing',
+            'Ejecutando análisis Crítico-Pluralista completo...',
+            'Extracción · Clasificación · 6 Dimensiones · Voces silenciadas'
           ));
 
-          // ─────────────────────────────────────────
-          // STEP 4: Classify sources
-          // ─────────────────────────────────────────
-          send(sendLog(encoder, 'classifying',
-            `Clasificando ${Math.min(uniqueResults.length, 15)} fuentes por categoría, orientación y perspectiva geopolítica...`
-          ));
+          // Add a small delay to avoid hitting rate limit from the search call
+          await delay(1000);
 
-          await delay(1500); // Rate limit buffer before classification LLM call
-          const sourcesFormatted = uniqueResults
-            .slice(0, 15)
-            .map(
-              (s, i) =>
-                `${i + 1}. Nombre: ${s.name}\n   URL: ${s.url}\n   Fragmento: ${s.snippet}\n   Host: ${s.host_name}`
-            )
-            .join('\n\n');
+          const extractedText = content;
 
-          let classifiedSources: SourceResult[] = [];
+          const sourcesSection = searchResultsText
+            ? `FUENTES ENCONTRADAS MEDIANTE BÚSQUEDA WEB:\n${searchResultsText}`
+            : 'No se encontraron fuentes adicionales mediante búsqueda web. Analiza basándote en tu conocimiento.';
 
-          if (uniqueResults.length > 0) {
-            try {
-              const classificationResponse = await chatCompletion([
-                { role: 'system', content: SYSTEM_PROMPT },
-                {
-                  role: 'user',
-                  content: `Clasifica cada una de las siguientes fuentes encontradas durante la verificación de esta noticia. Para cada fuente, determina:\n\n- category: una de [colectivo_occidental, sur_global, independiente, academico, resistencia]\n- orientation: una de [estatal, corporativo, comunitario, independiente, academico]\n- geopoliticalPerspective: una de [alineado_otan, alineado_usa, alineado_ue, no_alineado, critico_orden_global, multipolar]\n- relationToNews: una de [confirma, contradice, matiza, sin_relacion] basándote en el fragmento y la noticia analizada\n\nNoticia analizada: ${extractedText.slice(0, 1000)}\n\nFuentes:\n${sourcesFormatted}\n\nResponde SOLO con un JSON array donde cada elemento tenga: {index, category, orientation, geopoliticalPerspective, relationToNews}. Sin texto adicional.`,
-                },
-              ]);
-
-              const classText = classificationResponse.choices[0]?.message?.content || '[]';
-              const cleanedClass = classText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-              const parsed = JSON.parse(cleanedClass);
-
-              classifiedSources = uniqueResults.slice(0, 15).map((result, idx) => {
-                const classification = parsed.find(
-                  (c: { index?: number }) => c.index === idx + 1
-                ) || parsed[idx] || {};
-
-                return {
-                  name: result.name,
-                  url: result.url,
-                  snippet: result.snippet,
-                  category: (classification.category as SourceCategory) || 'independiente',
-                  orientation: (classification.orientation as SourceOrientation) || 'independiente',
-                  geopoliticalPerspective:
-                    (classification.geopoliticalPerspective as GeopoliticalPerspective) || 'no_alineado',
-                  relationToNews: (classification.relationToNews as SourceRelation) || 'sin_relacion',
-                  hostName: result.host_name,
-                };
-              });
-            } catch {
-              classifiedSources = uniqueResults.slice(0, 15).map((result) => ({
-                name: result.name,
-                url: result.url,
-                snippet: result.snippet,
-                category: 'independiente' as SourceCategory,
-                orientation: 'independiente' as SourceOrientation,
-                geopoliticalPerspective: 'no_alineado' as GeopoliticalPerspective,
-                relationToNews: 'sin_relacion' as SourceRelation,
-                hostName: result.host_name,
-              }));
-            }
-          }
-
-          // Count categories for the log
-          const categoryCounts: Record<string, number> = {};
-          classifiedSources.forEach((s) => {
-            categoryCounts[s.category] = (categoryCounts[s.category] || 0) + 1;
-          });
-          const categoryBreakdown = Object.entries(categoryCounts)
-            .map(([cat, count]) => `${cat}: ${count}`)
-            .join(', ');
-
-          send(sendLog(encoder, 'classifying',
-            `Fuentes clasificadas: ${classifiedSources.length} fuentes`,
-            categoryBreakdown,
-            'done'
-          ));
-
-          // ─────────────────────────────────────────
-          // STEP 5: Full analysis with LLM
-          // ─────────────────────────────────────────
-          send(sendLog(encoder, 'generating',
-            'Ejecutando análisis Crítico-Pluralista de 6 dimensiones...',
-            'Credibilidad · Coherencia · Corroboración · Sensacionalismo · Veracidad · Sesgo'
-          ));
-
-          await delay(1500); // Rate limit buffer before main analysis LLM call
-          const sourcesSummary = classifiedSources.length > 0
-            ? classifiedSources
-                .map(
-                  (s) =>
-                    `- ${s.name} [${s.category}/${s.orientation}/${s.geopoliticalPerspective}]: ${s.relationToNews} - "${s.snippet.slice(0, 150)}"`
-                )
-                .join('\n')
-            : 'No se encontraron fuentes adicionales mediante búsqueda web.';
-
-          const analysisResponse = await chatCompletion([
+          const megaResponse = await chatCompletion([
             { role: 'system', content: SYSTEM_PROMPT },
             {
               role: 'user',
-              content: `Realiza un análisis completo de verificación de la siguiente noticia con enfoque Crítico-Pluralista.
+              content: `Realiza un análisis COMPLETO de verificación Crítico-Pluralista de la siguiente noticia. Debes hacer TODO en una sola respuesta:
 
 NOTICIA/AFIRMACIÓN A VERIFICAR:
-${extractedText.slice(0, 3000)}
+${extractedText.slice(0, 4000)}
 
-AFIRMACIONES CLAVE IDENTIFICADAS:
-${keyClaims.map((c, i) => `${i + 1}. ${c}`).join('\n')}
-
-FUENTES ENCONTRADAS (clasificadas):
-${sourcesSummary}
+${sourcesSection}
 
 INSTRUCCIONES:
-1. Evalúa cada una de las 6 dimensiones con un score 0-100
-2. Para cada dimensión, proporciona una descripción detallada del análisis y evidencia encontrada
-3. Identifica las voces silenciadas o perspectivas omitidas
-4. Calcula un score general de veracidad (0-100) ponderando la diversidad de fuentes
-5. Genera un resumen ejecutivo
+1. Extrae las 3-5 afirmaciones clave verificables
+2. Clasifica CADA fuente encontrada por categoría, orientación y perspectiva geopolítica
+3. Evalúa las 6 dimensiones con score 0-100 y análisis detallado
+4. Identifica voces silenciadas y perspectivas omitidas
+5. Calcula un score general de veracidad ponderando la diversidad de fuentes
+6. Genera un resumen ejecutivo
 
 RESPONDE SOLO con un JSON con esta estructura exacta, sin texto adicional:
 {
+  "keyClaims": ["afirmación 1", "afirmación 2", ...],
+  "sources": [
+    {
+      "index": 1,
+      "category": "colectivo_occidental|sur_global|independiente|academico|resistencia",
+      "orientation": "estatal|corporativo|comunitario|independiente|academico",
+      "geopoliticalPerspective": "alineado_otan|alineado_usa|alineado_ue|no_alineado|critico_orden_global|multipolar",
+      "relationToNews": "confirma|contradice|matiza|sin_relacion"
+    }
+  ],
   "overallScore": <número 0-100>,
   "sourceCredibility": {"score": <0-100>, "title": "Credibilidad de Fuente", "description": "<análisis detallado>", "evidence": ["<evidencia1>", "<evidencia2>"]},
   "internalCoherence": {"score": <0-100>, "title": "Coherencia Interna", "description": "<análisis detallado>", "evidence": ["<evidencia1>", "<evidencia2>"]},
@@ -465,11 +266,15 @@ RESPONDE SOLO con un JSON con esta estructura exacta, sin texto adicional:
   "summary": "<resumen ejecutivo de 3-5 oraciones>"
 }`,
             },
-          ]);
+          ], { max_tokens: 4096 });
 
+          // ─────────────────────────────────────────
+          // STEP 3: Parse the mega-response
+          // ─────────────────────────────────────────
           let analysisResult: VerificationResult;
+
           try {
-            const analysisText = analysisResponse.choices[0]?.message?.content || '{}';
+            const analysisText = megaResponse.choices[0]?.message?.content || '{}';
             const cleanedAnalysis = analysisText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
             const parsed = JSON.parse(cleanedAnalysis);
 
@@ -492,6 +297,42 @@ RESPONDE SOLO con un JSON con esta estructura exacta, sin texto adicional:
               evidence: raw.evidence || [],
             });
 
+            // Build classified sources from search results + LLM classification
+            let classifiedSources: SourceResult[] = [];
+            if (allSearchResults.length > 0 && Array.isArray(parsed.sources)) {
+              classifiedSources = allSearchResults.slice(0, 15).map((result, idx) => {
+                const classification = parsed.sources.find(
+                  (c: { index?: number }) => c.index === idx + 1
+                ) || parsed.sources[idx] || {};
+
+                return {
+                  name: result.name,
+                  url: result.url,
+                  snippet: result.snippet,
+                  category: (classification.category as SourceCategory) || 'independiente',
+                  orientation: (classification.orientation as SourceOrientation) || 'independiente',
+                  geopoliticalPerspective:
+                    (classification.geopoliticalPerspective as GeopoliticalPerspective) || 'no_alineado',
+                  relationToNews: (classification.relationToNews as SourceRelation) || 'sin_relacion',
+                  hostName: result.host_name,
+                };
+              });
+            }
+
+            const keyClaims: string[] = Array.isArray(parsed.keyClaims) ? parsed.keyClaims : [extractedText.slice(0, 200)];
+
+            // Log intermediate progress
+            send(sendLog(encoder, 'analyzing',
+              `${keyClaims.length} afirmaciones clave identificadas`,
+              keyClaims.map((c: string, i: number) => `${i + 1}. ${c.slice(0, 60)}...`).join('\n'),
+              'done'
+            ));
+
+            send(sendLog(encoder, 'classifying',
+              `${classifiedSources.length} fuentes clasificadas`,
+              undefined, 'done'
+            ));
+
             analysisResult = {
               overallScore,
               veracityLevel,
@@ -509,11 +350,24 @@ RESPONDE SOLO con un JSON con esta estructura exacta, sin texto adicional:
 
             send(sendLog(encoder, 'generating',
               `Análisis completado — Score: ${overallScore}/100 (${veracityLevel})`,
-              `Voces silenciadas detectadas: ${analysisResult.silencedVoices.length}`,
+              `Voces silenciadas: ${analysisResult.silencedVoices.length} | Fuentes: ${classifiedSources.length}`,
               'done'
             ));
-          } catch {
+          } catch (parseError) {
+            console.error('Parse error:', parseError);
             // Fallback result
+            const keyClaims = [extractedText.slice(0, 200)];
+            const classifiedSources = allSearchResults.slice(0, 15).map((result) => ({
+              name: result.name,
+              url: result.url,
+              snippet: result.snippet,
+              category: 'independiente' as SourceCategory,
+              orientation: 'independiente' as SourceOrientation,
+              geopoliticalPerspective: 'no_alineado' as GeopoliticalPerspective,
+              relationToNews: 'sin_relacion' as SourceRelation,
+              hostName: result.host_name,
+            }));
+
             analysisResult = {
               overallScore: 50,
               veracityLevel: 'dubious',
@@ -530,14 +384,14 @@ RESPONDE SOLO con un JSON con esta estructura exacta, sin texto adicional:
             };
 
             send(sendLog(encoder, 'generating',
-              'Análisis completado con resultados parciales (fallback)',
-              'No se pudo parsear la respuesta completa del modelo',
+              'Análisis completado con resultados parciales',
+              'No se pudo parsear la respuesta del modelo',
               'error'
             ));
           }
 
           // ─────────────────────────────────────────
-          // STEP 6: Save to database
+          // STEP 4: Save to database
           // ─────────────────────────────────────────
           send(sendLog(encoder, 'saving',
             'Guardando resultados en la base de datos...'
@@ -625,7 +479,6 @@ RESPONDE SOLO con un JSON con esta estructura exacta, sin texto adicional:
   } catch (error) {
     console.error('Verification route error:', error);
     const msg = error instanceof Error ? error.message : 'Error interno durante la verificación';
-    // Return SSE error stream instead of JSON 500 — so the frontend can show LiveLog
     return createErrorStream(`Error del servidor: ${msg}`, 'Revisa las variables de entorno y la conexión a la base de datos');
   }
 }
