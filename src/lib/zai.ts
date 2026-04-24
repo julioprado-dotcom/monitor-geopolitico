@@ -13,7 +13,7 @@
  */
 
 const DEFAULT_BASE_URL = 'https://api.z.ai/api/paas/v4';
-const DEFAULT_MODEL = 'glm-4-flash';
+const DEFAULT_MODEL = 'glm-4.7-flash';
 
 function getBaseUrl(): string {
   return process.env.ZAI_BASE_URL || DEFAULT_BASE_URL;
