@@ -287,6 +287,15 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
+      {/* Top bar — tagline */}
+      <div className="bg-neon/10 border-b border-neon/20">
+        <div className="max-w-7xl mx-auto px-4 py-1.5 text-center">
+          <p className="text-xs text-neon font-medium tracking-wide">
+            Visibiliza sesgos, omisiones y voces silenciadas por las narrativas hegemónicas
+          </p>
+        </div>
+      </div>
+
       {/* Header */}
       <header className="border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -302,17 +311,32 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            {/* Theme toggle */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="gap-2 text-muted-foreground"
+          <div className="flex items-center gap-1">
+            {/* Theme toggle — prominent */}
+            <button
+              type="button"
               onClick={toggleTheme}
+              className="relative w-14 h-7 rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-neon/50"
+              style={{
+                background: isDark
+                  ? 'linear-gradient(135deg, #1e1b4b, #312e81)'
+                  : 'linear-gradient(135deg, #fbbf24, #f59e0b)',
+              }}
+              aria-label={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
             >
-              {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-              <span className="hidden sm:inline">{isDark ? 'Claro' : 'Oscuro'}</span>
-            </Button>
+              <span
+                className="absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-md transition-transform duration-300 flex items-center justify-center"
+                style={{
+                  transform: isDark ? 'translateX(0)' : 'translateX(28px)',
+                }}
+              >
+                {isDark ? (
+                  <Moon className="w-3.5 h-3.5 text-indigo-700" />
+                ) : (
+                  <Sun className="w-3.5 h-3.5 text-amber-500" />
+                )}
+              </span>
+            </button>
 
             <Button
               variant="ghost"
@@ -761,16 +785,22 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="border-t border-border bg-card/50 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div className="max-w-7xl mx-auto px-4 py-5">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <Shield className="w-4 h-4 text-neon" />
-              <span className="text-xs text-muted-foreground">
+              <span className="text-xs text-muted-foreground font-medium">
                 VeriNews — Verificación Crítico-Pluralista
               </span>
             </div>
-            <p className="text-xs text-muted-foreground text-center">
-              Visibiliza sesgos, omisiones y voces silenciadas por las narrativas hegemónicas
+            <p className="text-xs text-muted-foreground text-center max-w-lg">
+              Análisis desde 6 dimensiones con fuentes del Colectivo Occidental, Sur Global, independientes, académicos y de resistencia.
+              Detectamos lo que las narrativas hegemónicas omiten.
+            </p>
+          </div>
+          <div className="mt-3 pt-3 border-t border-border/30 text-center">
+            <p className="text-[10px] text-muted-foreground/60">
+              VeriNews no reemplaza el juicio crítico — lo amplifica. Las verificaciones son orientativas y deben complementarse con consulta directa a las fuentes.
             </p>
           </div>
         </div>
