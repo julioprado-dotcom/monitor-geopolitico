@@ -1,0 +1,378 @@
+diff --git a/edgeone.json b/edgeone.json
+index c9c5770..da51cca 100644
+--- a/edgeone.json
++++ b/edgeone.json
+@@ -1,5 +1,5 @@
+ {
+-  "buildCommand": "npx next build",
++  "buildCommand": "npx next build --webpack",
+   "outputDirectory": ".next",
+   "framework": "nextjs",
+   "installCommand": "bun install"
+diff --git a/next.config.ts b/next.config.ts
+index 2ecbcb2..b25c6f5 100644
+--- a/next.config.ts
++++ b/next.config.ts
+@@ -8,10 +8,9 @@ const nextConfig: NextConfig = {
+   images: {
+     unoptimized: true,
+   },
+-  serverExternalPackages: [
+-    '@libsql/client',
+-    'z-ai-web-dev-sdk',
+-  ],
++  // NOTE: Do NOT use serverExternalPackages — EdgeOne's serverless runtime
++  // cannot resolve externalized packages. Both @libsql/client and
++  // z-ai-web-dev-sdk must be bundled into the SSR function.
+ };
+ 
+ export default nextConfig;
+diff --git a/src/app/page.tsx b/src/app/page.tsx
+index 2c39474..19714ee 100644
+--- a/src/app/page.tsx
++++ b/src/app/page.tsx
+@@ -23,12 +23,25 @@ import {
+   FileText,
+   Moon,
+   Sun,
++  ChevronDown,
++  MapPin,
++  Tag,
++  Layers,
+ } from '@/lib/icons';
+ import type {
+   InputType,
+   VerificationResult,
+   AnalysisStage,
+   LogEntry,
++  SourceCategory,
++  GeopoliticalPerspective,
++  SourceOrientation,
++} from '@/lib/types';
++import {
++  SOURCE_CATEGORY_LABELS,
++  SOURCE_CATEGORY_ICONS,
++  GEOPOLITICAL_LABELS,
++  ORIENTATION_LABELS,
+ } from '@/lib/types';
+ 
+ export default function Home() {
+@@ -40,6 +53,11 @@ export default function Home() {
+   const [activeSourceFilter, setActiveSourceFilter] = useState<string>('all');
+   const [logs, setLogs] = useState<LogEntry[]>([]);
+   const [isDark, setIsDark] = useState(true);
++  const [regionsOpen, setRegionsOpen] = useState(true);
++  const [classifiersOpen, setClassifiersOpen] = useState(true);
++  const [categoriesOpen, setCategoriesOpen] = useState(true);
++  const [activeGeopoliticalFilter, setActiveGeopoliticalFilter] = useState<string>('all');
++  const [activeOrientationFilter, setActiveOrientationFilter] = useState<string>('all');
+ 
+   // Initialize dark mode
+   useEffect(() => {
+@@ -247,10 +265,25 @@ export default function Home() {
+     }
+   };
+ 
+-  const filteredSources =
+-    activeSourceFilter === 'all'
+-      ? result?.sourcesFound || []
+-      : result?.sourcesFound.filter((s) => s.category === activeSourceFilter) || [];
++  const filteredSources = (() => {
++    if (!result?.sourcesFound) return [];
++    let sources = result.sourcesFound;
++
++    // Filter by source category
++    if (activeSourceFilter !== 'all') {
++      sources = sources.filter((s) => s.category === activeSourceFilter);
++    }
++    // Filter by geopolitical perspective
++    if (activeGeopoliticalFilter !== 'all') {
++      sources = sources.filter((s) => s.geopoliticalPerspective === activeGeopoliticalFilter);
++    }
++    // Filter by orientation
++    if (activeOrientationFilter !== 'all') {
++      sources = sources.filter((s) => s.orientation === activeOrientationFilter);
++    }
++
++    return sources;
++  })();
+ 
+   return (
+     <div className="min-h-screen flex flex-col bg-background text-foreground">
+@@ -512,50 +545,202 @@ export default function Home() {
+                 {/* Source Summary */}
+                 <SourceSummary sources={result.sourcesFound} />
+ 
+-                {/* Filter tabs */}
+-                <div className="flex flex-wrap gap-2">
+-                  <Button
+-                    variant={activeSourceFilter === 'all' ? 'default' : 'outline'}
+-                    size="sm"
+-                    onClick={() => setActiveSourceFilter('all')}
+-                    className={activeSourceFilter === 'all' ? 'bg-neon text-deep hover:bg-neon/90' : ''}
++                {/* Collapsible: Categorías de Fuente */}
++                <div className="border border-border/50 rounded-xl overflow-hidden">
++                  <button
++                    type="button"
++                    className="w-full flex items-center justify-between px-4 py-3 bg-card hover:bg-muted/30 transition-colors"
++                    onClick={() => setCategoriesOpen(!categoriesOpen)}
+                   >
+-                    Todas ({result.sourcesFound.length})
+-                  </Button>
+-                  {['colectivo_occidental', 'sur_global', 'independiente', 'academico', 'resistencia'].map(
+-                    (cat) => {
+-                      const count = result.sourcesFound.filter(
+-                        (s) => s.category === cat
+-                      ).length;
+-                      if (count === 0) return null;
+-                      return (
+-                        <Button
+-                          key={cat}
+-                          variant={activeSourceFilter === cat ? 'default' : 'outline'}
+-                          size="sm"
+-                          onClick={() => setActiveSourceFilter(cat)}
+-                          className={
+-                            activeSourceFilter === cat
+-                              ? 'bg-neon text-deep hover:bg-neon/90'
+-                              : ''
+-                          }
+-                        >
+-                          {cat === 'colectivo_occidental'
+-                            ? '🏛️ Colectivo Occ.'
+-                            : cat === 'sur_global'
+-                            ? '🌎 Sur Global'
+-                            : cat === 'independiente'
+-                            ? '🔍 Independiente'
+-                            : cat === 'academico'
+-                            ? '🎓 Académico'
+-                            : '✊ Resistencia'}{' '}
+-                          ({count})
+-                        </Button>
+-                      );
+-                    }
++                    <div className="flex items-center gap-2">
++                      <Layers className="w-4 h-4 text-neon" />
++                      <span className="font-medium text-sm">Categorías de Fuente</span>
++                      {activeSourceFilter !== 'all' && (
++                        <Badge variant="secondary" className="text-xs px-1.5">
++                          1 activo
++                        </Badge>
++                      )}
++                    </div>
++                    <ChevronDown
++                      className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${
++                        categoriesOpen ? 'rotate-180' : ''
++                      }`}
++                    />
++                  </button>
++                  {categoriesOpen && (
++                    <div className="px-4 pb-3 pt-2 flex flex-wrap gap-2 border-t border-border/30">
++                      <Button
++                        variant={activeSourceFilter === 'all' ? 'default' : 'outline'}
++                        size="sm"
++                        onClick={() => setActiveSourceFilter('all')}
++                        className={activeSourceFilter === 'all' ? 'bg-neon text-deep hover:bg-neon/90' : ''}
++                      >
++                        Todas ({result.sourcesFound.length})
++                      </Button>
++                      {(['colectivo_occidental', 'sur_global', 'independiente', 'academico', 'resistencia'] as SourceCategory[]).map(
++                        (cat) => {
++                          const count = result.sourcesFound.filter(
++                            (s) => s.category === cat
++                          ).length;
++                          if (count === 0) return null;
++                          return (
++                            <Button
++                              key={cat}
++                              variant={activeSourceFilter === cat ? 'default' : 'outline'}
++                              size="sm"
++                              onClick={() => setActiveSourceFilter(cat)}
++                              className={
++                                activeSourceFilter === cat
++                                  ? 'bg-neon text-deep hover:bg-neon/90'
++                                  : ''
++                              }
++                            >
++                              {SOURCE_CATEGORY_ICONS[cat]} {SOURCE_CATEGORY_LABELS[cat]} ({count})
++                            </Button>
++                          );
++                        }
++                      )}
++                    </div>
+                   )}
+                 </div>
+ 
++                {/* Collapsible: Perspectiva Geopolítica (Regiones) */}
++                <div className="border border-border/50 rounded-xl overflow-hidden">
++                  <button
++                    type="button"
++                    className="w-full flex items-center justify-between px-4 py-3 bg-card hover:bg-muted/30 transition-colors"
++                    onClick={() => setRegionsOpen(!regionsOpen)}
++                  >
++                    <div className="flex items-center gap-2">
++                      <MapPin className="w-4 h-4 text-analysis" />
++                      <span className="font-medium text-sm">Regiones / Perspectiva Geopolítica</span>
++                      {activeGeopoliticalFilter !== 'all' && (
++                        <Badge variant="secondary" className="text-xs px-1.5">
++                          1 activo
++                        </Badge>
++                      )}
++                    </div>
++                    <ChevronDown
++                      className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${
++                        regionsOpen ? 'rotate-180' : ''
++                      }`}
++                    />
++                  </button>
++                  {regionsOpen && (
++                    <div className="px-4 pb-3 pt-2 flex flex-wrap gap-2 border-t border-border/30">
++                      <Button
++                        variant={activeGeopoliticalFilter === 'all' ? 'default' : 'outline'}
++                        size="sm"
++                        onClick={() => setActiveGeopoliticalFilter('all')}
++                        className={activeGeopoliticalFilter === 'all' ? 'bg-analysis text-white hover:bg-analysis/90' : ''}
++                      >
++                        Todas
++                      </Button>
++                      {(['alineado_otan', 'alineado_usa', 'alineado_ue', 'no_alineado', 'critico_orden_global', 'multipolar'] as GeopoliticalPerspective[]).map(
++                        (persp) => {
++                          const count = result.sourcesFound.filter(
++                            (s) => s.geopoliticalPerspective === persp
++                          ).length;
++                          if (count === 0) return null;
++                          return (
++                            <Button
++                              key={persp}
++                              variant={activeGeopoliticalFilter === persp ? 'default' : 'outline'}
++                              size="sm"
++                              onClick={() => setActiveGeopoliticalFilter(persp)}
++                              className={
++                                activeGeopoliticalFilter === persp
++                                  ? 'bg-analysis text-white hover:bg-analysis/90'
++                                  : ''
++                              }
++                            >
++                              {GEOPOLITICAL_LABELS[persp]} ({count})
++                            </Button>
++                          );
++                        }
++                      )}
++                    </div>
++                  )}
++                </div>
++
++                {/* Collapsible: Clasificadores (Orientación) */}
++                <div className="border border-border/50 rounded-xl overflow-hidden">
++                  <button
++                    type="button"
++                    className="w-full flex items-center justify-between px-4 py-3 bg-card hover:bg-muted/30 transition-colors"
++                    onClick={() => setClassifiersOpen(!classifiersOpen)}
++                  >
++                    <div className="flex items-center gap-2">
++                      <Tag className="w-4 h-4 text-trend" />
++                      <span className="font-medium text-sm">Clasificadores / Orientación</span>
++                      {activeOrientationFilter !== 'all' && (
++                        <Badge variant="secondary" className="text-xs px-1.5">
++                          1 activo
++                        </Badge>
++                      )}
++                    </div>
++                    <ChevronDown
++                      className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${
++                        classifiersOpen ? 'rotate-180' : ''
++                      }`}
++                    />
++                  </button>
++                  {classifiersOpen && (
++                    <div className="px-4 pb-3 pt-2 flex flex-wrap gap-2 border-t border-border/30">
++                      <Button
++                        variant={activeOrientationFilter === 'all' ? 'default' : 'outline'}
++                        size="sm"
++                        onClick={() => setActiveOrientationFilter('all')}
++                        className={activeOrientationFilter === 'all' ? 'bg-trend text-white hover:bg-trend/90' : ''}
++                      >
++                        Todas
++                      </Button>
++                      {(['estatal', 'corporativo', 'comunitario', 'independiente', 'academico'] as SourceOrientation[]).map(
++                        (orient) => {
++                          const count = result.sourcesFound.filter(
++                            (s) => s.orientation === orient
++                          ).length;
++                          if (count === 0) return null;
++                          return (
++                            <Button
++                              key={orient}
++                              variant={activeOrientationFilter === orient ? 'default' : 'outline'}
++                              size="sm"
++                              onClick={() => setActiveOrientationFilter(orient)}
++                              className={
++                                activeOrientationFilter === orient
++                                  ? 'bg-trend text-white hover:bg-trend/90'
++                                  : ''
++                              }
++                            >
++                              {ORIENTATION_LABELS[orient]} ({count})
++                            </Button>
++                          );
++                        }
++                      )}
++                    </div>
++                  )}
++                </div>
++
++                {/* Active filters summary */}
++                {(activeSourceFilter !== 'all' || activeGeopoliticalFilter !== 'all' || activeOrientationFilter !== 'all') && (
++                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
++                    <span>Mostrando {filteredSources.length} de {result.sourcesFound.length} fuentes</span>
++                    <Button
++                      variant="ghost"
++                      size="sm"
++                      className="h-6 text-xs text-muted-foreground underline"
++                      onClick={() => {
++                        setActiveSourceFilter('all');
++                        setActiveGeopoliticalFilter('all');
++                        setActiveOrientationFilter('all');
++                      }}
++                    >
++                      Limpiar filtros
++                    </Button>
++                  </div>
++                )}
++
+                 {/* Source cards grid */}
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                   {filteredSources.map((source, idx) => (
+@@ -565,7 +750,7 @@ export default function Home() {
+ 
+                 {filteredSources.length === 0 && (
+                   <p className="text-center text-sm text-muted-foreground py-6">
+-                    No se encontraron fuentes en esta categoría
++                    No se encontraron fuentes con los filtros seleccionados
+                   </p>
+                 )}
+               </div>
+diff --git a/src/lib/db.ts b/src/lib/db.ts
+index 79b8da4..5e2e05c 100644
+--- a/src/lib/db.ts
++++ b/src/lib/db.ts
+@@ -1,11 +1,14 @@
+-import { createClient, type Client } from '@libsql/client'
++// Use /web explicitly — this is the pure JS/WASM implementation that works
++// on edge/serverless runtimes (EdgeOne, Cloudflare Workers, Vercel Edge, etc.)
++// and avoids Turbopack's auto-externalization of the default @libsql/client entry.
++import { createClient, type Client } from '@libsql/client/web'
+ 
+ const globalForDb = globalThis as unknown as {
+   db: Client | undefined
+ }
+ 
+ function createDbClient(): Client {
+-  // If TURSO_URL is set, use Turso (remote libSQL)
++  // If TURSO_URL is set, use Turso (remote libSQL over HTTP)
+   if (process.env.TURSO_DATABASE_URL) {
+     return createClient({
+       url: process.env.TURSO_DATABASE_URL,
+diff --git a/upload/pasted_image_1776990307966.png b/upload/pasted_image_1776990307966.png
+new file mode 100755
+index 0000000..f4a0a43
+Binary files /dev/null and b/upload/pasted_image_1776990307966.png differ
