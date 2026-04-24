@@ -1,9 +1,51 @@
 import ZAI from 'z-ai-web-dev-sdk';
+import { writeFileSync, mkdirSync, existsSync } from 'fs';
+import { join } from 'path';
 
 let zaiInstance: Awaited<ReturnType<typeof ZAI.create>> | null = null;
 
+/**
+ * Ensure .z-ai-config exists. On EdgeOne/production, we generate it
+ * from environment variables at runtime. On local dev, it may already
+ * exist in /etc/ or the project root.
+ */
+function ensureConfig() {
+  const cwdConfig = join(process.cwd(), '.z-ai-config');
+
+  // If config already exists, nothing to do
+  if (existsSync(cwdConfig)) return;
+
+  // Build config from environment variables
+  const baseUrl = process.env.ZAI_BASE_URL;
+  const apiKey = process.env.ZAI_API_KEY;
+
+  if (!baseUrl || !apiKey) {
+    console.warn(
+      '[z-ai] No .z-ai-config found and ZAI_BASE_URL/ZAI_API_KEY env vars not set. ' +
+      'The SDK will look for config in home dir or /etc/.'
+    );
+    return;
+  }
+
+  const config = {
+    baseUrl,
+    apiKey,
+    chatId: process.env.ZAI_CHAT_ID || '',
+    userId: process.env.ZAI_USER_ID || '',
+    token: process.env.ZAI_TOKEN || '',
+  };
+
+  try {
+    writeFileSync(cwdConfig, JSON.stringify(config), 'utf-8');
+    console.log('[z-ai] Generated .z-ai-config from environment variables');
+  } catch (err) {
+    console.error('[z-ai] Failed to write .z-ai-config:', err);
+  }
+}
+
 export async function getZAI() {
   if (!zaiInstance) {
+    ensureConfig();
     zaiInstance = await ZAI.create();
   }
   return zaiInstance;

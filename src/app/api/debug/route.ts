@@ -8,12 +8,17 @@ export async function GET() {
       TURSO_DATABASE_URL: process.env.TURSO_DATABASE_URL ? 'SET' : 'MISSING',
       TURSO_AUTH_TOKEN: process.env.TURSO_AUTH_TOKEN ? 'SET' : 'MISSING',
       DATABASE_URL: process.env.DATABASE_URL ? 'SET' : 'MISSING',
+      ZAI_BASE_URL: process.env.ZAI_BASE_URL ? 'SET' : 'MISSING',
+      ZAI_API_KEY: process.env.ZAI_API_KEY ? 'SET' : 'MISSING',
+      ZAI_CHAT_ID: process.env.ZAI_CHAT_ID ? 'SET' : 'MISSING',
+      ZAI_USER_ID: process.env.ZAI_USER_ID ? 'SET' : 'MISSING',
+      ZAI_TOKEN: process.env.ZAI_TOKEN ? 'SET' : 'MISSING',
     },
   };
 
   // Test 1: @libsql/client
   try {
-    const { createClient } = await import('@libsql/client');
+    const { createClient } = await import('@libsql/client/web');
     const url = process.env.TURSO_DATABASE_URL || process.env.DATABASE_URL || 'file:./test.db';
     const authToken = process.env.TURSO_AUTH_TOKEN;
 
@@ -31,8 +36,8 @@ export async function GET() {
 
   // Test 2: z-ai-web-dev-sdk
   try {
-    const ZAI = (await import('z-ai-web-dev-sdk')).default;
-    const zai = await ZAI.create();
+    const { getZAI } = await import('@/lib/zai');
+    const zai = await getZAI();
     const completion = await zai.chat.completions.create({
       messages: [{ role: 'user', content: 'Responde solo: OK' }],
       max_tokens: 5,
