@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   description: "Detecta fake news, visibiliza sesgos y voces silenciadas por las narrativas hegemónicas. Análisis con fuentes diversas del Colectivo Occidental, Sur Global e independientes.",
   keywords: ["verificación", "fake news", "desinformación", "fact check", "sesgo mediático", "análisis crítico", "Sur Global"],
   icons: {
-    icon: "https://z-cdn.chatglm.cn/z-ai/static/logo.svg",
+    icon: "/favicon.png",
   },
 };
 
