@@ -216,43 +216,42 @@ RESPONDE SOLO con un JSON con esta estructura exacta, sin texto adicional:
   "summary": "<resumen ejecutivo de 3-5 oraciones>"
 }`;
 
-          // Retry with exponential backoff for rate limiting
-          const MAX_RETRIES = 3;
-          const RETRY_DELAYS = [5000, 15000, 30000]; // 5s, 15s, 30s
+          // Single retry with long delay — no double-retry amplification
+          // chatCompletion has NO internal retry, so this is the ONLY retry layer
           let megaResponse: any = null;
 
-          for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
-            try {
-              if (attempt > 0) {
-                const waitTime = RETRY_DELAYS[attempt - 1];
-                send(sendLog(encoder, 'analyzing',
-                  `Servidor ocupado, reintentando en ${waitTime / 1000}s... (intento ${attempt + 1}/${MAX_RETRIES + 1})`,
-                  'El servicio de IA está temporalmente saturado',
-                ));
-                await delay(waitTime);
+          try {
+            megaResponse = await chatCompletion([
+              { role: 'system', content: SYSTEM_PROMPT },
+              { role: 'user', content: megaPrompt },
+            ], { max_tokens: 4096 });
+          } catch (error: any) {
+            const errorMsg = error?.message || '';
+            const isRateLimit = errorMsg.includes('429') || errorMsg.includes('rate') || errorMsg.includes('overload') || errorMsg.includes('1302') || errorMsg.includes('1305');
+
+            if (isRateLimit) {
+              // One single retry with a 20-second delay to let rate limit window reset
+              send(sendLog(encoder, 'analyzing',
+                'Servidor ocupado, esperando 20s antes de reintentar...',
+                'El servicio de IA está temporalmente saturado — reintentando una vez más',
+              ));
+              await delay(20000);
+
+              try {
+                megaResponse = await chatCompletion([
+                  { role: 'system', content: SYSTEM_PROMPT },
+                  { role: 'user', content: megaPrompt },
+                ], { max_tokens: 4096 });
+              } catch (retryError: any) {
+                const retryMsg = retryError?.message || '';
+                const retryIsRateLimit = retryMsg.includes('429') || retryMsg.includes('rate') || retryMsg.includes('overload');
+                if (retryIsRateLimit) {
+                  throw new Error('El servicio de IA está saturado. Espera 1-2 minutos e intenta de nuevo.');
+                }
+                throw retryError;
               }
-
-              megaResponse = await chatCompletion([
-                { role: 'system', content: SYSTEM_PROMPT },
-                { role: 'user', content: megaPrompt },
-              ], { max_tokens: 4096 });
-
-              // If we got here, the call succeeded
-              break;
-            } catch (error: any) {
-              const errorMsg = error?.message || '';
-              const isRateLimit = errorMsg.includes('429') || errorMsg.includes('rate') || errorMsg.includes('overload');
-
-              if (isRateLimit && attempt < MAX_RETRIES) {
-                // Will retry on next loop iteration
-                continue;
-              } else if (isRateLimit) {
-                // Final attempt failed
-                throw new Error('El servicio de IA está saturado. Por favor espera unos minutos e intenta de nuevo.');
-              } else {
-                // Non-rate-limit error, don't retry
-                throw error;
-              }
+            } else {
+              throw error;
             }
           }
 
