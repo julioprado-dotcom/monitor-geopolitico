@@ -1,6 +1,6 @@
 'use client';
 
-import { type Signal, type Region, relevanceColors, sourceLevelLabels, sourceLevelColors, type SourceLevel } from '@/data/signals';
+import { type Signal, type Region, relevanceColors, sourceLevelLabels, sourceLevelColors, sourceCountry } from '@/data/signals';
 import { ShieldCheck, ShieldAlert, Clock, Eye } from 'lucide-react';
 import { useMounted } from '@/hooks/useMounted';
 
@@ -42,41 +42,7 @@ function truncateContent(text: string): string {
   return clean.slice(0, cut > TARGET - 30 ? cut : TARGET) + '…';
 }
 
-/** Mapa de fuente → bandera + abreviatura de país */
-const sourceCountry: Record<string, { flag: string; code: string }> = {
-  'Agencia BRICS de Noticias': { flag: '🌐', code: 'BRICS' },
-  'Al Jazeera': { flag: '🇶🇦', code: 'QAT' },
-  'Xinhua': { flag: '🇨🇳', code: 'CHN' },
-  'Reuters África': { flag: '🇬🇧', code: 'GBR' },
-  'EFE': { flag: '🇪🇸', code: 'ESP' },
-  'The Hindu': { flag: '🇮🇳', code: 'IND' },
-  'BBC África': { flag: '🇬🇧', code: 'GBR' },
-  'TASS': { flag: '🇷🇺', code: 'RUS' },
-  'Africa News': { flag: '🇦🇫', code: 'AFR' },
-  'Folha de São Paulo': { flag: '🇧🇷', code: 'BRA' },
-  'Middle East Eye': { flag: '🇬🇧', code: 'GBR' },
-  'The East African': { flag: '🇰🇪', code: 'KEN' },
-  'Euractiv': { flag: '🇪🇺', code: 'EUR' },
-  'La Jornada': { flag: '🇲🇽', code: 'MEX' },
-  'Africa Renewal': { flag: '🇺🇳', code: 'ONU' },
-  'Washington Post': { flag: '🇺🇸', code: 'USA' },
-  'OHCHR': { flag: '🇺🇳', code: 'ONU' },
-  'Telesur': { flag: '🇻🇪', code: 'VEN' },
-  'The National': { flag: '🇦🇪', code: 'EAU' },
-  'Nordic Monitor': { flag: '🇸🇪', code: 'SWE' },
-  'Página/12': { flag: '🇦🇷', code: 'ARG' },
-  'Irrawaddy': { flag: '🇲🇲', code: 'MMR' },
-  'Mongabay Latam': { flag: '🇵🇪', code: 'PER' },
-  'Le Monde Diplomatique': { flag: '🇫🇷', code: 'FRA' },
-  'MNOAL Official': { flag: '🇺🇳', code: 'ONU' },
-  'CBC News': { flag: '🇨🇦', code: 'CAN' },
-  'Anadolu Agency': { flag: '🇹🇷', code: 'TUR' },
-  'CIJ Official': { flag: '🇳🇱', code: 'NLD' },
-  'Prensa Latina': { flag: '🇨🇺', code: 'CUB' },
-  'RT': { flag: '🇷🇺', code: 'RUS' },
-  'TRT World': { flag: '🇹🇷', code: 'TUR' },
-  'CGTN': { flag: '🇨🇳', code: 'CHN' },
-};
+
 
 export default function SignalCard({ signal, onRegionClick, onClassifierClick, onSignalClick }: SignalCardProps) {
   const relevanceColor = relevanceColors[signal.relevance];

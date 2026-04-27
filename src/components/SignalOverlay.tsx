@@ -25,6 +25,7 @@ import {
   sourceLevelLabels,
   sourceLevelDescriptions,
   sourceLevelColors,
+  sourceCountry,
   accessLevelLabels,
   DISCLAIMER,
   SHARE_FOOTER_FREE,
@@ -194,23 +195,59 @@ export default function SignalOverlay({ signal, onClose, userTier = 'gratuito' }
             {signal.title}
           </h2>
 
-          {/* Source, language and "Ir a fuente original" */}
-          <div className="flex items-center gap-3 mb-3 flex-wrap">
-            <span className="text-[11px] text-white/40 font-[family-name:var(--font-jetbrains-mono)]">
-              Fuente: {signal.source}
+          {/* Fuente, idioma y enlace — panel destacado */}
+          <div
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl mb-3 flex-wrap"
+            style={{
+              backgroundColor: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.07)',
+            }}
+          >
+            {/* Bandera + código país */}
+            <div className="flex items-center gap-1.5 shrink-0">
+              {(() => {
+                const country = sourceCountry[signal.source];
+                return country ? (
+                  <>
+                    <span className="text-base leading-none">{country.flag}</span>
+                    <span className="text-[10px] font-bold text-white/35 font-[family-name:var(--font-jetbrains-mono)]">{country.code}</span>
+                    <span className="text-white/10 text-xs">·</span>
+                  </>
+                ) : null;
+              })()}
+            </div>
+
+            {/* Nombre de fuente — destacado */}
+            <span className="text-xs font-bold text-white/70 font-[family-name:var(--font-space-grotesk)]">
+              {signal.source}
             </span>
-            <span className="text-[11px] text-white/25 font-[family-name:var(--font-jetbrains-mono)]">
-              Idioma: {signal.language.toUpperCase()}
+
+            {/* Separador */}
+            <span className="text-white/10 text-xs">·</span>
+
+            {/* Idioma — badge */}
+            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-white/[0.06] text-white/40 font-[family-name:var(--font-jetbrains-mono)] uppercase tracking-wider">
+              {signal.language.toUpperCase()}
             </span>
+
+            {/* Separador */}
+            <span className="text-white/10 text-xs">·</span>
+
+            {/* Enlace a fuente original */}
             <a
               href={signal.sourceUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-[#00E5A0]/10 text-[#00E5A0]/70 hover:bg-[#00E5A0]/20 transition-colors font-[family-name:var(--font-jetbrains-mono)]"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold font-[family-name:var(--font-jetbrains-mono)] transition-colors duration-150"
+              style={{
+                backgroundColor: `${levelColors.bg}`,
+                color: levelColors.text,
+                border: `1px solid ${levelColors.border}`,
+              }}
               onClick={(e) => e.stopPropagation()}
             >
               <ExternalLink className="w-3 h-3" />
-              Ir a fuente original
+              Fuente original
             </a>
           </div>
 

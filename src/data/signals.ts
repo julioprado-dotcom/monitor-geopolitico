@@ -116,6 +116,43 @@ export const DISCLAIMER = 'El Monitor Geopolítico es una plataforma de análisi
 
 export const SHARE_FOOTER_FREE = '\n\nAnálisis por Monitor Geopolítico — monitor-geopolitico.com';
 
+// ── Mapa de fuente → bandera + código de país ──
+
+export const sourceCountry: Record<string, { flag: string; code: string }> = {
+  'Agencia BRICS de Noticias': { flag: '🌐', code: 'BRICS' },
+  'Al Jazeera': { flag: '🇶🇦', code: 'QAT' },
+  'Xinhua': { flag: '🇨🇳', code: 'CHN' },
+  'Reuters África': { flag: '🇬🇧', code: 'GBR' },
+  'EFE': { flag: '🇪🇸', code: 'ESP' },
+  'The Hindu': { flag: '🇮🇳', code: 'IND' },
+  'BBC África': { flag: '🇬🇧', code: 'GBR' },
+  'TASS': { flag: '🇷🇺', code: 'RUS' },
+  'Africa News': { flag: '🇦🇫', code: 'AFR' },
+  'Folha de São Paulo': { flag: '🇧🇷', code: 'BRA' },
+  'Middle East Eye': { flag: '🇬🇧', code: 'GBR' },
+  'The East African': { flag: '🇰🇪', code: 'KEN' },
+  'Euractiv': { flag: '🇪🇺', code: 'EUR' },
+  'La Jornada': { flag: '🇲🇽', code: 'MEX' },
+  'Africa Renewal': { flag: '🇺🇳', code: 'ONU' },
+  'Washington Post': { flag: '🇺🇸', code: 'USA' },
+  'OHCHR': { flag: '🇺🇳', code: 'ONU' },
+  'Telesur': { flag: '🇻🇪', code: 'VEN' },
+  'The National': { flag: '🇦🇪', code: 'EAU' },
+  'Nordic Monitor': { flag: '🇸🇪', code: 'SWE' },
+  'Página/12': { flag: '🇦🇷', code: 'ARG' },
+  'Irrawaddy': { flag: '🇲🇲', code: 'MMR' },
+  'Mongabay Latam': { flag: '🇵🇪', code: 'PER' },
+  'Le Monde Diplomatique': { flag: '🇫🇷', code: 'FRA' },
+  'MNOAL Official': { flag: '🇺🇳', code: 'ONU' },
+  'CBC News': { flag: '🇨🇦', code: 'CAN' },
+  'Anadolu Agency': { flag: '🇹🇷', code: 'TUR' },
+  'CIJ Official': { flag: '🇳🇱', code: 'NLD' },
+  'Prensa Latina': { flag: '🇨🇺', code: 'CUB' },
+  'RT': { flag: '🇷🇺', code: 'RUS' },
+  'TRT World': { flag: '🇹🇷', code: 'TUR' },
+  'CGTN': { flag: '🇨🇳', code: 'CHN' },
+};
+
 export const demoSignals: Signal[] = [
   {
     id: 'SIG-2025-001',
