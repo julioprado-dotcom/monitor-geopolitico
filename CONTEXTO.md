@@ -164,22 +164,24 @@ Prioridad 1 — MÁXIMA (implementar primero):
 4. Modificar content-proxy para cumplir política: visualización ampliada dentro del Monitor, compartir solo con enlace a fuente, disclaimer automático
 5. Implementar Fase 1 de estrategia SEO (ver docs/ESTRATEGIA_SEO.md)
 6. Definir estrategia de almacenamiento de análisis por tier junto con modelo de datos Analysis (ver docs/PROGRAMA_MONETIZACION.md y docs/POLITICA_FUENTES.md sección 2.4)
-7. Actualizar Historial_Desarrollo.pdf
-8. Actualizar Arquitectura_Tecnica.pdf
+7. Implementar Fase 1 de estrategia multilingue: UI en es/en con selector de idioma (ver docs/ESTRATEGIA_MULTILINGUE.md)
+8. Actualizar Historial_Desarrollo.pdf
+9. Actualizar Arquitectura_Tecnica.pdf
 
 Prioridad media:
-9. Implementar Fase 1 de programa de monetización (ver docs/PROGRAMA_MONETIZACION.md)
-10. Limpiar dependencias no utilizadas en package.json
-11. Integrar proxy en la UI del dashboard
-12. Agregar disclaimer legal en footer
-13. Implementar funciones de compartir artículo y compartir análisis con diferenciación por tier
+10. Implementar Fase 1 de programa de monetización (ver docs/PROGRAMA_MONETIZACION.md)
+11. Limpiar dependencias no utilizadas en package.json
+12. Integrar proxy en la UI del dashboard
+13. Agregar disclaimer legal en footer
+14. Implementar funciones de compartir artículo y compartir análisis con diferenciación por tier
 
 Prioridad baja:
-14. Evaluar proxy upstream si servidor no accede a RT
-15. Rotación de mirrors HLS
-16. Más fuentes RSS
-17. Implementar i18n (es, en mínimo)
-18. Usar docs/STARTER_PROMPT_ZAI.md como template para nuevos proyectos
+15. Evaluar proxy upstream si servidor no accede a RT
+16. Rotación de mirrors HLS
+17. Más fuentes RSS
+18. Implementar i18n (es, en mínimo)
+19. Usar docs/STARTER_PROMPT_ZAI.md como template para nuevos proyectos
+20. Implementar Fases 2-4 de estrategia multilingue (ver docs/ESTRATEGIA_MULTILINGUE.md)
 
 ## 16. ESTRATEGIA SEO
 
@@ -192,3 +194,9 @@ Resumen: 4 fases (fundamentos, contenido, escala, autoridad), keywords en 3 nive
 Ver documento completo: docs/PROGRAMA_MONETIZACION.md
 
 Resumen: 5 principios rectores (Soberanía Cognitiva, Justicia Cognitiva, Transparencia, Independencia, Sostenibilidad), modelo freemium con 4 tiers (gratuito, $5/mes, $25/mes, $200/mes), newsletter premium, API como servicio, donaciones, contenido patrocinado ético, consultoría. Punto de equilibrio: 14-30 suscriptores premium. Costo operativo mes 1: $0-70.
+
+## 18. ESTRATEGIA MULTILINGUE
+
+Ver documento completo: docs/ESTRATEGIA_MULTILINGUE.md
+
+Resumen: Interfaz por defecto en español, contenido en idioma original con badges. Al cambiar idioma se traduce TODO (no solo títulos). Dos capas: UI con diccionarios JSON, contenido con IA. 6 idiomas: es, en, pt, fr, ar, zh. Endpoint /api/translate con z-ai-web-dev-sdk. Términos epistemológicos nunca se traducen. Cache en navegador y servidor. Soporte RTL para árabe. 4 fases de implementación.
