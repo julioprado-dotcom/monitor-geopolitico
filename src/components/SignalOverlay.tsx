@@ -247,7 +247,7 @@ export default function SignalOverlay({ signal, onClose, userTier = 'gratuito' }
               onClick={(e) => e.stopPropagation()}
             >
               <ExternalLink className="w-3 h-3" />
-              Fuente original
+              Ir al artículo
             </a>
           </div>
 
