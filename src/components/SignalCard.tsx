@@ -55,9 +55,6 @@ export default function SignalCard({ signal, onRegionClick, onClassifierClick, o
             if (!cancelled) setThumbReady(true);
           }, 150);
           obs.unobserve(el);
-          // Cleanup por si el componente se desmonta antes del timeout
-          const cleanup = () => { clearTimeout(timer); cancelled = true; };
-          el.addEventListener('unobserve-cleanup', cleanup, { once: true });
         }
       },
       { rootMargin: '200px' } // empezar a cargar 200px antes de entrar al viewport
