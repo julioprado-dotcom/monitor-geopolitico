@@ -150,3 +150,25 @@ Git: Trabajar con protocolo claro, no actualizar el repo hasta estar listos
 ## 13. PROTOCOLO GIT
 
 Ver archivo: /home/z/my-project/PROTOCOLO_GIT.md
+
+## 14. PROXY ANTI-CENSURA
+
+Ver plan completo: /home/z/my-project/docs/PLAN_PROXY_ANTICENSURA.md
+
+## 15. TAREAS PENDIENTES
+
+Prioridad alta:
+1. Verificar acceso del servidor a RT (precondición para proxy anti-censura)
+2. Implementar proxy anti-censura (ver docs/PLAN_PROXY_ANTICENSURA.md)
+3. Actualizar Historial_Desarrollo.pdf
+4. Actualizar Arquitectura_Tecnica.pdf
+
+Prioridad media:
+5. Limpiar dependencias no utilizadas en package.json
+6. Integrar proxy en la UI del dashboard
+7. Agregar disclaimer legal
+
+Prioridad baja:
+8. Evaluar proxy upstream si servidor no accede a RT
+9. Rotación de mirrors HLS
+10. Más fuentes RSS
