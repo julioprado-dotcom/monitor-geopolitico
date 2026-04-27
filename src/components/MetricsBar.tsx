@@ -1,17 +1,19 @@
 'use client';
 
 import { type Signal, type Relevance, relevanceColors } from '@/data/signals';
+import { X } from 'lucide-react';
 
 interface MetricsBarProps {
   allSignals: Signal[];
   filteredCount: number;
   selectedRelevances: Set<Relevance>;
   onToggleRelevance: (s: Relevance) => void;
+  onClearRelevance: () => void;
 }
 
 const relevances: Relevance[] = ['CRÍTICA', 'ALTA', 'MEDIA', 'BAJA', 'INFORMATIVA'];
 
-export default function MetricsBar({ allSignals, filteredCount, selectedRelevances, onToggleRelevance }: MetricsBarProps) {
+export default function MetricsBar({ allSignals, filteredCount, selectedRelevances, onToggleRelevance, onClearRelevance }: MetricsBarProps) {
   const counts: Record<string, number> = {};
   relevances.forEach((sev) => {
     counts[sev] = allSignals.filter((s) => s.relevance === sev).length;
@@ -29,6 +31,15 @@ export default function MetricsBar({ allSignals, filteredCount, selectedRelevanc
         <span className="text-base font-bold text-[#00E5A0] font-[family-name:var(--font-space-grotesk)] leading-none">
           {filteredCount}
         </span>
+        {selectedRelevances.size > 0 && (
+          <button
+            onClick={() => onClearRelevance()}
+            className="ml-auto p-0.5 rounded bg-white/[0.06] hover:bg-white/[0.12] text-white/40 hover:text-white/70 transition-colors"
+            title="Limpiar filtro"
+          >
+            <X className="w-3 h-3" />
+          </button>
+        )}
       </div>
 
       {/* Barras sólidas verticales compactas */}
