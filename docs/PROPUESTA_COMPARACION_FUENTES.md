@@ -167,7 +167,7 @@ Respuesta:
     {
       signalId: "sig_001",
       sourceName: "RT",
-      sourceLevel: "A",
+      sourceLevel: "B",
       language: "ru",
       title: "Título original",
       titleTranslated: "Título traducido",

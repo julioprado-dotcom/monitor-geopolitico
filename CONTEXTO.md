@@ -40,7 +40,7 @@ Descripción: Plataforma de monitoreo geopolítico con óptica del Sur Global qu
 
 ## 3. STACK TECNOLÓGICO
 
-Framework: Next.js 16.2.4 (App Router)
+Framework: Next.js 16.1.x (App Router)
 Runtime: Bun
 Lenguaje: TypeScript
 Estilo: Tailwind CSS + Meridian theme
@@ -52,12 +52,14 @@ Deployment: Z.ai sandbox + GitHub
 ## 4. ESTRUCTURA DEL PROYECTO
 
 /home/z/my-project/
-app/ — layout.tsx (JSON-LD SEO, metadata), page.tsx (Dashboard + mobile tabs), globals.css, api/analyze/route.ts (8 secciones, 5 filtros, bidireccionalidad), api/hls-proxy/route.ts (150 líneas), api/youtube-live/route.ts (432 líneas)
-components/ — FloatingProjector.tsx (293 líneas), ProyectorWindow.tsx (481 líneas), HLSPlayer.tsx (271 líneas), SignalCard.tsx, etc.
-lib/ — channels.ts (15 canales de TV)
-types/ — signals.ts (Interface Signal con classifiers[], sourceLevel, accessLevel, verified, language)
-docs/ — Marco_Conceptual.pdf (NO cambiar), Arquitectura_Tecnica.pdf (pendiente actualizar), Historial_Desarrollo.pdf (pendiente actualizar)
-CONTEXTO.md, worklog.md, PROTOCOLO_GIT.md, .gitignore (incluye .zscripts/, worklog.md, download/)
+src/app/ — layout.tsx (JSON-LD SEO, metadata), page.tsx (Dashboard + mobile tabs), globals.css, api/analyze/route.ts (8 secciones, 5 filtros, bidireccionalidad), api/content-proxy/route.ts (proxy anti-censura), api/hls-proxy/route.ts (150 líneas), api/youtube-live/route.ts (432 líneas), api/route.ts
+src/components/ — 11 componentes: FloatingProjector.tsx (293 líneas), ProyectorWindow.tsx (481 líneas), HLSPlayer.tsx (271 líneas), LivePlayer.tsx, LatestSignals.tsx, SignalCard.tsx, SignalOverlay.tsx, SearchBar.tsx, SourceClassifier.tsx, MGSidebar.tsx, MetricsBar.tsx
+src/components/ui/ — 53 componentes shadcn/ui (accordion, alert, badge, button, card, dialog, drawer, select, tabs, tooltip, etc.)
+src/data/ — channels.ts (14 canales de TV con metadatos de streaming), signals.ts (tipos TypeScript + datos demo)
+src/lib/ — db.ts (Prisma ORM), utils.ts
+src/hooks/ — use-toast.ts, use-mobile.ts, useMounted.ts
+docs/ — 14 documentos estratégicos (ver §22-23) + 3 PDFs (Marco_Conceptual.pdf NO cambiar)
+CONTEXTO.md, PROTOCOLO_GIT.md, .gitignore (incluye .zscripts/, worklog.md, download/)
 
 ## 5. PARADIGMAS EPISTEMOLÓGICOS
 
@@ -107,14 +109,16 @@ Metadatos de Señal: sourceLevel (A/B/C/D), accessLevel (ABIERTO/RESTRINGIDO/CLA
 
 ## 7. SUBSISTEMA TV
 
-Componentes: FloatingProjector.tsx (293 líneas, ventana flotante draggable/resizable), ProyectorWindow.tsx (481 líneas, ventana principal con pestañas), HLSPlayer.tsx (271 líneas, player HLS con fallbacks)
+Componentes: FloatingProjector.tsx (293 líneas, ventana flotante draggable/resizable), ProyectorWindow.tsx (481 líneas, ventana principal con pestañas), HLSPlayer.tsx (271 líneas, player HLS con fallbacks), LivePlayer.tsx (integración en dashboard)
 APIs: /api/hls-proxy/route.ts (150 líneas), /api/youtube-live/route.ts (432 líneas)
-Canales: channels.ts con 15 canales (RT, Al Jazeera, CGTN, TeleSUR, France 24, etc.)
+Canales: channels.ts con 14 canales (RT, RT Español, Al Jazeera, CGTN, NHK World, WION, NDTV, Africanews, TeleSUR, TeleSUR English, Cubavisión, TRT World, Al Mayadeen, Press TV)
 JSON-LD SEO: Esquema structured data en layout.tsx
+Proxy anti-censura: content-proxy ya implementado en src/app/api/content-proxy/route.ts
 
 ## 8. DEPENDENCIAS NO UTILIZADAS
 
-next-auth, zustand, @tanstack/react-query, @dnd-kit/core, @dnd-kit/sortable, @mdxeditor/editor, framer-motion, recharts, prisma
+next-auth, zustand, @tanstack/react-query, @dnd-kit/core, @dnd-kit/sortable, @mdxeditor/editor, framer-motion, recharts
+NOTA: prisma fue eliminada de esta lista — está activamente usada en src/lib/db.ts
 
 ## 9. ESTADO DE DOCUMENTACIÓN
 
@@ -127,7 +131,7 @@ Principales gaps en Historial de Desarrollo: Subsistema TV completo no registrad
 ## 10. VERSIONES
 
 package.json: 0.9.0-meridian
-Historial_Desarrollo.pdf: referencia 0.8.0 DESACTUALIZADO
+Historial_Desarrollo.pdf: referencia 0.8.0 DESACTUALIZADO (pendiente actualización)
 Marco Conceptual: v0.9.0
 Tags Git: v0.9.0-meridian, v0.9.1-meridian
 
@@ -168,7 +172,7 @@ Prioridad 1 — MÁXIMA (implementar primero, requiere migraciones completadas):
 2. Rate limiting para /api/analyze y /api/translate (URGENTE — ver docs/PROPUESTAS_MEJORA.md)
 3. Accesibilidad básica (a11y) — ver docs/PROPUESTAS_MEJORA.md
 4. Verificar acceso del servidor a RT (precondición para proxy anti-censura)
-5. Implementar proxy anti-censura: content-proxy, image-proxy, rss-proxy (ver docs/PLAN_PROXY_ANTICENSURA.md)
+5. Implementar proxy anti-censura: image-proxy y rss-proxy (content-proxy ya existe, requiere XSS + política de fuentes — ver docs/PLAN_PROXY_ANTICENSURA.md)
 6. Implementar POLÍTICA_FUENTES.md en todos los componentes (ver docs/POLITICA_FUENTES.md)
 7. Modificar content-proxy para cumplir política: visualización ampliada dentro del Monitor, compartir solo con enlace a fuente, disclaimer automático
 8. Implementar Fase 1 de estrategia SEO (ver docs/ESTRATEGIA_SEO.md)
@@ -188,7 +192,7 @@ Prioridad media:
 20. Integrar proxy en la UI del dashboard
 21. Agregar disclaimer legal en footer + página de Transparencia Metodológica
 22. Implementar funciones de compartir artículo y compartir análisis con diferenciación por tier
-23. Auditar y reclasificar las 15 fuentes actuales de channels.ts según docs/CLASIFICACION_FUENTES.md
+23. Auditar y reclasificar las 14 fuentes actuales de channels.ts según docs/CLASIFICACION_FUENTES.md
 
 Prioridad baja:
 24. Evaluar proxy upstream si servidor no accede a RT
@@ -237,7 +241,7 @@ Killer feature del proyecto. Seleccionar un evento → ver cobertura de 4+ fuent
 
 Ver documento completo: docs/CLASIFICACION_FUENTES.md
 
-Jerarquía de criterios: (1) Honestidad periodística 40%, (2) Sesgos 25%, (3) Transparencia editorial 20%, (4) Cobertura 10%, (5) Accesibilidad 5%. Cuatro niveles: A Referencial, B Complementaria, C Contrastiva, D Vigilada. Selección sugerida por región con 6 zonas. Evaluación comparada con ejemplos numéricos (RT 71.5/B, Al Jazeera 61.75/B, Al Mayadeen 71.45/B, Democracy Now 75.9/B, Africa News 74.15/B). Revisión trimestral.
+Jerarquía de criterios: (1) Honestidad periodística 40%, (2) Sesgos 25%, (3) Transparencia editorial 20%, (4) Cobertura 10%, (5) Accesibilidad 5%. Cuatro niveles: A Referencial (>80), B Complementaria (60-80), C Contrastiva (40-60), D Vigilada (<40). NOTA: Actualmente ninguna fuente evaluada numéricamente alcanza Nivel A. Todas las fuentes evaluadas están en Nivel B (RT 71.5, Al Jazeera 61.75, Al Mayadeen 71.45, Democracy Now 75.9, Africa News 74.15). Fuentes sin evaluación numérica reclasificadas conservadoramente a B. Selección sugerida por región con 6 zonas. Evaluación comparada con ejemplos numéricos. Revisión trimestral.
 
 ## 22. PLAN DE IMPLEMENTACIÓN
 

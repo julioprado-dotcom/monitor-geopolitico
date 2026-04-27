@@ -3,7 +3,7 @@
 ## Proyecto: Monitor Geopolítico — News Connect
 ## Versión del plan: 1.0
 ## Fecha: 2026-04-28
-## Estado: PENDIENTE DE IMPLEMENTACIÓN
+## Estado: PARCIALMENTE IMPLEMENTADO (content-proxy existe, image-proxy y rss-proxy pendientes)
 
 ---
 
@@ -97,7 +97,7 @@ Uso de memoria: Cero. El XML se parsea en vuelo, se generan los items como JSON,
 
 Función: Proxy de streams de video HLS para canales de TV en vivo.
 
-Endpoint: GET /api/hls-proxy (ya existe en /app/api/hls-proxy/route.ts)
+Endpoint: GET /api/hls-proxy (ya existe en src/app/api/hls-proxy/route.ts)
 
 Acción requerida: Verificar que el proxy existente funciona correctamente con streams de RT y otros canales bloqueados. Si tiene cache en memoria, evaluar si es necesario o si se puede eliminar.
 
@@ -105,7 +105,7 @@ Acción requerida: Verificar que el proxy existente funciona correctamente con s
 
 ## 4. DOMINIOS PERMITIDOS (Whitelist)
 
-Solo se permite proxy de estas fuentes, alineadas con los 15 canales del proyecto:
+Solo se permite proxy de estas fuentes, alineadas con los 14 canales del proyecto:
 
 Fuentes principales:
 - rt.com (incluye rtd.rt.com, img.rt.com, cdn.rt.com)
@@ -177,9 +177,9 @@ Fase 1 — Verificación (5 minutos)
 - Leer channels.ts para mapear canales a dominios
 
 Fase 2 — Creación de endpoints (15 minutos)
-- Crear /app/api/content-proxy/route.ts
-- Crear /app/api/image-proxy/route.ts
-- Crear /app/api/rss-proxy/route.ts
+- Crear src/app/api/image-proxy/route.ts
+- Crear src/app/api/rss-proxy/route.ts
+- content-proxy ya existe en src/app/api/content-proxy/route.ts, requiere sanitización XSS
 - Verificar que compilan sin errores
 
 Fase 3 — Verificación del HLS Proxy (5 minutos)
