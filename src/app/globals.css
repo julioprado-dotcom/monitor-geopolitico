@@ -6,8 +6,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-space-grotesk);
+  --font-mono: var(--font-jetbrains-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -41,94 +41,52 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  /* Custom VeriNews colors */
-  --color-neon: var(--neon);
-  --color-alert: var(--alert);
-  --color-analysis: var(--analysis);
-  --color-trend: var(--trend);
-  --color-deep: var(--deep);
+
+  /* Meridian Accent Colors */
+  --color-neon: #00E5A0;
+  --color-neon-dim: #00E5A080;
+  --color-neon-glow: #00E5A020;
+  --color-dark-bg: #0A0F1C;
+  --color-dark-surface: #111827;
+  --color-dark-card: #1A2236;
+  --color-dark-border: #1E293B;
+  /* Sur Global brand */
+  --color-sur-global: #00E5A0;
+  --color-south-gold: #D4A017;
 }
 
 :root {
-  --radius: 0.625rem;
-  /* Light Mode - #F4F4F9 base */
-  --background: #F4F4F9;
-  --foreground: #0A0E1A;
-  --card: #FFFFFF;
-  --card-foreground: #0A0E1A;
-  --popover: #FFFFFF;
-  --popover-foreground: #0A0E1A;
-  --primary: #0A0E1A;
-  --primary-foreground: #FFFFFF;
-  --secondary: #E8E8F0;
-  --secondary-foreground: #0A0E1A;
-  --muted: #E8E8F0;
-  --muted-foreground: #6B6B80;
-  --accent: #E8E8F0;
-  --accent-foreground: #0A0E1A;
-  --destructive: #FF406A;
-  --border: #D4D4E0;
-  --input: #D4D4E0;
+  --radius: 0.75rem;
+  --background: #0A0F1C;
+  --foreground: #F1F5F9;
+  --card: #1A2236;
+  --card-foreground: #F1F5F9;
+  --popover: #1A2236;
+  --popover-foreground: #F1F5F9;
+  --primary: #00E5A0;
+  --primary-foreground: #0A0F1C;
+  --secondary: #1E293B;
+  --secondary-foreground: #F1F5F9;
+  --muted: #1E293B;
+  --muted-foreground: #94A3B8;
+  --accent: #1E293B;
+  --accent-foreground: #F1F5F9;
+  --destructive: #EF4444;
+  --border: #1E293B;
+  --input: #1E293B;
   --ring: #00E5A0;
   --chart-1: #00E5A0;
-  --chart-2: #3882F6;
-  --chart-3: #F59E0B;
-  --chart-4: #FF406A;
-  --chart-5: #8B8B9E;
-  /* VeriNews custom */
-  --neon: #00E5A0;
-  --alert: #FF406A;
-  --analysis: #3882F6;
-  --trend: #F59E0B;
-  --deep: #0A0E1A;
-  --sidebar: #FFFFFF;
-  --sidebar-foreground: #0A0E1A;
-  --sidebar-primary: #0A0E1A;
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #E8E8F0;
-  --sidebar-accent-foreground: #0A0E1A;
-  --sidebar-border: #D4D4E0;
-  --sidebar-ring: #00E5A0;
-}
-
-.dark {
-  /* Dark Mode - #0A0E1A base */
-  --background: #0A0E1A;
-  --foreground: #FFFFFF;
-  --card: #12162A;
-  --card-foreground: #FFFFFF;
-  --popover: #12162A;
-  --popover-foreground: #FFFFFF;
-  --primary: #FFFFFF;
-  --primary-foreground: #0A0E1A;
-  --secondary: #1A1F38;
-  --secondary-foreground: #FFFFFF;
-  --muted: #1A1F38;
-  --muted-foreground: #8B8B9E;
-  --accent: #1A1F38;
-  --accent-foreground: #FFFFFF;
-  --destructive: #FF406A;
-  --border: rgba(255, 255, 255, 0.08);
-  --input: rgba(255, 255, 255, 0.12);
-  --ring: #00E5A0;
-  --chart-1: #00E5A0;
-  --chart-2: #3882F6;
-  --chart-3: #F59E0B;
-  --chart-4: #FF406A;
-  --chart-5: #8B8B9E;
-  /* VeriNews custom */
-  --neon: #00E5A0;
-  --alert: #FF406A;
-  --analysis: #3882F6;
-  --trend: #F59E0B;
-  --deep: #0A0E1A;
-  --sidebar: #12162A;
-  --sidebar-foreground: #FFFFFF;
+  --chart-2: #3B82F6;
+  --chart-3: #EAB308;
+  --chart-4: #F97316;
+  --chart-5: #EF4444;
+  --sidebar: #111827;
+  --sidebar-foreground: #F1F5F9;
   --sidebar-primary: #00E5A0;
-  --sidebar-primary-foreground: #0A0E1A;
-  --sidebar-accent: #1A1F38;
-  --sidebar-accent-foreground: #FFFFFF;
-  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-primary-foreground: #0A0F1C;
+  --sidebar-accent: #1E293B;
+  --sidebar-accent-foreground: #F1F5F9;
+  --sidebar-border: #1E293B;
   --sidebar-ring: #00E5A0;
 }
 
@@ -138,5 +96,210 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "cv11", "ss01";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
+  button, a, [role="button"], [type="button"], [type="submit"], [type="reset"], select, summary {
+    cursor: pointer;
+  }
+}
+
+/* ============================================
+   Meridian Design System - Custom Styles
+   Performance-first: solo transform/opacity para animaciones
+   ============================================ */
+
+/* Glass — con @media para desactivar en conexiones lentas (prefers-reduced-data) */
+.glass {
+  background: rgba(26, 34, 54, 0.6);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-strong {
+  background: rgba(26, 34, 54, 0.85);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Desactivar backdrop-filter en save-data mode para conexiones lentas */
+@media (prefers-reduced-data: reduce) {
+  .glass,
+  .glass-strong {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(26, 34, 54, 0.95);
+  }
+}
+
+.neon-glow {
+  box-shadow: 0 0 20px rgba(0, 229, 160, 0.15), 0 0 60px rgba(0, 229, 160, 0.05);
+}
+
+.neon-glow-strong {
+  box-shadow: 0 0 30px rgba(0, 229, 160, 0.25), 0 0 80px rgba(0, 229, 160, 0.1);
+}
+
+.neon-text {
+  text-shadow: 0 0 10px rgba(0, 229, 160, 0.5), 0 0 40px rgba(0, 229, 160, 0.2);
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+.animate-scanline {
+  animation: scanline 4s linear infinite;
+}
+
+@keyframes neon-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.animate-neon-pulse {
+  animation: neon-pulse 2s ease-in-out infinite;
+}
+
+/* Stagger animation for signal grid items — CSS only */
+@keyframes staggerIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-stagger {
+  animation: staggerIn 0.2s ease-out both;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 229, 160, 0.15);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 229, 160, 0.3);
+}
+
+::selection {
+  background: rgba(0, 229, 160, 0.3);
+  color: #F1F5F9;
+}
+
+details.mg-collapse {
+  border: none;
+  outline: none;
+}
+
+details.mg-collapse > summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+details.mg-collapse > summary::-webkit-details-marker {
+  display: none;
+}
+
+details.mg-collapse > summary::marker {
+  display: none;
+  content: '';
+}
+
+details.mg-collapse > summary .chevron-icon {
+  transition: transform 0.2s ease;
+}
+
+details.mg-collapse[open] > summary .chevron-icon {
+  transform: rotate(0deg);
+}
+
+details.mg-collapse:not([open]) > summary .chevron-icon {
+  transform: rotate(-90deg);
+}
+
+details.mg-collapse > .collapse-content {
+  animation: collapse-reveal 0.15s ease-out;
+}
+
+@keyframes collapse-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Overlay & modal animations (transform/opacity only = GPU) ── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.animate-slide-in {
+  animation: slideIn 0.25s ease-out;
+}
+
+/* ── SearchBar focus glow ── */
+.search-glow:focus-within {
+  box-shadow: 0 0 0 1px rgba(0, 229, 160, 0.3), 0 0 12px rgba(0, 229, 160, 0.08);
+}
+
+/* ── Prose invert for markdown rendering ── */
+.prose-invert {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.prose-invert :first-child {
+  margin-top: 0;
+}
+
+.prose-invert :last-child {
+  margin-bottom: 0;
+}
+
+/* ── Content visibility for off-screen sections (perf) ── */
+.content-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 500px;
 }

@@ -1,8 +1,18 @@
+# Monitor Geopolítico — robots.txt
+# Permite indexación de señales y contenido público
+# Bloquea APIs internas y rutas de administración
+
 User-agent: Googlebot
 Allow: /
+Allow: /senales/
+Disallow: /api/
+Disallow: /admin/
 
 User-agent: Bingbot
 Allow: /
+Allow: /senales/
+Disallow: /api/
+Disallow: /admin/
 
 User-agent: Twitterbot
 Allow: /
@@ -12,3 +22,8 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /api/
+Disallow: /admin/
+
+# Sitemap
+Sitemap: https://monitor-geopolitico.vercel.app/sitemap.xml

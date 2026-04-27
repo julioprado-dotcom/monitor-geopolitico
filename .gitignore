@@ -1,6 +1,4 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
+# Dependencies
 node_modules
 /.pnp
 .pnp.*
@@ -10,49 +8,68 @@ node_modules
 !.yarn/releases
 !.yarn/versions
 
-# testing
+# Testing
 /coverage
 
-# next.js
+# Next.js
 /.next/
 /out/
 
-# production
+# Production
 /build
 
-# misc
+# Misc
 .DS_Store
 *.pem
 
-# debug
+# Debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# Environment files
 .env*
 
-# vercel
+# Vercel
 .vercel
 
-
-# typescript
+# TypeScript
 *.tsbuildinfo
 next-env.d.ts
-local-*
-.claude
-.z-ai-config
+
+# Logs
 *.log
 dev.log
 dev.out.log
-test
-prompt
-
 server.log
 
-# SQLite local database (use Turso in production)
-/db/
+# Z.ai sandbox (local only)
+.z-ai-config
+.claude
+.zscripts/
+skills/
 
-# Skills directory
-/skills/
+# Local data and archives (not for repo)
+archive/
+upload/
+download/
+db/
+worklog.md
+archive.sh
+
+# EdgeOne (deployment-specific)
+edgeone.json
+build-edgeone.sh
+
+# Caddy (local server)
+Caddyfile
+
+# IDE
+.vscode/
+.idea/
+
+# Test and temp
+test
+prompt
+local-*

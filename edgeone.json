@@ -1,6 +1,0 @@
-{
-  "buildCommand": "npx next build --webpack",
-  "outputDirectory": ".next",
-  "framework": "nextjs",
-  "installCommand": "bun install"
-}

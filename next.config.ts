@@ -1,16 +1,25 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: "standalone",
+  /* config options here */
   typescript: {
     ignoreBuildErrors: true,
   },
   reactStrictMode: false,
-  images: {
-    unoptimized: true,
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          {
+            key: "Referrer-Policy",
+            value: "strict-origin-when-cross-origin",
+          },
+        ],
+      },
+    ];
   },
-  // NOTE: Do NOT use serverExternalPackages — EdgeOne's serverless runtime
-  // cannot resolve externalized packages. Both @libsql/client and
-  // z-ai-web-dev-sdk must be bundled into the SSR function.
 };
 
 export default nextConfig;
