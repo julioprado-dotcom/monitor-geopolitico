@@ -144,21 +144,8 @@ export default function SignalCard({ signal, onRegionClick, onClassifierClick, o
           {displayText}
         </p>
 
-        {/* Región — una línea */}
-        <div className="mt-auto mb-1">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onRegionClick(signal.region);
-            }}
-            className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-[#00E5A0]/10 text-[#00E5A0]/70 hover:bg-[#00E5A0]/20 transition-colors font-[family-name:var(--font-jetbrains-mono)]"
-          >
-            {signal.region}
-          </button>
-        </div>
-
-        {/* Clasificadores temáticos — línea debajo de la región */}
-        <div className="flex items-center gap-1.5 flex-wrap mb-2">
+        {/* Clasificadores temáticos */}
+        <div className="mt-auto flex items-center gap-1.5 flex-wrap mb-1">
           {signal.classifiers.map((cls) => (
             <button
               key={cls}
@@ -171,6 +158,19 @@ export default function SignalCard({ signal, onRegionClick, onClassifierClick, o
               {cls}
             </button>
           ))}
+        </div>
+
+        {/* Región */}
+        <div className="mb-2">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onRegionClick(signal.region);
+            }}
+            className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-[#00E5A0]/10 text-[#00E5A0]/70 hover:bg-[#00E5A0]/20 transition-colors font-[family-name:var(--font-jetbrains-mono)]"
+          >
+            {signal.region}
+          </button>
         </div>
 
         {/* Línea de separación */}
