@@ -53,9 +53,9 @@ Deployment: Z.ai sandbox + GitHub
 
 /home/z/my-project/
 src/app/ — layout.tsx (JSON-LD SEO, metadata), page.tsx (Dashboard + mobile tabs), globals.css, api/analyze/route.ts (8 secciones, 5 filtros, bidireccionalidad), api/content-proxy/route.ts (proxy anti-censura), api/hls-proxy/route.ts (150 líneas), api/youtube-live/route.ts (432 líneas), api/route.ts
-src/components/ — 11 componentes: FloatingProjector.tsx (293 líneas), ProyectorWindow.tsx (481 líneas), HLSPlayer.tsx (271 líneas), LivePlayer.tsx, LatestSignals.tsx, SignalCard.tsx, SignalOverlay.tsx, SearchBar.tsx, SourceClassifier.tsx, MGSidebar.tsx, MetricsBar.tsx
+src/components/ — 11 componentes: FloatingProjector.tsx (293 líneas), ProyectorWindow.tsx (481 líneas), HLSPlayer.tsx (271 líneas), LivePlayer.tsx, LatestSignals.tsx ("Últimas Señales Geopolíticas"), SignalCard.tsx (footer: clasificadores → región → separador → fuente + nivel badge), SignalOverlay.tsx (overlay de noticia ampliada: metadata → imagen → título → panel fuente → contenido → tags → advertencias nivel C/D → análisis IA → disclaimer; cierre al clic fuera; X roja; indicador de scroll; sin botones de compartir), SearchBar.tsx, SourceClassifier.tsx, MGSidebar.tsx, MetricsBar.tsx (barras de relevancia exclusivas con botón limpiar, cuenta desde allSignals)
 src/components/ui/ — 53 componentes shadcn/ui (accordion, alert, badge, button, card, dialog, drawer, select, tabs, tooltip, etc.)
-src/data/ — channels.ts (14 canales de TV con metadatos de streaming), signals.ts (tipos TypeScript + datos demo)
+src/data/ — channels.ts (14 canales de TV con metadatos de streaming), signals.ts (tipos TypeScript + datos demo + sourceCountry compartido + DISCLAIMER actualizado con marca Newsconnect)
 src/lib/ — db.ts (Prisma ORM), utils.ts
 src/hooks/ — use-toast.ts, use-mobile.ts, useMounted.ts
 docs/ — 14 documentos estratégicos (ver §22-23) + 3 PDFs (Marco_Conceptual.pdf NO cambiar)
@@ -191,8 +191,20 @@ Prioridad media:
 19. Limpiar dependencias no utilizadas en package.json
 20. Integrar proxy en la UI del dashboard
 21. Agregar disclaimer legal en footer + página de Transparencia Metodológica
-22. Implementar funciones de compartir artículo y compartir análisis con diferenciación por tier
+22. Implementar funciones de compartir artículo y compartir análisis con diferenciación por tier (NOTA: botones de compartir removidos del overlay SignalOverlay por decisión de diseño; reubicar a SignalCard o vista dedicada si se reimplementan)
 23. Auditar y reclasificar las 14 fuentes actuales de channels.ts según docs/CLASIFICACION_FUENTES.md
+
+UI mejoradas (implementadas en sesión 2026-04-28):
+- SignalOverlay: reordenado (metadata → imagen → título → panel fuente → contenido → tags → análisis IA → disclaimer)
+- Panel de fuente destacado: bandera + código país + fuente + idioma + "Ir al artículo" con color de nivel
+- Botón X de cierre en rojo (bg-red-500/20, hover bg-red-500/40, text-red-400)
+- Cierre al hacer clic fuera del overlay (backdrop onClick)
+- Indicador de scroll: flecha verde animada en borde inferior, se oculta al llegar al fondo
+- sourceCountry extraído a signals.ts para reutilización entre SignalCard y SignalOverlay
+- DISCLAIMER actualizado: sin frase de compartir, con marca "Newsconnect"
+- MetricsBar: filtro de relevancia exclusivo (un solo nivel a la vez), botón limpiar, conteo desde allSignals
+- SignalCard: footer reorganizado (clasificadores → región → separador → fuente + nivel badge)
+- Nombres: "Señales" → "Señales Geopolíticas" en tabs, métricas y búsqueda
 
 Prioridad baja:
 24. Evaluar proxy upstream si servidor no accede a RT

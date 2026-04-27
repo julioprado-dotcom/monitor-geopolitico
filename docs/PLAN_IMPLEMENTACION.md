@@ -166,7 +166,7 @@ Objetivo: Implementar las funcionalidades que definen al producto y generan su p
 - Criterio de aceptación: Disclaimer visible en footer. Página de transparencia accesible desde el footer.
 
 **Tarea 2.8 — Funciones de compartir** (Ver docs/POLITICA_FUENTES.md §4.2)
-- Acción: Implementar `shareArticle` (título + enlace a fuente, nunca texto completo) y `shareAnalysis` (encabezado con enlace + análisis, formato diferenciado por tier). Integrar en SignalCard y SourceComparisonView.
+- Acción: Implementar `shareArticle` (título + enlace a fuente, nunca texto completo) y `shareAnalysis` (encabezado con enlace + análisis, formato diferenciado por tier). NOTA: Los botones de compartir fueron removidos del overlay SignalOverlay por decisión de diseño (sesión 2026-04-28). Reubicar a SignalCard o crear vista dedicada de compartir. Integrar también en SourceComparisonView.
 - Criterio de aceptación: Compartir artículo copia solo título+enlace. Compartir análisis incluye referencia a fuente. Tier gratuito incluye footer branding.
 
 ---
