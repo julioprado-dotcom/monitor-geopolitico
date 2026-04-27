@@ -160,15 +160,30 @@ Ver plan completo: /home/z/my-project/docs/PLAN_PROXY_ANTICENSURA.md
 Prioridad alta:
 1. Verificar acceso del servidor a RT (precondición para proxy anti-censura)
 2. Implementar proxy anti-censura (ver docs/PLAN_PROXY_ANTICENSURA.md)
-3. Actualizar Historial_Desarrollo.pdf
-4. Actualizar Arquitectura_Tecnica.pdf
+3. Implementar Fase 1 de estrategia SEO (ver docs/ESTRATEGIA_SEO.md)
+4. Actualizar Historial_Desarrollo.pdf
+5. Actualizar Arquitectura_Tecnica.pdf
 
 Prioridad media:
-5. Limpiar dependencias no utilizadas en package.json
-6. Integrar proxy en la UI del dashboard
-7. Agregar disclaimer legal
+6. Implementar Fase 1 de programa de monetización (ver docs/PROGRAMA_MONETIZACION.md)
+7. Limpiar dependencias no utilizadas en package.json
+8. Integrar proxy en la UI del dashboard
+9. Agregar disclaimer legal
 
 Prioridad baja:
-8. Evaluar proxy upstream si servidor no accede a RT
-9. Rotación de mirrors HLS
-10. Más fuentes RSS
+10. Evaluar proxy upstream si servidor no accede a RT
+11. Rotación de mirrors HLS
+12. Más fuentes RSS
+13. Implementar i18n (es, en mínimo)
+
+## 16. ESTRATEGIA SEO
+
+Ver documento completo: docs/ESTRATEGIA_SEO.md
+
+Resumen: 4 fases (fundamentos, contenido, escala, autoridad), keywords en 3 niveles (long tail, medium tail, head terms), SEO técnico (schema ampliado, Core Web Vitals, sitemap, i18n), contenido por clasificador, link building con bajo presupuesto, métricas con herramientas gratuitas. Costo total fase 1: $0.
+
+## 17. PROGRAMA DE MONETIZACIÓN
+
+Ver documento completo: docs/PROGRAMA_MONETIZACION.md
+
+Resumen: 5 principios rectores (Soberanía Cognitiva, Justicia Cognitiva, Transparencia, Independencia, Sostenibilidad), modelo freemium con 4 tiers (gratuito, $5/mes, $25/mes, $200/mes), newsletter premium, API como servicio, donaciones, contenido patrocinado ético, consultoría. Punto de equilibrio: 14-30 suscriptores premium. Costo operativo mes 1: $0-70.
