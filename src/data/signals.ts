@@ -112,7 +112,7 @@ export const userTierConfig: Record<UserTier, {
 
 // ── Disclaimer legal ──
 
-export const DISCLAIMER = 'El Monitor Geopolítico es una plataforma de análisis e investigación geopolítica. Los artículos y contenido original pertenecen a sus fuentes. Al compartir, siempre se redirige a la fuente original. El análisis geopolítico generado por el Monitor — Óptica Sur Global, 5 filtros analíticos, bidireccionalidad de relevancia — es contenido original del Monitor Geopolítico.';
+export const DISCLAIMER = 'Monitor Geopolítico es una plataforma de análisis e investigación geopolítica. Los artículos y contenido original pertenecen a sus fuentes. El análisis geopolítico generado por el Monitor — Óptica Sur Global, con filtros analíticos y bidireccionalidad de relevancia — es contenido original del Monitor Geopolítico - Newsconnect';
 
 export const SHARE_FOOTER_FREE = '\n\nAnálisis por Monitor Geopolítico — monitor-geopolitico.com';
 
