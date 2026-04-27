@@ -151,62 +151,62 @@ export default function SignalCard({ signal, onRegionClick, onClassifierClick, o
           {displayText}
         </p>
 
-        {/* Fuente con bandera */}
-        <div className="mt-auto flex items-center justify-center gap-1.5 mb-0.5">
-          {(() => {
-            const country = sourceCountry[signal.source];
-            return country ? (
-              <>
-                <span className="text-xs leading-none">{country.flag}</span>
-                <span className="text-[9px] text-white/35 font-bold font-[family-name:var(--font-jetbrains-mono)]">{country.code}</span>
-                <span className="text-[9px] text-white/15">·</span>
-              </>
-            ) : null;
-          })()}
-          <span className="text-[9px] text-white/25 font-[family-name:var(--font-jetbrains-mono)]">
-            {signal.source}
-          </span>
+        {/* Región — una línea */}
+        <div className="mt-auto mb-1">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onRegionClick(signal.region);
+            }}
+            className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-[#00E5A0]/10 text-[#00E5A0]/70 hover:bg-[#00E5A0]/20 transition-colors font-[family-name:var(--font-jetbrains-mono)]"
+          >
+            {signal.region}
+          </button>
         </div>
 
-        {/* Señalizador de fuente — debajo de la fuente, arriba de la línea */}
-        <div className="flex items-center justify-center mb-1.5">
-          <span
-            className="px-1.5 py-0.5 rounded text-[8px] font-bold font-[family-name:var(--font-jetbrains-mono)]"
-            style={{ backgroundColor: levelColors.bg, color: levelColors.text, border: `1px solid ${levelColors.border}` }}
-          >
-            {signal.sourceLevel} · {sourceLevelLabels[signal.sourceLevel]}
-          </span>
+        {/* Clasificadores temáticos — línea debajo de la región */}
+        <div className="flex items-center gap-1.5 flex-wrap mb-2">
+          {signal.classifiers.map((cls) => (
+            <button
+              key={cls}
+              onClick={(e) => {
+                e.stopPropagation();
+                onClassifierClick(cls);
+              }}
+              className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-white/[0.05] text-white/45 hover:bg-white/10 transition-colors font-[family-name:var(--font-jetbrains-mono)]"
+            >
+              {cls}
+            </button>
+          ))}
         </div>
 
         {/* Línea de separación */}
         <div className="pt-2 border-t border-white/[0.06]">
-          {/* Región — una línea */}
-          <div className="mb-1">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onRegionClick(signal.region);
-              }}
-              className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-[#00E5A0]/10 text-[#00E5A0]/70 hover:bg-[#00E5A0]/20 transition-colors font-[family-name:var(--font-jetbrains-mono)]"
-            >
-              {signal.region}
-            </button>
+          {/* Fuente con bandera */}
+          <div className="flex items-center justify-center gap-1.5 mb-0.5">
+            {(() => {
+              const country = sourceCountry[signal.source];
+              return country ? (
+                <>
+                  <span className="text-xs leading-none">{country.flag}</span>
+                  <span className="text-[9px] text-white/35 font-bold font-[family-name:var(--font-jetbrains-mono)]">{country.code}</span>
+                  <span className="text-[9px] text-white/15">·</span>
+                </>
+              ) : null;
+            })()}
+            <span className="text-[9px] text-white/25 font-[family-name:var(--font-jetbrains-mono)]">
+              {signal.source}
+            </span>
           </div>
 
-          {/* Clasificadores temáticos — línea debajo de la región */}
-          <div className="flex items-center gap-1.5 flex-wrap">
-            {signal.classifiers.map((cls) => (
-              <button
-                key={cls}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onClassifierClick(cls);
-                }}
-                className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-white/[0.05] text-white/45 hover:bg-white/10 transition-colors font-[family-name:var(--font-jetbrains-mono)]"
-              >
-                {cls}
-              </button>
-            ))}
+          {/* Señalizador de fuente — al fondo */}
+          <div className="flex items-center justify-center">
+            <span
+              className="px-1.5 py-0.5 rounded text-[8px] font-bold font-[family-name:var(--font-jetbrains-mono)]"
+              style={{ backgroundColor: levelColors.bg, color: levelColors.text, border: `1px solid ${levelColors.border}` }}
+            >
+              {signal.sourceLevel} · {sourceLevelLabels[signal.sourceLevel]}
+            </span>
           </div>
         </div>
       </div>
