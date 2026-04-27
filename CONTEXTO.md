@@ -158,30 +158,40 @@ Ver plan completo: /home/z/my-project/docs/PLAN_PROXY_ANTICENSURA.md
 ## 15. TAREAS PENDIENTES
 
 Prioridad 1 — MÁXIMA (implementar primero):
-1. Verificar acceso del servidor a RT (precondición para proxy anti-censura)
-2. Implementar proxy anti-censura: content-proxy, image-proxy, rss-proxy (ver docs/PLAN_PROXY_ANTICENSURA.md)
-3. Implementar POLÍTICA_FUENTES.md en todos los componentes (ver docs/POLITICA_FUENTES.md)
-4. Modificar content-proxy para cumplir política: visualización ampliada dentro del Monitor, compartir solo con enlace a fuente, disclaimer automático
-5. Implementar Fase 1 de estrategia SEO (ver docs/ESTRATEGIA_SEO.md)
-6. Definir estrategia de almacenamiento de análisis por tier junto con modelo de datos Analysis (ver docs/PROGRAMA_MONETIZACION.md y docs/POLITICA_FUENTES.md sección 2.4)
-7. Implementar Fase 1 de estrategia multilingue: UI en es/en con selector de idioma (ver docs/ESTRATEGIA_MULTILINGUE.md)
-8. Actualizar Historial_Desarrollo.pdf
-9. Actualizar Arquitectura_Tecnica.pdf
+1. Sanitización XSS del content-proxy (URGENTE — ver docs/PROPUESTAS_MEJORA.md)
+2. Rate limiting para /api/analyze y /api/translate (URGENTE — ver docs/PROPUESTAS_MEJORA.md)
+3. Accesibilidad básica (a11y) — ver docs/PROPUESTAS_MEJORA.md
+4. Verificar acceso del servidor a RT (precondición para proxy anti-censura)
+5. Implementar proxy anti-censura: content-proxy, image-proxy, rss-proxy (ver docs/PLAN_PROXY_ANTICENSURA.md)
+6. Implementar POLÍTICA_FUENTES.md en todos los componentes (ver docs/POLITICA_FUENTES.md)
+7. Modificar content-proxy para cumplir política: visualización ampliada dentro del Monitor, compartir solo con enlace a fuente, disclaimer automático
+8. Implementar Fase 1 de estrategia SEO (ver docs/ESTRATEGIA_SEO.md)
+9. Definir estrategia de almacenamiento de análisis por tier junto con modelo de datos Analysis (ver docs/PROGRAMA_MONETIZACION.md y docs/POLITICA_FUENTES.md sección 2.4)
+10. Implementar Fase 1 de estrategia multilingue: UI en es/en con selector de idioma (ver docs/ESTRATEGIA_MULTILINGUE.md)
+11. Actualizar Historial_Desarrollo.pdf
+12. Actualizar Arquitectura_Tecnica.pdf
 
 Prioridad media:
-10. Implementar Fase 1 de programa de monetización (ver docs/PROGRAMA_MONETIZACION.md)
-11. Limpiar dependencias no utilizadas en package.json
-12. Integrar proxy en la UI del dashboard
-13. Agregar disclaimer legal en footer
-14. Implementar funciones de compartir artículo y compartir análisis con diferenciación por tier
+13. Implementar Fase 1 de programa de monetización (ver docs/PROGRAMA_MONETIZACION.md)
+14. Vista de Comparación de Fuentes — killer feature (ver docs/PROPUESTAS_MEJORA.md)
+15. Sistema de Alertas configurables (ver docs/PROPUESTAS_MEJORA.md)
+16. Mobile-first redesign (ver docs/PROPUESTAS_MEJORA.md)
+17. Limpiar dependencias no utilizadas en package.json
+18. Integrar proxy en la UI del dashboard
+19. Agregar disclaimer legal en footer + página de Transparencia Metodológica
+20. Implementar funciones de compartir artículo y compartir análisis con diferenciación por tier
 
 Prioridad baja:
-15. Evaluar proxy upstream si servidor no accede a RT
-16. Rotación de mirrors HLS
-17. Más fuentes RSS
-18. Implementar i18n (es, en mínimo)
-19. Usar docs/STARTER_PROMPT_ZAI.md como template para nuevos proyectos
-20. Implementar Fases 2-4 de estrategia multilingue (ver docs/ESTRATEGIA_MULTILINGUE.md)
+21. Evaluar proxy upstream si servidor no accede a RT
+22. Rotación de mirrors HLS
+23. Más fuentes RSS
+24. Implementar i18n (es, en mínimo)
+25. Usar docs/STARTER_PROMPT_ZAI.md como template para nuevos proyectos
+26. Implementar Fases 2-4 de estrategia multilingue (ver docs/ESTRATEGIA_MULTILINGUE.md)
+27. Dark Mode
+28. Glosario interactivo de términos epistemológicos
+29. Modo Offline / PWA
+30. Vista de Mapa geográfico
 
 ## 16. ESTRATEGIA SEO
 
@@ -200,3 +210,9 @@ Resumen: 5 principios rectores (Soberanía Cognitiva, Justicia Cognitiva, Transp
 Ver documento completo: docs/ESTRATEGIA_MULTILINGUE.md
 
 Resumen: Interfaz por defecto en español, contenido en idioma original con badges. Al cambiar idioma se traduce TODO (no solo títulos). Dos capas: UI con diccionarios JSON, contenido con IA. 6 idiomas: es, en, pt, fr, ar, zh. Endpoint /api/translate con z-ai-web-dev-sdk. Términos epistemológicos nunca se traducen. Cache en navegador y servidor. Soporte RTL para árabe. 4 fases de implementación.
+
+## 19. PROPUESTAS DE MEJORA
+
+Ver documento completo: docs/PROPUESTAS_MEJORA.md
+
+Killer feature: Vista de Comparación de Fuentes (ver mismo evento cubierto por múltiples fuentes con filtros aplicados). Advertencias críticas: XSS en proxy, sesgo IA, costos IA. Ver docs/PROPUESTAS_MEJORA.md para lista completa y priorización.
