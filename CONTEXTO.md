@@ -168,30 +168,32 @@ Prioridad 1 — MÁXIMA (implementar primero):
 8. Implementar Fase 1 de estrategia SEO (ver docs/ESTRATEGIA_SEO.md)
 9. Definir estrategia de almacenamiento de análisis por tier junto con modelo de datos Analysis (ver docs/PROGRAMA_MONETIZACION.md y docs/POLITICA_FUENTES.md sección 2.4)
 10. Implementar Fase 1 de estrategia multilingue: UI en es/en con selector de idioma (ver docs/ESTRATEGIA_MULTILINGUE.md)
-11. Actualizar Historial_Desarrollo.pdf
-12. Actualizar Arquitectura_Tecnica.pdf
+11. Implementar Vista de Comparación de Fuentes Fase 1 MVP (ver docs/PROPUESTA_COMPARACION_FUENTES.md)
+12. Actualizar Historial_Desarrollo.pdf
+13. Actualizar Arquitectura_Tecnica.pdf
 
 Prioridad media:
-13. Implementar Fase 1 de programa de monetización (ver docs/PROGRAMA_MONETIZACION.md)
-14. Vista de Comparación de Fuentes — killer feature (ver docs/PROPUESTAS_MEJORA.md)
-15. Sistema de Alertas configurables (ver docs/PROPUESTAS_MEJORA.md)
-16. Mobile-first redesign (ver docs/PROPUESTAS_MEJORA.md)
-17. Limpiar dependencias no utilizadas en package.json
-18. Integrar proxy en la UI del dashboard
-19. Agregar disclaimer legal en footer + página de Transparencia Metodológica
-20. Implementar funciones de compartir artículo y compartir análisis con diferenciación por tier
+14. Implementar Fase 1 de programa de monetización (ver docs/PROGRAMA_MONETIZACION.md)
+15. Vista de Comparación de Fuentes Fase 2 — meta-análisis IA (ver docs/PROPUESTA_COMPARACION_FUENTES.md)
+16. Sistema de Alertas configurables (ver docs/PROPUESTAS_MEJORA.md)
+17. Mobile-first redesign (ver docs/PROPUESTAS_MEJORA.md)
+18. Limpiar dependencias no utilizadas en package.json
+19. Integrar proxy en la UI del dashboard
+20. Agregar disclaimer legal en footer + página de Transparencia Metodológica
+21. Implementar funciones de compartir artículo y compartir análisis con diferenciación por tier
 
 Prioridad baja:
-21. Evaluar proxy upstream si servidor no accede a RT
-22. Rotación de mirrors HLS
-23. Más fuentes RSS
-24. Implementar i18n (es, en mínimo)
-25. Usar docs/STARTER_PROMPT_ZAI.md como template para nuevos proyectos
-26. Implementar Fases 2-4 de estrategia multilingue (ver docs/ESTRATEGIA_MULTILINGUE.md)
-27. Dark Mode
-28. Glosario interactivo de términos epistemológicos
-29. Modo Offline / PWA
-30. Vista de Mapa geográfico
+22. Evaluar proxy upstream si servidor no accede a RT
+23. Rotación de mirrors HLS
+24. Más fuentes RSS
+25. Implementar i18n (es, en mínimo)
+26. Usar docs/STARTER_PROMPT_ZAI.md como template para nuevos proyectos
+27. Implementar Fases 2-4 de estrategia multilingue (ver docs/ESTRATEGIA_MULTILINGUE.md)
+28. Dark Mode
+29. Glosario interactivo de términos epistemológicos
+30. Modo Offline / PWA
+31. Vista de Mapa geográfico
+32. Vista de Comparación de Fuentes Fases 3-4 — clustering inteligente + compartir (ver docs/PROPUESTA_COMPARACION_FUENTES.md)
 
 ## 16. ESTRATEGIA SEO
 
@@ -216,3 +218,9 @@ Resumen: Interfaz por defecto en español, contenido en idioma original con badg
 Ver documento completo: docs/PROPUESTAS_MEJORA.md
 
 Killer feature: Vista de Comparación de Fuentes (ver mismo evento cubierto por múltiples fuentes con filtros aplicados). Advertencias críticas: XSS en proxy, sesgo IA, costos IA. Ver docs/PROPUESTAS_MEJORA.md para lista completa y priorización.
+
+## 20. VISTA DE COMPARACIÓN DE FUENTES
+
+Ver documento completo: docs/PROPUESTA_COMPARACION_FUENTES.md
+
+Killer feature del proyecto. Seleccionar un evento → ver cobertura de 4+ fuentes lado a lado → meta-análisis con convergencias, divergencias, omisiones cruzadas, mapa de intereses, evaluación bidireccional comparada, síntesis del Sur Global. Endpoint /api/compare. Componentes: SourceComparisonView, SourceColumn, MetaAnalysisPanel, FilterComparisonRadar. 4 fases: MVP visual, meta-análisis IA, clustering inteligente, compartir/difusión.
