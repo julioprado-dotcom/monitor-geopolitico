@@ -179,6 +179,7 @@ Prioridad baja:
 15. Rotación de mirrors HLS
 16. Más fuentes RSS
 17. Implementar i18n (es, en mínimo)
+18. Usar docs/STARTER_PROMPT_ZAI.md como template para nuevos proyectos
 
 ## 16. ESTRATEGIA SEO
 
