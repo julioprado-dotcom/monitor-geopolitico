@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import ReactMarkdown from 'react-markdown';
 import {
@@ -37,11 +37,31 @@ export default function SignalOverlay({ signal, onClose, userTier = 'gratuito' }
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const mounted = useMounted();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [showScrollHint, setShowScrollHint] = useState(false);
 
   const relevanceColor = relevanceColors[signal.relevance];
   const levelColors = sourceLevelColors[signal.sourceLevel];
   const isContrastiva = signal.sourceLevel === 'C';
   const isVigilada = signal.sourceLevel === 'D';
+
+  // Detectar si hay contenido por debajo del viewport del overlay
+  const handleScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const { scrollTop, scrollHeight, clientHeight } = el;
+    // Mostrar hint si no está al fondo (con margen de 20px)
+    setShowScrollHint(scrollTop + clientHeight < scrollHeight - 20);
+  }, []);
+
+  // Mostrar hint después de montar si hay scroll disponible
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    handleScroll();
+    el.addEventListener('scroll', handleScroll, { passive: true });
+    return () => el.removeEventListener('scroll', handleScroll);
+  }, [handleScroll, analysis]);
 
   // Close on Escape
   const handleKeyDown = useCallback(
@@ -100,8 +120,25 @@ export default function SignalOverlay({ signal, onClose, userTier = 'gratuito' }
     >
       <div
         className="relative glass-strong rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto animate-slide-in"
+        ref={scrollRef}
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Indicador de scroll — flecha animada en borde inferior */}
+        <div
+          className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 pointer-events-none transition-opacity duration-300"
+          style={{ opacity: showScrollHint ? 1 : 0 }}
+        >
+          <div
+            className="flex items-center justify-center w-10 h-6 rounded-full"
+            style={{
+              background: 'linear-gradient(to top, rgba(0,229,160,0.25) 0%, transparent 100%)',
+            }}
+          >
+            <svg width="14" height="8" viewBox="0 0 16 10" fill="none" className="animate-bounce">
+              <path d="M2 2L8 8L14 2" stroke="rgba(0,229,160,0.7)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+        </div>
         {/* Close button */}
         <button
           onClick={onClose}
