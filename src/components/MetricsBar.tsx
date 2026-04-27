@@ -31,15 +31,19 @@ export default function MetricsBar({ allSignals, filteredCount, selectedRelevanc
         <span className="text-base font-bold text-[#00E5A0] font-[family-name:var(--font-space-grotesk)] leading-none">
           {filteredCount}
         </span>
-        {selectedRelevances.size > 0 && (
-          <button
-            onClick={() => onClearRelevance()}
-            className="ml-auto p-0.5 rounded bg-white/[0.06] hover:bg-white/[0.12] text-white/40 hover:text-white/70 transition-colors"
-            title="Limpiar filtro"
-          >
-            <X className="w-3 h-3" />
-          </button>
-        )}
+        {selectedRelevances.size > 0 && (() => {
+          const activeColor = relevanceColors[[...selectedRelevances][selectedRelevances.size - 1]];
+          return (
+            <button
+              onClick={() => onClearRelevance()}
+              className="ml-auto px-1.5 py-0.5 rounded text-[9px] font-bold font-[family-name:var(--font-jetbrains-mono)] transition-colors"
+              style={{ backgroundColor: `${activeColor}20`, color: activeColor, border: `1px solid ${activeColor}40` }}
+              title="Limpiar filtro"
+            >
+              <X className="w-3 h-3 inline" /> <span className="ml-0.5 text-[8px]">LIMPIAR</span>
+            </button>
+          );
+        })()}
       </div>
 
       {/* Barras sólidas verticales compactas */}
