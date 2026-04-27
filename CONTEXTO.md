@@ -157,24 +157,28 @@ Ver plan completo: /home/z/my-project/docs/PLAN_PROXY_ANTICENSURA.md
 
 ## 15. TAREAS PENDIENTES
 
-Prioridad alta:
+Prioridad 1 — MÁXIMA (implementar primero):
 1. Verificar acceso del servidor a RT (precondición para proxy anti-censura)
-2. Implementar proxy anti-censura (ver docs/PLAN_PROXY_ANTICENSURA.md)
-3. Implementar Fase 1 de estrategia SEO (ver docs/ESTRATEGIA_SEO.md)
-4. Actualizar Historial_Desarrollo.pdf
-5. Actualizar Arquitectura_Tecnica.pdf
+2. Implementar proxy anti-censura: content-proxy, image-proxy, rss-proxy (ver docs/PLAN_PROXY_ANTICENSURA.md)
+3. Implementar POLÍTICA_FUENTES.md en todos los componentes (ver docs/POLITICA_FUENTES.md)
+4. Modificar content-proxy para cumplir política: visualización ampliada dentro del Monitor, compartir solo con enlace a fuente, disclaimer automático
+5. Implementar Fase 1 de estrategia SEO (ver docs/ESTRATEGIA_SEO.md)
+6. Definir estrategia de almacenamiento de análisis por tier junto con modelo de datos Analysis (ver docs/PROGRAMA_MONETIZACION.md y docs/POLITICA_FUENTES.md sección 2.4)
+7. Actualizar Historial_Desarrollo.pdf
+8. Actualizar Arquitectura_Tecnica.pdf
 
 Prioridad media:
-6. Implementar Fase 1 de programa de monetización (ver docs/PROGRAMA_MONETIZACION.md)
-7. Limpiar dependencias no utilizadas en package.json
-8. Integrar proxy en la UI del dashboard
-9. Agregar disclaimer legal
+9. Implementar Fase 1 de programa de monetización (ver docs/PROGRAMA_MONETIZACION.md)
+10. Limpiar dependencias no utilizadas en package.json
+11. Integrar proxy en la UI del dashboard
+12. Agregar disclaimer legal en footer
+13. Implementar funciones de compartir artículo y compartir análisis con diferenciación por tier
 
 Prioridad baja:
-10. Evaluar proxy upstream si servidor no accede a RT
-11. Rotación de mirrors HLS
-12. Más fuentes RSS
-13. Implementar i18n (es, en mínimo)
+14. Evaluar proxy upstream si servidor no accede a RT
+15. Rotación de mirrors HLS
+16. Más fuentes RSS
+17. Implementar i18n (es, en mínimo)
 
 ## 16. ESTRATEGIA SEO
 

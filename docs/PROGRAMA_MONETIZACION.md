@@ -89,6 +89,7 @@ Nivel Gratuito (siempre):
 - TV en vivo con 15 canales
 - RSS proxy de fuentes abiertas
 - Buscador básico
+- Almacenamiento: 30 días de historial personal (los análisis se conservan permanentemente a nivel de plataforma)
 
 Nivel Premium ($5/mes o $50/año):
 - Análisis IA ilimitado (sin límite diario)
@@ -97,6 +98,7 @@ Nivel Premium ($5/mes o $50/año):
 - Filtros avanzados (por fuente, región, nivel de amenaza/emancipación)
 - Alertas por email o Telegram
 - RSS proxy con todas las fuentes
+- Almacenamiento: 1 año de historial personal con búsqueda
 
 Nivel Profesional ($25/mes o $250/año):
 - Todo lo de Premium
@@ -105,6 +107,7 @@ Nivel Profesional ($25/mes o $250/año):
 - Análisis comparativo entre señales
 - Reportes semanales automatizados
 - Soporte prioritario
+- Almacenamiento: Historial ilimitado con búsqueda avanzada
 
 Nivel Institucional ($200/mes o $2000/año):
 - Todo lo de Profesional
@@ -114,6 +117,7 @@ Nivel Institucional ($200/mes o $2000/año):
 - Reportes personalizados
 - Capacitación en la metodología
 - SLA de disponibilidad
+- Almacenamiento: Historial ilimitado + acceso a datos agregados de plataforma + exportable
 
 Proyección de ingresos del modelo freemium (conservadora):
 
