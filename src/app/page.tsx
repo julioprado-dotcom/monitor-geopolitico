@@ -45,9 +45,11 @@ export default function Home() {
   }, [selectedRegion, selectedClassifier, selectedRelevances, searchQuery]);
 
   const toggleRelevance = (sev: Relevance) => {
-    const next = new Set(selectedRelevances);
-    if (next.has(sev)) next.delete(sev); else next.add(sev);
-    setSelectedRelevances(next);
+    if (selectedRelevances.has(sev)) {
+      setSelectedRelevances(new Set());
+    } else {
+      setSelectedRelevances(new Set([sev]));
+    }
   };
 
   const handleRegionSelect = useCallback((r: Region | null) => {
