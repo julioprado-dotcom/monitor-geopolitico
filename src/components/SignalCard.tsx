@@ -102,13 +102,6 @@ export default function SignalCard({ signal, onRegionClick, onClassifierClick, o
             loading="lazy"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-[#0A0F1C]/30 via-transparent to-[#0A0F1C]/60" />
-          {/* Badge de nivel de fuente sobre la imagen */}
-          <div
-            className="absolute top-2 left-2 px-1.5 py-0.5 rounded text-[8px] font-bold font-[family-name:var(--font-jetbrains-mono)] backdrop-blur-sm"
-            style={{ backgroundColor: levelColors.bg, color: levelColors.text, border: `1px solid ${levelColors.border}` }}
-          >
-            {signal.sourceLevel} · {sourceLevelLabels[signal.sourceLevel]}
-          </div>
         </div>
       )}
 
