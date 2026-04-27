@@ -16,6 +16,7 @@ import LivePlayer from '@/components/LivePlayer';
 // ── Dynamic imports: solo se cargan cuando se necesitan (cero impacto en carga inicial) ──
 const SignalOverlay = dynamic(() => import('@/components/SignalOverlay'), { ssr: false });
 const FloatingProjector = dynamic(() => import('@/components/FloatingProjector'), { ssr: false });
+const SourceComparisonView = dynamic(() => import('@/components/SourceComparisonView'), { ssr: false });
 
 type MobileTab = 'signals' | 'tv';
 
@@ -28,6 +29,7 @@ export default function Home() {
   const [floatingChannel, setFloatingChannel] = useState<TVChannel | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mobileTab, setMobileTab] = useState<MobileTab>('signals');
+  const [comparisonSignal, setComparisonSignal] = useState<Signal | null>(null);
 
   const filteredSignals = useMemo(() => {
     return demoSignals.filter((s) => {
@@ -162,6 +164,19 @@ export default function Home() {
               {filteredSignals.map((signal) => (
                 <SignalCard key={signal.id} signal={signal} onRegionClick={setSelectedRegion} onClassifierClick={setSelectedClassifier} onSignalClick={setSelectedSignal} />
               ))}
+              {filteredSignals.length > 0 && (
+                <div className="sm:col-span-2 flex justify-center">
+                  <button
+                    onClick={() => {
+                      if (filteredSignals.length >= 2) setComparisonSignal(filteredSignals[0]);
+                    }}
+                    className="mt-2 flex items-center gap-2 px-4 py-2 rounded-xl bg-[#00E5A0]/5 border border-[#00E5A0]/15 text-[#00E5A0]/60 hover:bg-[#00E5A0]/10 hover:text-[#00E5A0]/80 transition-colors text-[11px] font-bold font-[family-name:var(--font-space-grotesk)]"
+                  >
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M11 18H8a2 2 0 0 1-2-2V9"/></svg>
+                    Comparar fuentes ({filteredSignals.length} señales)
+                  </button>
+                </div>
+              )}
             </div>
             {filteredSignals.length === 0 && (
               <div className="text-center py-16">
@@ -197,6 +212,14 @@ export default function Home() {
       {/* SIGNAL OVERLAY */}
       {selectedSignal && (
         <SignalOverlay signal={selectedSignal} onClose={() => setSelectedSignal(null)} />
+      )}
+
+      {/* SOURCE COMPARISON VIEW */}
+      {comparisonSignal && (
+        <SourceComparisonView
+          seedSignal={comparisonSignal}
+          onClose={() => setComparisonSignal(null)}
+        />
       )}
 
       {/* FOOTER */}

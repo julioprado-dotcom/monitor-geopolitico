@@ -14,28 +14,40 @@ import {
   MessageCircle,
   Mail,
   Check,
+  ExternalLink,
+  AlertTriangle,
+  Eye,
 } from 'lucide-react';
 import {
   type Signal,
+  type UserTier,
   relevanceColors,
   sourceLevelLabels,
+  sourceLevelDescriptions,
+  sourceLevelColors,
   accessLevelLabels,
+  DISCLAIMER,
+  SHARE_FOOTER_FREE,
 } from '@/data/signals';
 import { useMounted } from '@/hooks/useMounted';
 
 interface SignalOverlayProps {
   signal: Signal;
   onClose: () => void;
+  userTier?: UserTier;
 }
 
-export default function SignalOverlay({ signal, onClose }: SignalOverlayProps) {
+export default function SignalOverlay({ signal, onClose, userTier = 'gratuito' }: SignalOverlayProps) {
   const [analysis, setAnalysis] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<string | null>(null);
   const mounted = useMounted();
 
   const relevanceColor = relevanceColors[signal.relevance];
+  const levelColors = sourceLevelColors[signal.sourceLevel];
+  const isContrastiva = signal.sourceLevel === 'C';
+  const isVigilada = signal.sourceLevel === 'D';
 
   // Close on Escape
   const handleKeyDown = useCallback(
@@ -72,6 +84,7 @@ export default function SignalOverlay({ signal, onClose }: SignalOverlayProps) {
       const data = await res.json();
 
       if (!res.ok) {
+        if (res.status === 429) throw new Error('Límite diario de análisis alcanzado. Intenta más tarde o mejora tu plan.');
         throw new Error(data.error || 'Error al generar el análisis');
       }
 
@@ -83,22 +96,30 @@ export default function SignalOverlay({ signal, onClose }: SignalOverlayProps) {
     }
   };
 
-  const shareText = analysis
-    ? `🔍 ${signal.title}\n\n📊 Análisis IA - Perspectiva Sur Global:\n\n${analysis.slice(0, 500)}...`
-    : `🔍 ${signal.title}\n\n${signal.summary}`;
-  const shareUrl = signal.sourceUrl;
-  const encodedText = encodeURIComponent(shareText);
-  const encodedUrl = encodeURIComponent(shareUrl);
+  // ── Funciones de compartir según POLÍTICA_FUENTES.md ──
 
-  const copyToClipboard = async () => {
+  /** REGLA 3: Compartir artículo = solo título + enlace a fuente original */
+  const shareArticleText = `${signal.source}: ${signal.title} → ${signal.sourceUrl}`;
+
+  /** REGLA 5-6: Compartir análisis = encabezado con enlace + análisis + footer según tier */
+  const shareAnalysisText = analysis
+    ? `Análisis del Monitor Geopolítico\nFuente: ${signal.source} — ${signal.title}\n→ ${signal.sourceUrl}\n\n${analysis.slice(0, 800)}${userTier === 'gratuito' ? SHARE_FOOTER_FREE : ''}`
+    : '';
+
+  const copyToClipboard = async (text: string, type: string) => {
     try {
-      await navigator.clipboard.writeText(shareText + '\n\n' + shareUrl);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      await navigator.clipboard.writeText(text);
+      setCopied(type);
+      setTimeout(() => setCopied(null), 2000);
     } catch {
       // fallback
     }
   };
+
+  const encodedArticleText = encodeURIComponent(shareArticleText);
+  const encodedArticleUrl = encodeURIComponent(signal.sourceUrl);
+  const encodedAnalysisText = encodeURIComponent(shareAnalysisText);
+  const encodedAnalysisUrl = encodeURIComponent(signal.sourceUrl);
 
   return (
     <div
@@ -113,6 +134,7 @@ export default function SignalOverlay({ signal, onClose }: SignalOverlayProps) {
         <button
           onClick={onClose}
           className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+          aria-label="Cerrar"
         >
           <XIcon className="w-4 h-4 text-white/60" />
         </button>
@@ -140,6 +162,15 @@ export default function SignalOverlay({ signal, onClose }: SignalOverlayProps) {
             >
               {signal.relevance}
             </span>
+
+            {/* Badge de nivel de fuente con color */}
+            <span
+              className="px-2 py-0.5 rounded text-[10px] font-bold font-[family-name:var(--font-jetbrains-mono)] flex items-center gap-1"
+              style={{ backgroundColor: levelColors.bg, color: levelColors.text, border: `1px solid ${levelColors.border}` }}
+            >
+              {signal.sourceLevel} · {sourceLevelLabels[signal.sourceLevel]}
+            </span>
+
             {signal.verified ? (
               <span className="flex items-center gap-1 text-[10px] text-[#00E5A0]/70 font-[family-name:var(--font-jetbrains-mono)]">
                 <ShieldCheck className="w-5 h-5" /> Verificado
@@ -163,31 +194,66 @@ export default function SignalOverlay({ signal, onClose }: SignalOverlayProps) {
             {signal.title}
           </h2>
 
-          {/* Source and language */}
-          <div className="flex items-center gap-3 mb-4">
+          {/* Source, language and "Ir a fuente original" */}
+          <div className="flex items-center gap-3 mb-3 flex-wrap">
             <span className="text-[11px] text-white/40 font-[family-name:var(--font-jetbrains-mono)]">
               Fuente: {signal.source}
             </span>
             <span className="text-[11px] text-white/25 font-[family-name:var(--font-jetbrains-mono)]">
               Idioma: {signal.language.toUpperCase()}
             </span>
+            <a
+              href={signal.sourceUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-[#00E5A0]/10 text-[#00E5A0]/70 hover:bg-[#00E5A0]/20 transition-colors font-[family-name:var(--font-jetbrains-mono)]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <ExternalLink className="w-3 h-3" />
+              Ir a fuente original
+            </a>
           </div>
 
           {/* Tags */}
-          <div className="flex items-center flex-wrap gap-2 mb-5">
+          <div className="flex items-center flex-wrap gap-2 mb-3">
             <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#00E5A0]/10 text-[#00E5A0]/70 font-[family-name:var(--font-jetbrains-mono)]">
               {signal.region}
             </span>
-            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-white/[0.06] text-white/50 font-[family-name:var(--font-jetbrains-mono)]">
-              {signal.classifiers.join(' · ')}
-            </span>
-            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-white/[0.06] text-white/40 font-[family-name:var(--font-jetbrains-mono)]">
-              {sourceLevelLabels[signal.sourceLevel]}
-            </span>
+            {signal.classifiers.map((cls) => (
+              <span key={cls} className="px-2 py-0.5 rounded text-[10px] font-bold bg-white/[0.06] text-white/50 font-[family-name:var(--font-jetbrains-mono)]">
+                {cls}
+              </span>
+            ))}
             <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-white/[0.06] text-white/40 font-[family-name:var(--font-jetbrains-mono)]">
               {accessLevelLabels[signal.accessLevel]}
             </span>
           </div>
+
+          {/* Nota de contextualización para fuentes nivel C */}
+          {isContrastiva && (
+            <div
+              className="flex items-start gap-2 px-3 py-2 rounded-lg mb-4"
+              style={{ backgroundColor: 'rgba(249,115,22,0.08)', border: '1px solid rgba(249,115,22,0.2)' }}
+            >
+              <AlertTriangle className="w-4 h-4 text-[#F97316] mt-0.5 shrink-0" />
+              <p className="text-[11px] text-[#F97316]/80 leading-relaxed font-[family-name:var(--font-space-grotesk)]">
+                <strong>Fuente contrastiva (Nivel C):</strong> {sourceLevelDescriptions[signal.sourceLevel]} Verifica la información con otras fuentes antes de formar opinión.
+              </p>
+            </div>
+          )}
+
+          {/* Advertencia para fuentes nivel D */}
+          {isVigilada && (
+            <div
+              className="flex items-start gap-2 px-3 py-2 rounded-lg mb-4"
+              style={{ backgroundColor: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}
+            >
+              <Eye className="w-4 h-4 text-[#EF4444] mt-0.5 shrink-0" />
+              <p className="text-[11px] text-[#EF4444]/80 leading-relaxed font-[family-name:var(--font-space-grotesk)]">
+                <strong>Fuente vigilada (Nivel D):</strong> {sourceLevelDescriptions[signal.sourceLevel]} Se muestra para fines de vigilancia de narrativas, no como fuente informativa.
+              </p>
+            </div>
+          )}
 
           {/* Full content */}
           <div className="mb-6">
@@ -290,62 +356,117 @@ export default function SignalOverlay({ signal, onClose }: SignalOverlayProps) {
             )}
           </div>
 
-          {/* Share buttons */}
-          <div className="border-t border-white/[0.06] pt-4">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold text-white/30 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">
-                Compartir
-              </span>
+          {/* Divider */}
+          <div className="w-full h-px bg-white/[0.06] mb-4" />
+
+          {/* Share buttons — con separación clara artículo vs análisis */}
+          <div className="mb-4">
+            <div className="text-[10px] font-bold text-white/30 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] mb-2">
+              Compartir artículo
+            </div>
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => copyToClipboard(shareArticleText, 'article')}
+                className="h-8 px-2.5 flex items-center justify-center gap-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-[10px] text-white/40 font-[family-name:var(--font-jetbrains-mono)]"
+                title="Copiar título + enlace (POLÍTICA: nunca incluye texto completo)"
+              >
+                {copied === 'article' ? (
+                  <Check className="w-3.5 h-3.5 text-[#00E5A0]" />
+                ) : (
+                  <Copy className="w-3.5 h-3.5" />
+                )}
+                <span className="hidden sm:inline">Copiar enlace</span>
+              </button>
+              <a
+                href={`https://twitter.com/intent/tweet?text=${encodedArticleText}&url=${encodedArticleUrl}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-[#1DA1F2]/10 transition-colors"
+                title="Compartir artículo en X"
+              >
+                <svg className="w-3.5 h-3.5 text-white/40" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                </svg>
+              </a>
+              <a
+                href={`https://t.me/share/url?url=${encodedArticleUrl}&text=${encodedArticleText}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-[#26A5E4]/10 transition-colors"
+                title="Compartir artículo en Telegram"
+              >
+                <MessageCircle className="w-3.5 h-3.5 text-white/40" />
+              </a>
+              <a
+                href={`https://wa.me/?text=${encodedArticleText}%20${encodedArticleUrl}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-[#25D366]/10 transition-colors"
+                title="Compartir artículo en WhatsApp"
+              >
+                <Share2 className="w-3.5 h-3.5 text-white/40" />
+              </a>
+              <a
+                href={`mailto:?subject=${encodeURIComponent(signal.title)}&body=${encodedArticleText}%0A%0A${encodedArticleUrl}`}
+                className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                title="Compartir artículo por email"
+              >
+                <Mail className="w-3.5 h-3.5 text-white/40" />
+              </a>
+            </div>
+          </div>
+
+          {/* Compartir análisis — solo visible si hay análisis */}
+          {analysis && (
+            <div className="mb-4">
+              <div className="text-[10px] font-bold text-white/30 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] mb-2">
+                Compartir análisis
+                {userTier === 'gratuito' && (
+                  <span className="text-[#00E5A0]/40 ml-1">— incluye branding</span>
+                )}
+              </div>
               <div className="flex items-center gap-1.5">
                 <button
-                  onClick={copyToClipboard}
-                  className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
-                  title="Copiar al portapapeles"
+                  onClick={() => copyToClipboard(shareAnalysisText, 'analysis')}
+                  className="h-8 px-2.5 flex items-center justify-center gap-1.5 rounded-lg bg-[#00E5A0]/5 hover:bg-[#00E5A0]/10 transition-colors text-[10px] text-[#00E5A0]/50 font-[family-name:var(--font-jetbrains-mono)]"
+                  title="Copiar análisis con referencia a fuente"
                 >
-                  {copied ? (
+                  {copied === 'analysis' ? (
                     <Check className="w-3.5 h-3.5 text-[#00E5A0]" />
                   ) : (
-                    <Copy className="w-3.5 h-3.5 text-white/40" />
+                    <Copy className="w-3.5 h-3.5" />
                   )}
+                  <span className="hidden sm:inline">Copiar análisis</span>
                 </button>
                 <a
-                  href={`https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`}
+                  href={`https://twitter.com/intent/tweet?text=${encodedAnalysisText}&url=${encodedAnalysisUrl}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-[#1DA1F2]/10 transition-colors"
-                  title="Compartir en X"
+                  className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#00E5A0]/5 hover:bg-[#00E5A0]/10 transition-colors"
+                  title="Compartir análisis en X"
                 >
-                  <svg className="w-3.5 h-3.5 text-white/40" viewBox="0 0 24 24" fill="currentColor">
+                  <svg className="w-3.5 h-3.5 text-[#00E5A0]/40" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                   </svg>
                 </a>
                 <a
-                  href={`https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`}
+                  href={`https://t.me/share/url?url=${encodedAnalysisUrl}&text=${encodedAnalysisText}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-[#26A5E4]/10 transition-colors"
-                  title="Compartir en Telegram"
+                  className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#00E5A0]/5 hover:bg-[#00E5A0]/10 transition-colors"
+                  title="Compartir análisis en Telegram"
                 >
-                  <MessageCircle className="w-3.5 h-3.5 text-white/40" />
-                </a>
-                <a
-                  href={`https://wa.me/?text=${encodedText}%20${encodedUrl}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-[#25D366]/10 transition-colors"
-                  title="Compartir en WhatsApp"
-                >
-                  <Share2 className="w-3.5 h-3.5 text-white/40" />
-                </a>
-                <a
-                  href={`mailto:?subject=${encodeURIComponent(signal.title)}&body=${encodedText}%0A%0A${encodedUrl}`}
-                  className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
-                  title="Compartir por email"
-                >
-                  <Mail className="w-3.5 h-3.5 text-white/40" />
+                  <MessageCircle className="w-3.5 h-3.5 text-[#00E5A0]/40" />
                 </a>
               </div>
             </div>
+          )}
+
+          {/* Disclaimer — POLÍTICA_FUENTES.md §3 */}
+          <div className="border-t border-white/[0.06] pt-3">
+            <p className="text-[9px] text-white/20 leading-relaxed font-[family-name:var(--font-jetbrains-mono)]">
+              {DISCLAIMER}
+            </p>
           </div>
         </div>
       </div>

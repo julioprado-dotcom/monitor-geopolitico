@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import ZAI from 'z-ai-web-dev-sdk';
+import { rateLimit } from '@/lib/rateLimit';
 
 const SUR_GLOBAL_SYSTEM_PROMPT = `Eres el analista geopolítico del Monitor Geopolítico de News Connect. Tu función es generar análisis contextualizados desde la perspectiva del Sur Global y el mundo multipolar.
 
@@ -151,6 +152,16 @@ REGLAS DE ESTILO:
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting — PROPUESTAS_MEJORA.md §1.3
+    const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
+    const rl = rateLimit(ip, 'analyze');
+    if (!rl.success) {
+      return NextResponse.json(
+        { error: 'Límite de análisis alcanzado. Intenta más tarde o mejora tu plan.' },
+        { status: 429, headers: { 'Retry-After': String(rl.retryAfter) } }
+      );
+    }
+
     const body = await request.json();
     const { title, summary, fullContent, region, classifiers, relevance, language, source } = body;
 

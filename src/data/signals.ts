@@ -6,6 +6,8 @@ export type SourceLevel = 'A' | 'B' | 'C' | 'D';
 
 export type AccessLevel = 'ABIERTO' | 'RESTRINGIDO' | 'CLASIFICADO';
 
+export type UserTier = 'gratuito' | 'premium' | 'profesional' | 'institucional';
+
 export interface Signal {
   id: string;
   title: string;
@@ -33,10 +35,24 @@ export const relevanceColors: Record<Relevance, string> = {
 };
 
 export const sourceLevelLabels: Record<SourceLevel, string> = {
-  'A': 'Fuente oficial primaria',
-  'B': 'Fuente institucional verificada',
-  'C': 'Fuente periodística secundaria',
-  'D': 'Fuente no verificada',
+  'A': 'Referencial',
+  'B': 'Complementaria',
+  'C': 'Contrastiva',
+  'D': 'Vigilada',
+};
+
+export const sourceLevelDescriptions: Record<SourceLevel, string> = {
+  'A': 'Fuente con alta honestidad periodística, sesgo predecible y declarado, cobertura amplia del Sur Global.',
+  'B': 'Fuente valiosa con honestidad aceptable pero sesgos más variables o cobertura limitada. Requiere contextualización.',
+  'C': 'Fuente con honestidad cuestionable en ciertos temas o línea editorial oculta. Útil para contrastar perspectivas.',
+  'D': 'Fuente con patrón recurrente de desinformación verificable. Se muestra para vigilancia de narrativas.',
+};
+
+export const sourceLevelColors: Record<SourceLevel, { bg: string; text: string; border: string }> = {
+  'A': { bg: 'rgba(34,197,94,0.15)', text: '#22C55E', border: 'rgba(34,197,94,0.3)' },
+  'B': { bg: 'rgba(234,179,8,0.15)', text: '#EAB308', border: 'rgba(234,179,8,0.3)' },
+  'C': { bg: 'rgba(249,115,22,0.15)', text: '#F97316', border: 'rgba(249,115,22,0.3)' },
+  'D': { bg: 'rgba(239,68,68,0.15)', text: '#EF4444', border: 'rgba(239,68,68,0.3)' },
 };
 
 export const accessLevelLabels: Record<AccessLevel, string> = {
@@ -44,6 +60,61 @@ export const accessLevelLabels: Record<AccessLevel, string> = {
   'RESTRINGIDO': 'Acceso limitado o parcial',
   'CLASIFICADO': 'Información reservada filtrada',
 };
+
+// ── Niveles de usuario y límites de acceso ──
+
+export const userTierConfig: Record<UserTier, {
+  label: string;
+  maxAnalysesPerDay: number;
+  maxComparisonsPerDay: number;
+  historyDays: number;
+  accessLevelD: boolean;
+  shareBranding: boolean;
+  color: string;
+}> = {
+  'gratuito': {
+    label: 'Gratuito',
+    maxAnalysesPerDay: 5,
+    maxComparisonsPerDay: 2,
+    historyDays: 30,
+    accessLevelD: false,
+    shareBranding: true,
+    color: '#38BDF8',
+  },
+  'premium': {
+    label: 'Premium',
+    maxAnalysesPerDay: -1, // ilimitado
+    maxComparisonsPerDay: 10,
+    historyDays: 365,
+    accessLevelD: false,
+    shareBranding: false,
+    color: '#00E5A0',
+  },
+  'profesional': {
+    label: 'Profesional',
+    maxAnalysesPerDay: 200,
+    maxComparisonsPerDay: 50,
+    historyDays: -1, // ilimitado
+    accessLevelD: true,
+    shareBranding: false,
+    color: '#A78BFA',
+  },
+  'institucional': {
+    label: 'Institucional',
+    maxAnalysesPerDay: -1, // ilimitado
+    maxComparisonsPerDay: -1, // ilimitado
+    historyDays: -1, // ilimitado
+    accessLevelD: true,
+    shareBranding: false,
+    color: '#F472B6',
+  },
+};
+
+// ── Disclaimer legal ──
+
+export const DISCLAIMER = 'El Monitor Geopolítico es una plataforma de análisis e investigación geopolítica. Los artículos y contenido original pertenecen a sus fuentes. Al compartir, siempre se redirige a la fuente original. El análisis geopolítico generado por el Monitor — Óptica Sur Global, 5 filtros analíticos, bidireccionalidad de relevancia — es contenido original del Monitor Geopolítico.';
+
+export const SHARE_FOOTER_FREE = '\n\nAnálisis por Monitor Geopolítico — monitor-geopolitico.com';
 
 export const demoSignals: Signal[] = [
   {

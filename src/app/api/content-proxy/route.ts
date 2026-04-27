@@ -10,6 +10,33 @@ const ALLOWED_DOMAINS = [
 
 const DISCLAIMER = 'Contenido original de su fuente. El Monitor Geopolítico no se atribuye la propiedad del contenido. Análisis independiente con Óptica Sur Global.';
 
+/**
+ * Sanitización XSS: elimina scripts, event handlers, javascript: URLs, y elementos peligrosos.
+ * Cumple PROPUESTAS_MEJORA.md §1.1 — vector de ataque crítico.
+ */
+function sanitizeHtml(html: string): string {
+  let clean = html;
+  // Remove script tags and content
+  clean = clean.replace(/<script[\s\S]*?<\/script>/gi, '');
+  // Remove style tags and content
+  clean = clean.replace(/<style[\s\S]*?<\/style>/gi, '');
+  // Remove iframe, object, embed, form, link[rel=import]
+  clean = clean.replace(/<iframe[\s\S]*?<\/iframe>/gi, '');
+  clean = clean.replace(/<object[\s\S]*?<\/object>/gi, '');
+  clean = clean.replace(/<embed[^>]*>/gi, '');
+  clean = clean.replace(/<form[\s\S]*?<\/form>/gi, '');
+  clean = clean.replace(/<link[^>]*rel=["']import["'][^>]*>/gi, '');
+  // Remove all on* event handlers (onclick, onload, onerror, onmouseover, etc.)
+  clean = clean.replace(/\s+on\w+\s*=\s*(?:"[^"]*"|'[^']*'|\S+)/gi, '');
+  // Remove javascript: and vbscript: URLs in href/src/action attributes
+  clean = clean.replace(/(?:href|src|action|formaction|data|background)\s*=\s*["']?(?:javascript|vbscript|data)\s*:[^"'>\s]*/gi, '');
+  // Remove <meta http-equiv="refresh"> redirects
+  clean = clean.replace(/<meta[^>]*http-equiv[\s]*=[\s]*["']?refresh["']?[^>]*>/gi, '');
+  // Remove <base> tag (can hijack relative URLs)
+  clean = clean.replace(/<base[^>]*>/gi, '');
+  return clean;
+}
+
 function isUrlAllowed(url: string): boolean {
   try {
     const hostname = new URL(url).hostname;
@@ -45,14 +72,11 @@ function extractContent(html: string, url: string) {
     .trim()
     .substring(0, 300);
 
-  // Contenido ampliado para visualización dentro del Monitor
-  const fullContent = article
-    .replace(/<script[\s\S]*?<\/script>/gi, '')
-    .replace(/<style[\s\S]*?<\/style>/gi, '')
+  // Contenido ampliado para visualización dentro del Monitor — con sanitización XSS
+  const fullContent = sanitizeHtml(article)
     .replace(/<nav[\s\S]*?<\/nav>/gi, '')
     .replace(/<footer[\s\S]*?<\/footer>/gi, '')
     .replace(/<aside[\s\S]*?<\/aside>/gi, '')
-    .replace(/<iframe[\s\S]*?<\/iframe>/gi, '')
     .replace(/<header[\s\S]*?<\/header>/gi, '')
     .trim();
 
