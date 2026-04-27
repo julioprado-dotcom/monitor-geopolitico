@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect, useRef } from 'react';
 import { type Signal, type Region, relevanceColors, sourceLevelLabels, sourceLevelColors, sourceCountry } from '@/data/signals';
 import { ShieldCheck, ShieldAlert, Clock, Eye } from 'lucide-react';
 import { useMounted } from '@/hooks/useMounted';
@@ -50,6 +51,32 @@ export default function SignalCard({ signal, onRegionClick, onClassifierClick, o
   const recent = isRecent(signal.timestamp);
   const displayText = truncateContent(signal.fullContent);
   const levelColors = sourceLevelColors[signal.sourceLevel];
+  const [thumbReady, setThumbReady] = useState(false);
+  const thumbRef = useRef<HTMLDivElement>(null);
+
+  // Cargar thumbnail solo cuando el contenedor es visible (IntersectionObserver)
+  useEffect(() => {
+    const el = thumbRef.current;
+    if (!el || !signal.image) return;
+    let cancelled = false;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          // Retraso mínimo para que el contenido de texto renderice primero
+          const timer = setTimeout(() => {
+            if (!cancelled) setThumbReady(true);
+          }, 150);
+          obs.unobserve(el);
+          // Cleanup por si el componente se desmonta antes del timeout
+          const cleanup = () => { clearTimeout(timer); cancelled = true; };
+          el.addEventListener('unobserve-cleanup', cleanup, { once: true });
+        }
+      },
+      { rootMargin: '200px' } // empezar a cargar 200px antes de entrar al viewport
+    );
+    obs.observe(el);
+    return () => { cancelled = true; obs.disconnect(); };
+  }, [signal.image]);
 
   return (
     <div
@@ -59,15 +86,31 @@ export default function SignalCard({ signal, onRegionClick, onClassifierClick, o
     >
       {/* Thumbnail — arriba de todo, solo si hay imagen */}
       {signal.image && (
-        <div className="relative overflow-hidden shrink-0">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={signal.image}
-            alt=""
-            className="w-full h-32 sm:h-40 object-cover transition-transform duration-300 group-hover:scale-105"
-            loading="lazy"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0A0F1C]/30 via-transparent to-[#0A0F1C]/60" />
+        <div ref={thumbRef} className="relative overflow-hidden shrink-0 h-32 sm:h-40">
+          {/* Placeholder gradiente mientras carga */}
+          {!thumbReady && (
+            <div
+              className="absolute inset-0 animate-pulse"
+              style={{
+                background: `linear-gradient(135deg, ${relevanceColor}08 0%, ${relevanceColor}04 50%, transparent 100%)`,
+              }}
+            />
+          )}
+          {/* Imagen real — solo se renderiza cuando thumbReady=true */}
+          {thumbReady && (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={signal.image}
+                alt=""
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                loading="lazy"
+                decoding="async"
+                fetchPriority="low"
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-[#0A0F1C]/30 via-transparent to-[#0A0F1C]/60" />
+            </>
+          )}
         </div>
       )}
 

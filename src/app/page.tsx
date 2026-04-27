@@ -11,12 +11,29 @@ import MGSidebar from '@/components/MGSidebar';
 import LatestSignals from '@/components/LatestSignals';
 import SourceClassifier from '@/components/SourceClassifier';
 import SearchBar from '@/components/SearchBar';
-import LivePlayer from '@/components/LivePlayer';
 
 // ── Dynamic imports: solo se cargan cuando se necesitan (cero impacto en carga inicial) ──
 const SignalOverlay = dynamic(() => import('@/components/SignalOverlay'), { ssr: false });
 const FloatingProjector = dynamic(() => import('@/components/FloatingProjector'), { ssr: false });
 const SourceComparisonView = dynamic(() => import('@/components/SourceComparisonView'), { ssr: false });
+// LivePlayer: carga diferida — se renderiza DESPUÉS de las tarjetas de señales
+const LivePlayer = dynamic(() => import('@/components/LivePlayer'), {
+  ssr: false,
+  loading: () => (
+    <div className="glass rounded-xl overflow-hidden">
+      <div className="px-3 py-2 border-b border-white/[0.06] flex items-center gap-2">
+        <div className="w-2 h-2 rounded-full bg-[#00E5A0]/30 animate-pulse" />
+        <span className="text-[10px] font-bold text-white/30 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">Monitor en Vivo</span>
+      </div>
+      <div className="relative bg-black" style={{ aspectRatio: '16/9' }}>
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+          <div className="w-6 h-6 border-2 border-[#00E5A0]/20 border-t-[#00E5A0]/40 rounded-full animate-spin" />
+          <span className="text-[8px] text-white/20 font-[family-name:var(--font-jetbrains-mono)]">Cargando reproductor...</span>
+        </div>
+      </div>
+    </div>
+  ),
+});
 
 type MobileTab = 'signals' | 'tv';
 
