@@ -124,6 +124,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" suppressHydrationWarning>
+      <head>
+        {/* Preconnect para Google Fonts — reduce latencia en baja conexión */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* Preconnect para placehold.co (imágenes placeholder) */}
+        <link rel="preconnect" href="https://placehold.co" />
+        {/* DNS prefetch para dominios de fuentes de noticias */}
+        <link rel="dns-prefetch" href="https://www.aljazeera.com" />
+        <link rel="dns-prefetch" href="https://www.telesurtv.net" />
+        <link rel="dns-prefetch" href="https://www.trtworld.com" />
+      </head>
       <body
         className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} antialiased bg-background text-foreground`}
       >

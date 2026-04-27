@@ -135,6 +135,20 @@
   }
 }
 
+/* Desactivar backdrop-filter en móvil para mejorar rendimiento de carga */
+@media (max-width: 1023px) {
+  .glass {
+    backdrop-filter: blur(8px) saturate(140%);
+    -webkit-backdrop-filter: blur(8px) saturate(140%);
+    background: rgba(26, 34, 54, 0.75);
+  }
+  .glass-strong {
+    backdrop-filter: blur(12px) saturate(150%);
+    -webkit-backdrop-filter: blur(12px) saturate(150%);
+    background: rgba(26, 34, 54, 0.9);
+  }
+}
+
 .neon-glow {
   box-shadow: 0 0 20px rgba(0, 229, 160, 0.15), 0 0 60px rgba(0, 229, 160, 0.05);
 }
