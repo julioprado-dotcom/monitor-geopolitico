@@ -157,7 +157,13 @@ Ver plan completo: /home/z/my-project/docs/PLAN_PROXY_ANTICENSURA.md
 
 ## 15. TAREAS PENDIENTES
 
-Prioridad 1 — MÁXIMA (implementar primero):
+PRE-REQUISITO: Ejecutar migraciones de docs/PLAN_MIGRACION.md (22 migraciones, ~3 días) antes de iniciar cualquier tarea funcional. Ver también docs/PLAN_IMPLEMENTACION.md para el plan completo con cronograma.
+
+Prioridad 0 — PRE-IMPLEMENTACIÓN (auditoría y correcciones documentales):
+- Corregir 23 inconsistencias entre documentos y código (ver docs/PLAN_IMPLEMENTACION.md §0)
+- Ejecutar migraciones M1-M5 de docs/PLAN_MIGRACION.md
+
+Prioridad 1 — MÁXIMA (implementar primero, requiere migraciones completadas):
 1. Sanitización XSS del content-proxy (URGENTE — ver docs/PROPUESTAS_MEJORA.md)
 2. Rate limiting para /api/analyze y /api/translate (URGENTE — ver docs/PROPUESTAS_MEJORA.md)
 3. Accesibilidad básica (a11y) — ver docs/PROPUESTAS_MEJORA.md
@@ -169,31 +175,33 @@ Prioridad 1 — MÁXIMA (implementar primero):
 9. Definir estrategia de almacenamiento de análisis por tier junto con modelo de datos Analysis (ver docs/PROGRAMA_MONETIZACION.md y docs/POLITICA_FUENTES.md sección 2.4)
 10. Implementar Fase 1 de estrategia multilingue: UI en es/en con selector de idioma (ver docs/ESTRATEGIA_MULTILINGUE.md)
 11. Implementar Vista de Comparación de Fuentes Fase 1 MVP (ver docs/PROPUESTA_COMPARACION_FUENTES.md)
-12. Actualizar Historial_Desarrollo.pdf
-13. Actualizar Arquitectura_Tecnica.pdf
+12. Implementar sistema de clasificación de fuentes en la interfaz del Monitor (etiquetas por nivel A/B/C/D, notas de contextualización automáticas para nivel C, acceso restringido para nivel D — ver docs/CLASIFICACION_FUENTES.md)
+13. Actualizar Historial_Desarrollo.pdf
+14. Actualizar Arquitectura_Tecnica.pdf
 
 Prioridad media:
-14. Implementar Fase 1 de programa de monetización (ver docs/PROGRAMA_MONETIZACION.md)
-15. Vista de Comparación de Fuentes Fase 2 — meta-análisis IA (ver docs/PROPUESTA_COMPARACION_FUENTES.md)
-16. Sistema de Alertas configurables (ver docs/PROPUESTAS_MEJORA.md)
-17. Mobile-first redesign (ver docs/PROPUESTAS_MEJORA.md)
-18. Limpiar dependencias no utilizadas en package.json
-19. Integrar proxy en la UI del dashboard
-20. Agregar disclaimer legal en footer + página de Transparencia Metodológica
-21. Implementar funciones de compartir artículo y compartir análisis con diferenciación por tier
+15. Implementar Fase 1 de programa de monetización (ver docs/PROGRAMA_MONETIZACION.md)
+16. Vista de Comparación de Fuentes Fase 2 — meta-análisis IA (ver docs/PROPUESTA_COMPARACION_FUENTES.md)
+17. Sistema de Alertas configurables (ver docs/PROPUESTAS_MEJORA.md)
+18. Mobile-first redesign (ver docs/PROPUESTAS_MEJORA.md)
+19. Limpiar dependencias no utilizadas en package.json
+20. Integrar proxy en la UI del dashboard
+21. Agregar disclaimer legal en footer + página de Transparencia Metodológica
+22. Implementar funciones de compartir artículo y compartir análisis con diferenciación por tier
+23. Auditar y reclasificar las 15 fuentes actuales de channels.ts según docs/CLASIFICACION_FUENTES.md
 
 Prioridad baja:
-22. Evaluar proxy upstream si servidor no accede a RT
-23. Rotación de mirrors HLS
-24. Más fuentes RSS
-25. Implementar i18n (es, en mínimo)
-26. Usar docs/STARTER_PROMPT_ZAI.md como template para nuevos proyectos
-27. Implementar Fases 2-4 de estrategia multilingue (ver docs/ESTRATEGIA_MULTILINGUE.md)
-28. Dark Mode
-29. Glosario interactivo de términos epistemológicos
-30. Modo Offline / PWA
-31. Vista de Mapa geográfico
-32. Vista de Comparación de Fuentes Fases 3-4 — clustering inteligente + compartir (ver docs/PROPUESTA_COMPARACION_FUENTES.md)
+24. Evaluar proxy upstream si servidor no accede a RT
+25. Rotación de mirrors HLS
+26. Más fuentes RSS
+27. Expandir catálogo de fuentes según selección sugerida en docs/CLASIFICACION_FUENTES.md §5
+28. Implementar Fases 2-4 de estrategia multilingue (ver docs/ESTRATEGIA_MULTILINGUE.md)
+29. Dark Mode
+30. Glosario interactivo de términos epistemológicos
+31. Modo Offline / PWA
+32. Vista de Mapa geográfico
+33. Vista de Comparación de Fuentes Fases 3-4 — clustering inteligente + compartir (ver docs/PROPUESTA_COMPARACION_FUENTES.md)
+34. Sistema automatizado de evaluación de honestidad periodística (ver docs/CLASIFICACION_FUENTES.md §7)
 
 ## 16. ESTRATEGIA SEO
 
@@ -224,3 +232,21 @@ Killer feature: Vista de Comparación de Fuentes (ver mismo evento cubierto por 
 Ver documento completo: docs/PROPUESTA_COMPARACION_FUENTES.md
 
 Killer feature del proyecto. Seleccionar un evento → ver cobertura de 4+ fuentes lado a lado → meta-análisis con convergencias, divergencias, omisiones cruzadas, mapa de intereses, evaluación bidireccional comparada, síntesis del Sur Global. Endpoint /api/compare. Componentes: SourceComparisonView, SourceColumn, MetaAnalysisPanel, FilterComparisonRadar. 4 fases: MVP visual, meta-análisis IA, clustering inteligente, compartir/difusión.
+
+## 21. CLASIFICACIÓN DE FUENTES
+
+Ver documento completo: docs/CLASIFICACION_FUENTES.md
+
+Jerarquía de criterios: (1) Honestidad periodística 40%, (2) Sesgos 25%, (3) Transparencia editorial 20%, (4) Cobertura 10%, (5) Accesibilidad 5%. Cuatro niveles: A Referencial, B Complementaria, C Contrastiva, D Vigilada. Selección sugerida por región con 6 zonas. Evaluación comparada con ejemplos numéricos (RT 71.5/B, Al Jazeera 61.75/B, Al Mayadeen 71.45/B, Democracy Now 75.9/B, Africa News 74.15/B). Revisión trimestral.
+
+## 22. PLAN DE IMPLEMENTACIÓN
+
+Ver documento completo: docs/PLAN_IMPLEMENTACION.md
+
+Plan de implementación por prioridades con 4 fases y 5 sprints. Fase 0: Corrección de 23 inconsistencias documentales. Fase 1 (semanas 1-2): Seguridad (XSS, rate limiting), proxy endpoints, Prisma, SEO F1, i18n F1, clasificación de fuentes en UI. Fase 2 (semanas 3-6): Comparación de fuentes, autenticación, tiers, a11y, disclaimer. Fase 3 (semanas 7-12): Alertas, mobile-first, monetización, contenido SEO. Fase 4 (semanas 13-24): Multilingue completo, PWA, mapa, newsletter, API.
+
+## 23. PLAN DE MIGRACIÓN
+
+Ver documento completo: docs/PLAN_MIGRACION.md
+
+22 migraciones técnicas en 5 fases. M1: Documentación (6 correcciones). M2: Estructura de código (separar tipos, config centralizada, normalizar regiones). M3: Base de datos (esquema Prisma, datos demo, autenticación). M4: Datos de fuentes (metadatos, evaluación, catálogo RSS). M5: API y seguridad (rutas protegidas, deploy). Duración estimada: 22 horas (~3 días). PRE-REQUISITO para toda implementación funcional.
