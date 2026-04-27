@@ -73,3 +73,46 @@ Largo plazo (meses 6-12):
 - Citabilidad académica
 - Versionado metodológico
 - Retroalimentación de calidad
+
+---
+
+## 5. MEJORAS IMPLEMENTADAS (v0.9.0-meridian)
+
+Las siguientes mejoras ya fueron implementadas en la sesión del 2026-04-28 y se encuentran activas en el código:
+
+### 5.1 SignalOverlay — Rediseño completo del overlay de noticia ampliada
+- **Orden de secciones**: ① Metadata (relevancia·nivel / verificado / fecha) → ② Imagen hero → ③ Título → ④ Panel de fuente (bandera·código país·nombre fuente·idioma badge·"Ir al artículo") → ⑤ Contenido completo → ⑥ Tags (región, clasificadores, acceso) → Advertencias nivel C/D → Análisis IA → Disclaimer
+- **Panel de fuente destacado**: Fondo semitransparente (bg-white/0.02, border-white/0.04), bandera emoji + código país ISO de 3 letras, nombre de fuente en bold, badge de idioma en mayúsculas, botón "→ Ir al artículo" con color dinámico según nivel de fuente (verde=A, amarillo=B, naranja=C, rojo=D). Enlace abre signal.sourceUrl en nueva pestaña.
+- **Botón X de cierre**: Estilo rojo (bg-red-500/20, hover bg-red-500/40, text-red-400), posición top-right absoluta con z-10.
+- **Cierre al clic fuera**: El backdrop del overlay ejecuta onClose al hacer clic, con stopPropagation en la tarjeta interior.
+- **Indicador de scroll**: Flecha verde animada (animate-bounce) con gradiente de desvanecimiento en el borde inferior del overlay. Aparece cuando hay contenido por debajo del viewport y desaparece al llegar al fondo. Implementado con useRef + useState + useEffect con listener de scroll pasivo.
+- **Botones de compartir eliminados**: Removidos del overlay tanto del artículo como del análisis por decisión de diseño. (Tarea #22 en CONTEXTO.md: reubicar a SignalCard o vista dedicada si se reimplementan).
+- **Eliminación de código muerto**: Imports de Copy, Share2, MessageCircle, Mail, Check removidos. Props userTier y UserTier eliminados.
+
+### 5.2 SignalCard — Mejoras de footer y fuente
+- **Footer reorganizado**: Orden: clasificadores temáticos → región → separador → fila de fuente con bandera + código país + nombre + badge de nivel con color.
+- **sourceCountry compartido**: Mapa fuente→bandera+código extraído de SignalCard.tsx a signals.ts como export, reutilizado por SignalOverlay.
+
+### 5.3 MetricsBar — Filtro de relevancia mejorado
+- **Filtro exclusivo**: Un solo nivel de relevancia activo a la vez (no acumulativo).
+- **Botón limpiar**: Añadido con color diferenciado para restablecer filtros.
+- **Conteo desde allSignals**: Los contadores reflejan el total de señales disponibles, no solo las filtradas.
+
+### 5.4 Datos y constantes compartidas
+- **DISCLAIMER actualizado**: `"Monitor Geopolítico es una plataforma de análisis e investigación geopolítica. Los artículos y contenido original pertenecen a sus fuentes. El análisis geopolítico generado por el Monitor — Óptica Sur Global, con filtros analíticos y bidireccionalidad de relevancia — es contenido original del Monitor Geopolítico - Newsconnect"`. Sin prefijo "El", sin frase de compartir, "con" en vez de "5 filtros", marca "Newsconnect" al final.
+- **sourceCountry**: Mapa con 30 fuentes mapeadas a bandera emoji + código país ISO, exportado desde signals.ts.
+
+### 5.5 Nomenclatura
+- "Señales" → "Señales Geopolíticas" en tabs de navegación, métricas y barra de búsqueda.
+
+---
+
+## 6. HISTORIAL DE CAMBIOS
+
+| Fecha | Componente | Cambio |
+|-------|-----------|--------|
+| 2026-04-28 | SignalOverlay.tsx | Rediseño completo de overlay (orden, panel fuente, X roja, cierre exterior, scroll indicator) |
+| 2026-04-28 | SignalCard.tsx | Footer reorganizado, import sourceCountry desde signals.ts |
+| 2026-04-28 | signals.ts | sourceCountry extraído como export compartido, DISCLAIMER actualizado |
+| 2026-04-28 | MetricsBar.tsx | Filtro de relevancia exclusivo, botón limpiar, conteo desde allSignals |
+| 2026-04-28 | LatestSignals.tsx | Nombres actualizados a "Señales Geopolíticas" |
