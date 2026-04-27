@@ -32,9 +32,10 @@ function isRecent(timestamp: string): boolean {
   return diff < 2 * 60 * 60 * 1000;
 }
 
-/** Trunca texto a ~250 caracteres, cortando en límite de palabra */
+/** Trunca texto a ~200 caracteres, cortando en límite de palabra */
 function truncateContent(text: string): string {
-  const TARGET = 250;
+  if (!text) return '';
+  const TARGET = 200;
   const clean = text.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
 
   if (clean.length <= TARGET + 20) return clean;
@@ -49,7 +50,7 @@ export default function SignalCard({ signal, onRegionClick, onClassifierClick, o
   const relevanceColor = relevanceColors[signal.relevance];
   const mounted = useMounted();
   const recent = isRecent(signal.timestamp);
-  const displayText = truncateContent(signal.fullContent);
+  const displayText = truncateContent(signal.summary || signal.fullContent);
   const levelColors = sourceLevelColors[signal.sourceLevel];
   const [thumbReady, setThumbReady] = useState(false);
   const thumbRef = useRef<HTMLDivElement>(null);
@@ -149,7 +150,7 @@ export default function SignalCard({ signal, onRegionClick, onClassifierClick, o
         </h3>
 
         {/* Contenido — empuja el botón hacia abajo con flex-1 */}
-        <p className="text-[11px] sm:text-xs text-white/55 leading-relaxed mb-3 font-[family-name:var(--font-space-grotesk)]">
+        <p className="text-[11px] sm:text-xs text-white/55 leading-relaxed mb-3 font-[family-name:var(--font-space-grotesk)] line-clamp-3">
           {displayText}
         </p>
 
