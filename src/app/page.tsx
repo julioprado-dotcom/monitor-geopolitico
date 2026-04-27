@@ -158,7 +158,7 @@ export default function Home() {
 
           {/* Center column */}
           <div className={`flex flex-col gap-4 sm:gap-5 min-w-0 ${mobileTab !== 'signals' ? 'hidden lg:flex' : 'flex'}`}>
-            <MetricsBar signals={filteredSignals} selectedRelevances={selectedRelevances} onToggleRelevance={toggleRelevance} />
+            <MetricsBar signals={filteredSignals} selectedRelevances={selectedRelevances} onToggleRelevance={toggleRelevance} selectedClassifier={selectedClassifier} onToggleClassifier={(c) => setSelectedClassifier(selectedClassifier === c ? null : c)} />
             <SearchBar value={searchQuery} onChange={setSearchQuery} />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {filteredSignals.map((signal) => (
