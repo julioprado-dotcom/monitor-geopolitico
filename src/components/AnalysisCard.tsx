@@ -1,0 +1,141 @@
+'use client';
+
+import { useState, useEffect, useRef } from 'react';
+import { type Analysis } from '@/data/analysis';
+import { Clock, BookOpen } from 'lucide-react';
+import { useMounted } from '@/hooks/useMounted';
+
+interface AnalysisCardProps {
+  analysis: Analysis;
+  onClick: (a: Analysis) => void;
+}
+
+function timeAgo(timestamp: string): string {
+  const now = new Date();
+  const date = new Date(timestamp);
+  const diffMs = now.getTime() - date.getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+  const diffHr = Math.floor(diffMin / 60);
+  const diffDay = Math.floor(diffHr / 24);
+
+  if (diffMin < 60) return `hace ${diffMin}m`;
+  if (diffHr < 24) return `hace ${diffHr}h`;
+  return `hace ${diffDay}d`;
+}
+
+export default function AnalysisCard({ analysis, onClick }: AnalysisCardProps) {
+  const mounted = useMounted();
+  const [imgVisible, setImgVisible] = useState(false);
+  const imgRef = useRef<HTMLDivElement>(null);
+
+  // Lazy load imagen con IntersectionObserver
+  useEffect(() => {
+    const el = imgRef.current;
+    if (!el || !analysis.image) return;
+    let cancelled = false;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          const timer = setTimeout(() => {
+            if (!cancelled) setImgVisible(true);
+          }, 150);
+          obs.unobserve(el);
+        }
+      },
+      { rootMargin: '200px' }
+    );
+    obs.observe(el);
+    return () => { cancelled = true; obs.disconnect(); };
+  }, [analysis.image]);
+
+  return (
+    <div
+      className="glass rounded-xl overflow-hidden hover:bg-white/[0.04] cursor-pointer transition-colors duration-150 group flex flex-col"
+      style={{ borderLeft: '3px solid #D4A017' }}
+      onClick={() => onClick(analysis)}
+    >
+      {/* Imagen */}
+      {analysis.image && (
+        <div ref={imgRef} className="relative overflow-hidden shrink-0 h-36 sm:h-44">
+          {!imgVisible && (
+            <div className="absolute inset-0 animate-pulse" style={{ background: 'linear-gradient(135deg, rgba(212,160,23,0.04) 0%, transparent 100%)' }} />
+          )}
+          {imgVisible && (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={analysis.image}
+                alt=""
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                loading="lazy"
+                decoding="async"
+                fetchPriority="low"
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-[#0A0F1C]/40 via-transparent to-[#0A0F1C]/70" />
+            </>
+          )}
+          {/* Badge de análisis superpuesto */}
+          <div className="absolute top-2.5 left-2.5">
+            <span
+              className="px-2 py-0.5 rounded text-[9px] font-bold uppercase font-[family-name:var(--font-jetbrains-mono)]"
+              style={{ backgroundColor: 'rgba(212,160,23,0.2)', color: '#D4A017', border: '1px solid rgba(212,160,23,0.3)' }}
+            >
+              Análisis
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Contenido */}
+      <div className="p-3.5 sm:p-4 flex flex-col flex-1">
+        {/* Metadatos superiores: tiempo lectura + fecha */}
+        <div className="flex items-center justify-between gap-2 mb-2.5">
+          <div className="flex items-center gap-1.5 text-[9px] text-[#D4A017]/60 font-[family-name:var(--font-jetbrains-mono)]">
+            <BookOpen className="w-3 h-3" />
+            <span>{analysis.readTime} min lectura</span>
+          </div>
+          <div className="flex items-center gap-1 text-[9px] text-white/25 font-[family-name:var(--font-jetbrains-mono)]">
+            <Clock className="w-2.5 h-2.5" />
+            {mounted ? timeAgo(analysis.timestamp) : '...'}
+          </div>
+        </div>
+
+        {/* Título */}
+        <h3 className="text-[13px] sm:text-sm font-bold text-white leading-snug line-clamp-3 mb-2 font-[family-name:var(--font-space-grotesk)] group-hover:text-[#D4A017]/90 transition-colors duration-150">
+          {analysis.title}
+        </h3>
+
+        {/* Resumen */}
+        <p className="text-[11px] sm:text-xs text-white/55 leading-relaxed mb-3 font-[family-name:var(--font-space-grotesk)] line-clamp-4 flex-1">
+          {analysis.summary}
+        </p>
+
+        {/* Tags */}
+        <div className="flex items-center gap-1.5 flex-wrap mb-2">
+          {analysis.tags.map((tag) => (
+            <span
+              key={tag}
+              className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-[#D4A017]/8 text-[#D4A017]/50 font-[family-name:var(--font-jetbrains-mono)]"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+
+        {/* Separador + autor + región */}
+        <div className="pt-2 border-t border-white/[0.06]">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <span className="text-[9px] text-white/35 font-[family-name:var(--font-jetbrains-mono)]">
+                {analysis.author}
+              </span>
+            </div>
+            <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-[#D4A017]/10 text-[#D4A017]/60 font-[family-name:var(--font-jetbrains-mono)]">
+              {analysis.region}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

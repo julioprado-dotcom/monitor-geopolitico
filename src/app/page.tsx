@@ -2,11 +2,13 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import dynamic from 'next/dynamic';
-import { Radar, Menu, Tv, Radio } from 'lucide-react';
+import { Radar, Menu, Tv, Radio, Brain, BookOpen, Compass } from 'lucide-react';
 import { demoSignals, type Relevance, type Region, type Signal } from '@/data/signals';
+import { demoAnalysis, type Analysis } from '@/data/analysis';
 import { type TVChannel } from '@/data/channels';
 import MetricsBar from '@/components/MetricsBar';
 import SignalCard from '@/components/SignalCard';
+import AnalysisCard from '@/components/AnalysisCard';
 import SearchBar from '@/components/SearchBar';
 
 // Lazy imports: componentes secundarios no críticos para carga inicial
@@ -52,7 +54,15 @@ const MGSidebarFallback = () => (
   </div>
 );
 
-type MobileTab = 'signals' | 'tv';
+// ── Tipos de pestañas ──
+type ContentTab = 'signals' | 'analysis' | 'explorer';
+type MobileTab = ContentTab | 'tv';
+
+const CONTENT_TABS: { id: ContentTab; label: string; icon: typeof Radio; color: string }[] = [
+  { id: 'signals', label: 'Señales Geopolíticas', icon: Radio, color: '#00E5A0' },
+  { id: 'analysis', label: 'Análisis', icon: Brain, color: '#D4A017' },
+  { id: 'explorer', label: 'Explorador', icon: Compass, color: '#38BDF8' },
+];
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -60,10 +70,15 @@ export default function Home() {
   const [selectedClassifier, setSelectedClassifier] = useState<string | null>(null);
   const [selectedRelevances, setSelectedRelevances] = useState<Set<Relevance>>(new Set());
   const [selectedSignal, setSelectedSignal] = useState<Signal | null>(null);
+  const [selectedAnalysis, setSelectedAnalysis] = useState<Analysis | null>(null);
   const [floatingChannel, setFloatingChannel] = useState<TVChannel | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [contentTab, setContentTab] = useState<ContentTab>('signals');
   const [mobileTab, setMobileTab] = useState<MobileTab>('signals');
   const [comparisonSignal, setComparisonSignal] = useState<Signal | null>(null);
+
+  // Sync mobile tab with content tab
+  const activeTab: MobileTab = mobileTab === 'tv' ? 'tv' : contentTab;
 
   const filteredSignals = useMemo(() => {
     return demoSignals.filter((s) => {
@@ -88,13 +103,23 @@ export default function Home() {
 
   const handleRegionSelect = useCallback((r: Region | null) => {
     setSelectedRegion(r);
-    setSidebarOpen(false); // Cerrar sidebar en mobile al seleccionar
+    setSidebarOpen(false);
   }, []);
 
   const handleClassifierSelect = useCallback((c: string | null) => {
     setSelectedClassifier(c);
     setSidebarOpen(false);
   }, []);
+
+  const handleMobileTabChange = (tab: MobileTab) => {
+    setMobileTab(tab);
+    if (tab !== 'tv') {
+      setContentTab(tab as ContentTab);
+    }
+  };
+
+  const activeTabConfig = CONTENT_TABS.find((t) => t.id === activeTab);
+  const activeColor = activeTabConfig?.color || '#00E5A0';
 
   return (
     <div className="min-h-screen flex flex-col bg-[#0A0F1C] text-[#F1F5F9]">
@@ -134,29 +159,44 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Mobile tab bar — solo visible en < lg */}
-        <div className="lg:hidden flex border-t border-white/[0.04]">
+        {/* Tab bar — siempre visible */}
+        <div className="flex border-t border-white/[0.04]">
+          {CONTENT_TABS.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => handleMobileTabChange(tab.id)}
+                className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] transition-all duration-150 ${
+                  isActive
+                    ? 'border-b-2'
+                    : 'text-white/35 hover:text-white/55'
+                }`}
+                style={isActive ? {
+                  color: tab.color,
+                  borderColor: tab.color,
+                  backgroundColor: `${tab.color}08`,
+                } : undefined}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">{tab.label}</span>
+                <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
+              </button>
+            );
+          })}
+          {/* TV en Vivo */}
           <button
-            onClick={() => setMobileTab('signals')}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-[11px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] transition-colors ${
-              mobileTab === 'signals'
-                ? 'text-[#00E5A0] border-b-2 border-[#00E5A0] bg-[#00E5A0]/5'
-                : 'text-white/35 hover:text-white/55'
-            }`}
-          >
-            <Radio className="w-3.5 h-3.5" />
-            Señales Geopolíticas
-          </button>
-          <button
-            onClick={() => setMobileTab('tv')}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-[11px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] transition-colors ${
+            onClick={() => handleMobileTabChange('tv')}
+            className={`flex items-center justify-center gap-1.5 px-4 py-2.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] transition-all duration-150 ${
               mobileTab === 'tv'
-                ? 'text-[#00E5A0] border-b-2 border-[#00E5A0] bg-[#00E5A0]/5'
+                ? 'border-b-2 border-[#00E5A0] text-[#00E5A0] bg-[#00E5A0]/8'
                 : 'text-white/35 hover:text-white/55'
             }`}
           >
             <Tv className="w-3.5 h-3.5" />
-            TV en Vivo
+            <span className="hidden sm:inline">TV en Vivo</span>
+            <span className="sm:hidden">TV</span>
           </button>
         </div>
       </header>
@@ -187,47 +227,92 @@ export default function Home() {
       {/* MAIN */}
       <main className="flex-1 max-w-screen-2xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-5">
         <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr_260px] gap-4 h-full">
-          {/* Sidebar — desktop only (mobile usa offcanvas) */}
+          {/* Sidebar — desktop only */}
           <div className="hidden lg:block">
             <MGSidebar selectedRegion={selectedRegion} selectedClassifier={selectedClassifier} onRegionSelect={setSelectedRegion} onClassifierSelect={setSelectedClassifier} />
           </div>
 
-          {/* Center column */}
-          <div className={`flex flex-col gap-4 sm:gap-5 min-w-0 ${mobileTab !== 'signals' ? 'hidden lg:flex' : 'flex'}`}>
-            <MetricsBar allSignals={demoSignals} filteredCount={filteredSignals.length} selectedRelevances={selectedRelevances} onToggleRelevance={toggleRelevance} onClearRelevance={() => setSelectedRelevances(new Set())} />
-            <SearchBar value={searchQuery} onChange={setSearchQuery} />
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {filteredSignals.map((signal) => (
-                <SignalCard key={signal.id} signal={signal} onRegionClick={setSelectedRegion} onClassifierClick={setSelectedClassifier} onSignalClick={setSelectedSignal} />
-              ))}
-              {filteredSignals.length > 0 && (
-                <div className="sm:col-span-2 flex justify-center">
-                  <button
-                    onClick={() => {
-                      if (filteredSignals.length >= 2) setComparisonSignal(filteredSignals[0]);
-                    }}
-                    className="mt-2 flex items-center gap-2 px-4 py-2 rounded-xl bg-[#00E5A0]/5 border border-[#00E5A0]/15 text-[#00E5A0]/60 hover:bg-[#00E5A0]/10 hover:text-[#00E5A0]/80 transition-colors text-[11px] font-bold font-[family-name:var(--font-space-grotesk)]"
-                  >
-                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M11 18H8a2 2 0 0 1-2-2V9"/></svg>
-                    Comparar fuentes ({filteredSignals.length} señales geopolíticas)
-                  </button>
+          {/* Center column — tabs de contenido */}
+          <div className={`${mobileTab === 'tv' ? 'hidden lg:flex' : 'flex'} flex-col gap-4 sm:gap-5 min-w-0`}>
+            {/* ── TAB: Señales Geopolíticas ── */}
+            {contentTab === 'signals' && (
+              <>
+                <MetricsBar allSignals={demoSignals} filteredCount={filteredSignals.length} selectedRelevances={selectedRelevances} onToggleRelevance={toggleRelevance} onClearRelevance={() => setSelectedRelevances(new Set())} />
+                <SearchBar value={searchQuery} onChange={setSearchQuery} />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {filteredSignals.map((signal) => (
+                    <SignalCard key={signal.id} signal={signal} onRegionClick={setSelectedRegion} onClassifierClick={setSelectedClassifier} onSignalClick={setSelectedSignal} />
+                  ))}
+                  {filteredSignals.length > 0 && (
+                    <div className="sm:col-span-2 flex justify-center">
+                      <button
+                        onClick={() => {
+                          if (filteredSignals.length >= 2) setComparisonSignal(filteredSignals[0]);
+                        }}
+                        className="mt-2 flex items-center gap-2 px-4 py-2 rounded-xl bg-[#00E5A0]/5 border border-[#00E5A0]/15 text-[#00E5A0]/60 hover:bg-[#00E5A0]/10 hover:text-[#00E5A0]/80 transition-colors text-[11px] font-bold font-[family-name:var(--font-space-grotesk)]"
+                      >
+                        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M11 18H8a2 2 0 0 1-2-2V9"/></svg>
+                        Comparar fuentes ({filteredSignals.length} señales geopolíticas)
+                      </button>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-            {filteredSignals.length === 0 && (
-              <div className="text-center py-16">
-                <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-4">
-                  <Radar className="w-8 h-8 text-white/15" />
+                {filteredSignals.length === 0 && (
+                  <div className="text-center py-16">
+                    <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-4">
+                      <Radar className="w-8 h-8 text-white/15" />
+                    </div>
+                    <p className="text-sm text-white/25 font-[family-name:var(--font-space-grotesk)]">No se encontraron señales con los filtros actuales</p>
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* ── TAB: Análisis ── */}
+            {contentTab === 'analysis' && (
+              <>
+                {/* Header de sección */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Brain className="w-4 h-4 text-[#D4A017]/60" />
+                    <h2 className="text-xs font-bold text-white/50 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">
+                      Análisis y Perspectivas
+                    </h2>
+                  </div>
+                  <span className="text-[9px] text-[#D4A017]/40 font-[family-name:var(--font-jetbrains-mono)]">
+                    {demoAnalysis.length} artículos
+                  </span>
                 </div>
-                <p className="text-sm text-white/25 font-[family-name:var(--font-space-grotesk)]">No se encontraron señales con los filtros actuales</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {demoAnalysis.map((analysis) => (
+                    <AnalysisCard key={analysis.id} analysis={analysis} onClick={setSelectedAnalysis} />
+                  ))}
+                </div>
+              </>
+            )}
+
+            {/* ── TAB: Explorador (pendiente) ── */}
+            {contentTab === 'explorer' && (
+              <div className="text-center py-20">
+                <div className="w-16 h-16 rounded-2xl bg-white/[0.03] flex items-center justify-center mx-auto mb-4 border border-white/[0.06]">
+                  <Compass className="w-8 h-8 text-[#38BDF8]/20" />
+                </div>
+                <h3 className="text-sm font-bold text-white/30 mb-2 font-[family-name:var(--font-space-grotesk)]">
+                  Explorador Geopolítico
+                </h3>
+                <p className="text-xs text-white/20 max-w-xs mx-auto font-[family-name:var(--font-space-grotesk)]">
+                  Herramienta interactiva de exploración geopolítica en desarrollo.
+                </p>
+                <span className="inline-block mt-4 px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-wider bg-[#38BDF8]/8 text-[#38BDF8]/30 font-[family-name:var(--font-jetbrains-mono)]">
+                  Próximamente
+                </span>
               </div>
             )}
           </div>
 
-          {/* Right column — desktop always visible, mobile only on TV tab */}
-          <div className={`flex-col gap-3 ${mobileTab !== 'tv' ? 'hidden lg:flex' : 'flex lg:flex'}`}>
+          {/* Right column — TV en Vivo + sidebars */}
+          <div className={`${mobileTab !== 'tv' ? 'hidden lg:flex' : 'flex lg:flex'} flex-col gap-3`}>
             <LivePlayer onOpenFloating={(ch) => setFloatingChannel(ch)} />
-            {/* LatestSignals + SourceClassifier solo en desktop o en TV tab con espacio */}
             <div className="hidden lg:flex flex-col gap-3">
               <LatestSignals onSignalClick={setSelectedSignal} />
               <SourceClassifier />
@@ -248,6 +333,30 @@ export default function Home() {
       {/* SIGNAL OVERLAY */}
       {selectedSignal && (
         <SignalOverlay signal={selectedSignal} onClose={() => setSelectedSignal(null)} />
+      )}
+
+      {/* ANALYSIS OVERLAY — reutiliza SignalOverlay temporalmente */}
+      {selectedAnalysis && (
+        <SignalOverlay
+          signal={{
+            id: selectedAnalysis.id,
+            title: selectedAnalysis.title,
+            summary: selectedAnalysis.summary,
+            fullContent: selectedAnalysis.fullContent || selectedAnalysis.summary,
+            region: selectedAnalysis.region as any,
+            classifiers: selectedAnalysis.tags,
+            relevance: 'MEDIA',
+            source: selectedAnalysis.author,
+            sourceUrl: '',
+            language: 'es',
+            timestamp: selectedAnalysis.timestamp,
+            verified: true,
+            sourceLevel: 'A',
+            accessLevel: 'ABIERTO',
+            image: selectedAnalysis.image,
+          }}
+          onClose={() => setSelectedAnalysis(null)}
+        />
       )}
 
       {/* SOURCE COMPARISON VIEW */}
