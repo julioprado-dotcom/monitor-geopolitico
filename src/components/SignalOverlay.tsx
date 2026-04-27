@@ -199,8 +199,8 @@ export default function SignalOverlay({ signal, onClose, userTier = 'gratuito' }
           <div
             className="flex items-center gap-3 px-3 py-2.5 rounded-xl mb-3 flex-wrap"
             style={{
-              backgroundColor: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.07)',
+              backgroundColor: 'rgba(255,255,255,0.02)',
+              border: '1px solid rgba(255,255,255,0.04)',
             }}
           >
             {/* Bandera + código país */}
