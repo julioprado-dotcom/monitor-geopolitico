@@ -275,18 +275,6 @@ export default function SignalOverlay({ signal, onClose, userTier = 'gratuito' }
             </div>
           )}
 
-          {/* Full content */}
-          <div className="mb-6">
-            {signal.fullContent.split('\n\n').map((paragraph, i) => (
-              <p
-                key={i}
-                className="text-sm text-white/70 leading-relaxed mb-3 last:mb-0 font-[family-name:var(--font-space-grotesk)]"
-              >
-                {paragraph}
-              </p>
-            ))}
-          </div>
-
           {/* Divider */}
           <div className="w-full h-px bg-white/[0.06] mb-6" />
 
