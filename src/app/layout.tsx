@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/og-image.png",
+        url: "/og-image.webp",
         width: 1344,
         height: 768,
         alt: "Monitor Geopolítico — News Connect",
@@ -67,7 +67,7 @@ export const metadata: Metadata = {
     title: "Monitor Geopolítico — Inteligencia desde el Sur Global",
     description:
       "Señales geopolíticas clasificadas en tiempo real con análisis IA.",
-    images: ["/og-image.png"],
+    images: ["/og-image.webp"],
   },
   icons: {
     icon: "/favicon.png",

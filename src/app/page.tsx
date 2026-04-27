@@ -7,10 +7,12 @@ import { demoSignals, type Relevance, type Region, type Signal } from '@/data/si
 import { type TVChannel } from '@/data/channels';
 import MetricsBar from '@/components/MetricsBar';
 import SignalCard from '@/components/SignalCard';
-import MGSidebar from '@/components/MGSidebar';
-import LatestSignals from '@/components/LatestSignals';
-import SourceClassifier from '@/components/SourceClassifier';
 import SearchBar from '@/components/SearchBar';
+
+// Lazy imports: componentes secundarios no críticos para carga inicial
+const MGSidebar = dynamic(() => import('@/components/MGSidebar'), { loading: () => <MGSidebarFallback /> });
+const LatestSignals = dynamic(() => import('@/components/LatestSignals'));
+const SourceClassifier = dynamic(() => import('@/components/SourceClassifier'));
 
 // ── Dynamic imports: solo se cargan cuando se necesitan (cero impacto en carga inicial) ──
 const SignalOverlay = dynamic(() => import('@/components/SignalOverlay'), { ssr: false });
@@ -34,6 +36,21 @@ const LivePlayer = dynamic(() => import('@/components/LivePlayer'), {
     </div>
   ),
 });
+// Lazy: sidebar skeleton (no renderiza nada hasta que cargue)
+const MGSidebarFallback = () => (
+  <div className="flex flex-col gap-2 p-2">
+    {['Regiones', 'Clasificadores'].map((label) => (
+      <div key={label}>
+        <div className="h-3 w-16 rounded bg-white/[0.04] mb-2" />
+        <div className="flex flex-col gap-1.5">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="h-2 rounded bg-white/[0.03]" style={{ width: `${50 + i * 10}%` }} />
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
+);
 
 type MobileTab = 'signals' | 'tv';
 

@@ -37,6 +37,14 @@ export default function SignalOverlay({ signal, onClose }: SignalOverlayProps) {
   const mounted = useMounted();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showScrollHint, setShowScrollHint] = useState(false);
+  // Lazy load fullContent desde signalContent.ts (no incluido en bundle inicial)
+  const [fullContent, setFullContent] = useState<string | null>(null);
+
+  useEffect(() => {
+    import('@/data/signalContent').then(({ signalFullContent }) => {
+      setFullContent(signalFullContent[signal.id] || signal.summary);
+    });
+  }, [signal.id]);
 
   const relevanceColor = relevanceColors[signal.relevance];
   const levelColors = sourceLevelColors[signal.sourceLevel];
@@ -257,16 +265,23 @@ export default function SignalOverlay({ signal, onClose }: SignalOverlayProps) {
             </a>
           </div>
 
-          {/* 5. Full content */}
+          {/* 5. Full content — lazy loaded */}
           <div className="mb-4">
-            {signal.fullContent.split('\n\n').map((paragraph, i) => (
-              <p
-                key={i}
-                className="text-sm text-white/70 leading-relaxed mb-3 last:mb-0 font-[family-name:var(--font-space-grotesk)]"
-              >
-                {paragraph}
-              </p>
-            ))}
+            {!fullContent ? (
+              <div className="flex items-center gap-2 py-4">
+                <div className="w-4 h-4 border-2 border-white/10 border-t-white/30 rounded-full animate-spin" />
+                <span className="text-xs text-white/30 font-[family-name:var(--font-jetbrains-mono)]">Cargando contenido...</span>
+              </div>
+            ) : (
+              fullContent.split('\n\n').map((paragraph, i) => (
+                <p
+                  key={i}
+                  className="text-sm text-white/70 leading-relaxed mb-3 last:mb-0 font-[family-name:var(--font-space-grotesk)]"
+                >
+                  {paragraph}
+                </p>
+              ))
+            )}
           </div>
 
           {/* 6. Tags */}
