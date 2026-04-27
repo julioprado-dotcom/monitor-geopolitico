@@ -31,19 +31,6 @@ export default function MetricsBar({ allSignals, filteredCount, selectedRelevanc
         <span className="text-base font-bold text-[#00E5A0] font-[family-name:var(--font-space-grotesk)] leading-none">
           {filteredCount}
         </span>
-        {selectedRelevances.size > 0 && (() => {
-          const activeColor = relevanceColors[[...selectedRelevances][selectedRelevances.size - 1]];
-          return (
-            <button
-              onClick={() => onClearRelevance()}
-              className="ml-auto px-1.5 py-0.5 rounded text-[9px] font-bold font-[family-name:var(--font-jetbrains-mono)] transition-colors"
-              style={{ backgroundColor: `${activeColor}20`, color: activeColor, border: `1px solid ${activeColor}40` }}
-              title="Limpiar filtro"
-            >
-              <X className="w-3 h-3 inline" /> <span className="ml-0.5 text-[8px]">LIMPIAR</span>
-            </button>
-          );
-        })()}
       </div>
 
       {/* Barras sólidas verticales compactas */}
@@ -60,6 +47,18 @@ export default function MetricsBar({ allSignals, filteredCount, selectedRelevanc
               onClick={() => onToggleRelevance(sev)}
               className="flex-1 flex flex-col items-center gap-1 transition-all duration-150"
             >
+              {/* Botón limpiar encima de la barra seleccionada */}
+              {isSelected && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); onClearRelevance(); }}
+                  className="px-1 py-px rounded text-[7px] font-bold font-[family-name:var(--font-jetbrains-mono)] transition-colors"
+                  style={{ backgroundColor: `${color}20`, color, border: `1px solid ${color}40` }}
+                  title="Limpiar filtro"
+                >
+                  <X className="w-2 h-2 inline" /> <span className="ml-0.5">LIMPIAR</span>
+                </button>
+              )}
+
               {/* Contador */}
               <span
                 className="text-[10px] font-bold font-[family-name:var(--font-jetbrains-mono)] leading-none"
