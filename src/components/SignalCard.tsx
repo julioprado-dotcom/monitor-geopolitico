@@ -176,7 +176,7 @@ export default function SignalCard({ signal, onRegionClick, onClassifierClick, o
         {/* Línea de separación */}
         <div className="pt-2 border-t border-white/[0.06]">
           {/* Fuente con bandera */}
-          <div className="flex items-center justify-center gap-1.5 mb-0.5">
+          <div className="flex items-center gap-1.5 mb-0.5">
             {(() => {
               const country = sourceCountry[signal.source];
               return country ? (
@@ -193,7 +193,7 @@ export default function SignalCard({ signal, onRegionClick, onClassifierClick, o
           </div>
 
           {/* Señalizador de fuente — al fondo */}
-          <div className="flex items-center justify-center">
+          <div className="flex items-center">
             <span
               className="px-1.5 py-0.5 rounded text-[8px] font-bold font-[family-name:var(--font-jetbrains-mono)]"
               style={{ backgroundColor: levelColors.bg, color: levelColors.text, border: `1px solid ${levelColors.border}` }}
