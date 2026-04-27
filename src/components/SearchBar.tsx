@@ -31,7 +31,7 @@ export default function SearchBar({ value, onChange }: SearchBarProps) {
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="Buscar señales, regiones, fuentes..."
+        placeholder="Buscar señales geopolíticas, regiones, fuentes..."
         className="flex-1 bg-transparent text-sm text-white/80 placeholder:text-white/25 outline-none font-[family-name:var(--font-space-grotesk)]"
       />
       {value ? (

@@ -21,10 +21,10 @@ export default function MetricsBar({ signals, selectedRelevances, onToggleReleva
 
   return (
     <div className="glass-strong rounded-xl px-3 py-2.5">
-      {/* Fila 1: Señales + total */}
+      {/* Fila 1: Señales Geopolíticas + total */}
       <div className="flex items-center gap-2 mb-2">
         <span className="text-[10px] font-bold text-white/40 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">
-          Señales
+          Señales Geopolíticas
         </span>
         <span className="text-base font-bold text-[#00E5A0] font-[family-name:var(--font-space-grotesk)] leading-none">
           {total}

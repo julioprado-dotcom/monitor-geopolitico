@@ -32,7 +32,7 @@ export default function LatestSignals({ onSignalClick }: LatestSignalsProps) {
       {/* Header */}
       <div className="px-3 py-2.5 border-b border-white/[0.06] flex items-center justify-between">
         <span className="text-[10px] font-bold text-white/50 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">
-          Últimas Señales
+          Últimas Señales Geopolíticas
         </span>
         <span className="text-[10px] font-bold text-[#00E5A0]/60 font-[family-name:var(--font-jetbrains-mono)]">
           {latestSignals.length}
