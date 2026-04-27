@@ -140,20 +140,6 @@ export default function SignalOverlay({ signal, onClose, userTier = 'gratuito' }
           <XIcon className="w-4 h-4 text-white/60" />
         </button>
 
-        {/* Hero image */}
-        {signal.image && (
-          <div className="relative w-full h-48 overflow-hidden rounded-t-2xl">
-            <Image
-              src={signal.image}
-              alt={signal.title}
-              fill
-              className="object-cover"
-              unoptimized
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0A0F1C] to-transparent" />
-          </div>
-        )}
-
         <div className="p-4 sm:p-6">
           {/* Metadata row */}
           <div className="flex items-center flex-wrap gap-2 mb-3">
@@ -250,6 +236,20 @@ export default function SignalOverlay({ signal, onClose, userTier = 'gratuito' }
               Ir al artículo
             </a>
           </div>
+
+          {/* Hero image */}
+          {signal.image && (
+            <div className="relative w-full h-48 overflow-hidden rounded-xl mb-3">
+              <Image
+                src={signal.image}
+                alt={signal.title}
+                fill
+                className="object-cover"
+                unoptimized
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0A0F1C] to-transparent" />
+            </div>
+          )}
 
           {/* Tags */}
           <div className="flex items-center flex-wrap gap-2 mb-3">
