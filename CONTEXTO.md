@@ -150,6 +150,8 @@ Git: Trabajar con protocolo claro, no actualizar el repo hasta estar listos
 3. git reset --hard sin verificar → Puede destruir archivos no commiteados. SIEMPRE verificar qué es HEAD antes de reset
 4. Sesiones no comparten estado → Cada sesión empieza desde cero. CONTEXTO.md y worklog.md son la memoria persistente
 5. Health check cacheado → Si una sesión tiene merge conflict, aunque se resuelva externamente, la sesión queda bloqueada. Hay que continuar en nuevo chat.
+6. Hydration mismatch (overflow-hidden) → Si page.tsx tiene overflow-hidden en el grid y se quita, el servidor cachea el HTML viejo y el cliente renderiza distinto. Solución: mantener overflow-hidden consistente entre servidor y cliente.
+7. AnalysisOverlay → Creado clonando patrón de SignalOverlay con fuente de datos en analysisContent.ts. Tarjetas de análisis ahora muestran artículo completo correctamente.
 
 ## 13. PROTOCOLO GIT
 
@@ -163,7 +165,19 @@ Ver plan completo: /home/z/my-project/docs/PLAN_PROXY_ANTICENSURA.md
 
 PRE-REQUISITO: Ejecutar migraciones de docs/PLAN_MIGRACION.md (22 migraciones, ~3 días) antes de iniciar cualquier tarea funcional. Ver también docs/PLAN_IMPLEMENTACION.md para el plan completo con cronograma.
 
-Prioridad 0 — PRE-IMPLEMENTACIÓN (auditoría y correcciones documentales):
+Prioridad 0 — URGENTE (bugs activos en la UI):
+1. **Overlays (SignalOverlay + AnalysisOverlay) — flecha scroll y botón cerrar mal posicionados**: Se aplicaron múltiples intentos de corrección. Estado actual del código:
+   - Wrapper: `relative glass-strong rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col animate-slide-in`
+   - Close button: `absolute top-3 right-3 z-10` (hijo directo del wrapper)
+   - Scroll indicator: `absolute bottom-3 right-3 z-20 pointer-events-none` (hijo directo del wrapper)
+   - Scroll container: `flex-1 min-h-0 overflow-y-auto overlay-scroll` (hijo directo del wrapper)
+   - Problema: El botón de cerrar y la flecha NO aparecen en la esquina inferior derecha del cuadro visible. Posiblemente el `glass-strong` (que tiene `backdrop-filter`) crea un nuevo stacking context que interfere con `absolute`, o el wrapper no tiene altura resuelta al momento del render. Investigar con DevTools inspeccionando los computed styles del wrapper.
+   - Archivos: `src/components/SignalOverlay.tsx`, `src/components/AnalysisOverlay.tsx`
+   - NOTA: No ejecutar bun run dev manualmente. Usar bash .zscripts/dev.sh o dejar que el sandbox lo maneje.
+2. Crear shared analysis prompt en `src/lib/analysis-prompt.ts` y unificar en `analyze/route.ts` y `compare/route.ts`
+3. Remover sección "Recomendaciones" del análisis IA
+
+Prioridad 0.5 — PRE-IMPLEMENTACIÓN (auditoría y correcciones documentales):
 - Corregir 23 inconsistencias entre documentos y código (ver docs/PLAN_IMPLEMENTACION.md §0)
 - Ejecutar migraciones M1-M5 de docs/PLAN_MIGRACION.md
 
@@ -199,8 +213,10 @@ UI mejoradas (implementadas en sesión 2026-04-28):
 - Panel de fuente destacado: bandera + código país + fuente + idioma + "Ir al artículo" con color de nivel
 - Botón X de cierre en rojo (bg-red-500/20, hover bg-red-500/40, text-red-400)
 - Cierre al hacer clic fuera del overlay (backdrop onClick)
-- Indicador de scroll: flecha verde animada en borde inferior, se oculta al llegar al fondo
+- Indicador de scroll: flecha animada en esquina inferior derecha, se oculta al llegar al fondo (PENDIENTE: posicionamiento incorrecto, ver Prioridad 0 #1)
 - sourceCountry extraído a signals.ts para reutilización entre SignalCard y SignalOverlay
+- AnalysisOverlay creado con mismo patrón que SignalOverlay (fuentes en analysisContent.ts)
+- Explorer renombrado a "Hilos Geopolíticos" en tabs
 - DISCLAIMER actualizado: sin frase de compartir, con marca "Newsconnect"
 - MetricsBar: filtro de relevancia exclusivo (un solo nivel a la vez), botón limpiar, conteo desde allSignals
 - SignalCard: footer reorganizado (clasificadores → región → separador → fuente + nivel badge)
