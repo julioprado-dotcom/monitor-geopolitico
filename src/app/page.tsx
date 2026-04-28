@@ -5,11 +5,14 @@ import dynamic from 'next/dynamic';
 import { Radar, Menu, Tv, Radio, Brain, Compass } from 'lucide-react';
 import { demoSignals, type Relevance, type Region, type Signal } from '@/data/signals';
 import { demoAnalysis, type Analysis } from '@/data/analysis';
+import { demoThreads, type Thread, type ThreadStatus } from '@/data/threads';
 import { type TVChannel } from '@/data/channels';
 import MetricsBar from '@/components/MetricsBar';
 import SignalCard from '@/components/SignalCard';
 import AnalysisCard from '@/components/AnalysisCard';
 import SearchBar from '@/components/SearchBar';
+import ThreadCard from '@/components/Explorer/ThreadCard';
+import ThreadDetail from '@/components/Explorer/ThreadDetail';
 
 // Lazy imports: componentes secundarios no críticos para carga inicial
 const MGSidebar = dynamic(() => import('@/components/MGSidebar'), { loading: () => <MGSidebarFallback /> });
@@ -75,6 +78,9 @@ export default function Home() {
   const [mobileTab, setMobileTab] = useState<MobileTab>('signals');
   const [selectedAnalysis, setSelectedAnalysis] = useState<Analysis | null>(null);
   const [comparisonSignal, setComparisonSignal] = useState<Signal | null>(null);
+  const [expandedThread, setExpandedThread] = useState<Thread | null>(null);
+  const [followedThreads, setFollowedThreads] = useState<Set<string>>(new Set());
+  const [threadFilter, setThreadFilter] = useState<ThreadStatus | 'SEGUIDOS' | null>(null);
 
   const filteredSignals = useMemo(() => {
     return demoSignals.filter((s) => {
@@ -106,6 +112,34 @@ export default function Home() {
     setSelectedClassifier(c);
     setSidebarOpen(false);
   }, []);
+
+  const toggleFollowThread = (id: string) => {
+    setFollowedThreads((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const filteredThreads = useMemo(() => {
+    let threads = demoThreads;
+    if (threadFilter === 'SEGUIDOS') {
+      threads = threads.filter((t) => followedThreads.has(t.id));
+    } else if (threadFilter) {
+      threads = threads.filter((t) => t.status === threadFilter);
+    }
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      threads = threads.filter((t) =>
+        t.title.toLowerCase().includes(q) ||
+        t.description.toLowerCase().includes(q) ||
+        t.tags.some((tag) => tag.toLowerCase().includes(q)) ||
+        t.signals.some((s) => s.title.toLowerCase().includes(q) || s.source.toLowerCase().includes(q))
+      );
+    }
+    return threads;
+  }, [threadFilter, followedThreads, searchQuery]);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#0A0F1C] text-[#F1F5F9]">
@@ -247,16 +281,76 @@ export default function Home() {
               </div>
             )}
 
-            {/* 4. Tarjetas — Explorador (pendiente) */}
+            {/* 4. Explorador Geopolítico */}
             {contentTab === 'explorer' && (
-              <div className="text-center py-20">
-                <div className="w-16 h-16 rounded-2xl bg-white/[0.03] flex items-center justify-center mx-auto mb-4 border border-white/[0.06]">
-                  <Compass className="w-8 h-8 text-[#38BDF8]/20" />
+              <>
+                {/* Filtros rápidos */}
+                <div className="flex gap-1.5 overflow-x-auto pb-0.5 -mx-1 px-1">
+                  {([
+                    { id: null as ThreadStatus | 'SEGUIDOS' | null, label: 'Todos', color: '#64748B' },
+                    { id: 'EN_VIVO' as ThreadStatus, label: 'En Vivo', color: '#EF4444' },
+                    { id: 'EVOLUCION' as ThreadStatus, label: 'Evolución', color: '#F59E0B' },
+                    { id: 'RESUELTO' as ThreadStatus, label: 'Resueltos', color: '#00E5A0' },
+                    { id: 'DORMANTE' as ThreadStatus, label: 'Dormantes', color: '#64748B' },
+                    { id: 'SEGUIDOS' as const, label: 'Seguidos', color: '#38BDF8' },
+                  ]).map((f) => {
+                    const isActive = threadFilter === f.id;
+                    const count = f.id === 'SEGUIDOS'
+                      ? followedThreads.size
+                      : f.id === null
+                        ? demoThreads.length
+                        : demoThreads.filter((t) => t.status === f.id).length;
+                    return (
+                      <button
+                        key={f.label}
+                        onClick={() => setThreadFilter(isActive ? null : f.id)}
+                        className={`shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] transition-all duration-150 border ${
+                          isActive ? 'shadow-sm' : 'text-white/35 hover:text-white/55 border-white/[0.04] hover:border-white/[0.08]'
+                        }`}
+                        style={isActive ? { color: f.color, backgroundColor: `${f.color}12`, borderColor: `${f.color}30` } : undefined}
+                      >
+                        <span className={`w-1.5 h-1.5 rounded-full ${f.id === 'EN_VIVO' && isActive ? 'animate-pulse' : ''}`} style={{ backgroundColor: f.color }} />
+                        {f.label}
+                        <span className="opacity-50">({count})</span>
+                      </button>
+                    );
+                  })}
                 </div>
-                <h3 className="text-sm font-bold text-white/30 mb-2 font-[family-name:var(--font-space-grotesk)]">Explorador Geopolítico</h3>
-                <p className="text-xs text-white/20 max-w-xs mx-auto font-[family-name:var(--font-space-grotesk)]">Herramienta interactiva de exploración geopolítica en desarrollo.</p>
-                <span className="inline-block mt-4 px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-wider bg-[#38BDF8]/8 text-[#38BDF8]/30 font-[family-name:var(--font-jetbrains-mono)]">Próximamente</span>
-              </div>
+
+                {/* Vista: hilo expandido o lista de hilos */}
+                {expandedThread ? (
+                  <ThreadDetail
+                    thread={expandedThread}
+                    isFollowed={followedThreads.has(expandedThread.id)}
+                    onToggleFollow={toggleFollowThread}
+                    onClose={() => setExpandedThread(null)}
+                    onNavigateRelation={(threadId) => {
+                      const t = demoThreads.find((th) => th.id === threadId);
+                      if (t) setExpandedThread(t);
+                    }}
+                  />
+                ) : (
+                  <div className="flex flex-col gap-3">
+                    {filteredThreads.map((thread) => (
+                      <ThreadCard
+                        key={thread.id}
+                        thread={thread}
+                        isFollowed={followedThreads.has(thread.id)}
+                        onToggleFollow={toggleFollowThread}
+                        onExpand={setExpandedThread}
+                      />
+                    ))}
+                    {filteredThreads.length === 0 && (
+                      <div className="text-center py-16">
+                        <div className="w-16 h-16 rounded-2xl bg-white/[0.03] flex items-center justify-center mx-auto mb-4 border border-white/[0.06]">
+                          <Compass className="w-8 h-8 text-[#38BDF8]/20" />
+                        </div>
+                        <p className="text-sm text-white/25 font-[family-name:var(--font-space-grotesk)]">No hay hilos con los filtros actuales</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
             )}
           </div>
 
