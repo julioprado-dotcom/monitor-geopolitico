@@ -67,7 +67,7 @@ export default function SignalOverlay({ signal, onClose }: SignalOverlayProps) {
     handleScroll();
     el.addEventListener('scroll', handleScroll, { passive: true });
     return () => el.removeEventListener('scroll', handleScroll);
-  }, [handleScroll, analysis]);
+  }, [handleScroll, analysis, fullContent]);
 
   // Close on Escape
   const handleKeyDown = useCallback(

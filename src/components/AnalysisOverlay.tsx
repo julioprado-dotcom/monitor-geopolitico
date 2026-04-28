@@ -57,7 +57,7 @@ export default function AnalysisOverlay({ analysis: analysisData, onClose }: Ana
     handleScroll();
     el.addEventListener('scroll', handleScroll, { passive: true });
     return () => el.removeEventListener('scroll', handleScroll);
-  }, [handleScroll, aiAnalysis]);
+  }, [handleScroll, aiAnalysis, fullContent]);
 
   // Close on Escape
   const handleKeyDown = useCallback(
