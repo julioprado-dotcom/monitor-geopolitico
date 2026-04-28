@@ -64,9 +64,15 @@ export default function SignalOverlay({ signal, onClose }: SignalOverlayProps) {
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
-    handleScroll();
+    // Usar rAF para asegurar que el DOM se reflowe tras cambios de contenido
+    const rafId = requestAnimationFrame(() => {
+      handleScroll();
+    });
     el.addEventListener('scroll', handleScroll, { passive: true });
-    return () => el.removeEventListener('scroll', handleScroll);
+    return () => {
+      cancelAnimationFrame(rafId);
+      el.removeEventListener('scroll', handleScroll);
+    };
   }, [handleScroll, analysis, fullContent]);
 
   // Close on Escape
@@ -129,20 +135,19 @@ export default function SignalOverlay({ signal, onClose }: SignalOverlayProps) {
       style={{ backdropFilter: 'blur(8px)', backgroundColor: 'rgba(0,0,0,0.7)' }}
       onClick={onClose}
     >
-      {/* Wrapper visual — glass-strong con backdrop-filter */}
-      {/* flex flex-col + flex-1 min-h-0: patron CSS para scroll dentro de contenedor con max-height */}
-      <div className="relative glass-strong rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col animate-slide-in">
-        {/* Close button — absolute al wrapper, no scroll */}
+      {/* Contenedor de posicionamiento — SIN backdrop-filter ni transform para evitar stacking context */}
+      <div className="relative rounded-2xl w-full max-w-3xl max-h-[90vh] animate-slide-in">
+        {/* Close button — absolute al contenedor limpio, fuera del glass */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-lg bg-red-500/20 hover:bg-red-500/40 transition-colors"
+          className="absolute top-3 right-3 z-30 w-8 h-8 flex items-center justify-center rounded-lg bg-red-500/20 hover:bg-red-500/40 transition-colors"
           aria-label="Cerrar"
         >
           <XIcon className="w-4 h-4 text-red-400" />
         </button>
-        {/* Indicador de scroll — absolute al wrapper, esquina inferior derecha */}
+        {/* Indicador de scroll — absolute al contenedor limpio, esquina inferior derecha */}
         <div
-          className="absolute bottom-3 right-3 z-20 pointer-events-none transition-opacity duration-300"
+          className="absolute bottom-3 right-3 z-30 pointer-events-none transition-opacity duration-300"
           style={{ opacity: showScrollHint ? 1 : 0 }}
         >
           <div
@@ -154,6 +159,8 @@ export default function SignalOverlay({ signal, onClose }: SignalOverlayProps) {
             </svg>
           </div>
         </div>
+        {/* Wrapper visual — glass-strong con backdrop-filter — hijo interno, NO afecta posicionamiento de controles */}
+        <div className="rounded-2xl overflow-hidden flex flex-col max-h-[90vh] glass-strong">
         {/* Scroll container — flex-1 min-h-0 permite scroll dentro de contenedor flex */}
         <div
           className="flex-1 min-h-0 overflow-y-auto overlay-scroll"
@@ -435,7 +442,8 @@ export default function SignalOverlay({ signal, onClose }: SignalOverlayProps) {
           </div>
         </div>
         </div>
-      </div>
+        </div>{/* fin glass-strong */}
+      </div>{/* fin contenedor de posicionamiento */}
     </div>
   );
 }

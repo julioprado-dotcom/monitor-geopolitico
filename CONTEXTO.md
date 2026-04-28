@@ -176,14 +176,11 @@ Ver plan completo: /home/z/my-project/docs/PLAN_PROXY_ANTICENSURA.md
 PRE-REQUISITO: Ejecutar migraciones de docs/PLAN_MIGRACION.md (22 migraciones, ~3 días) antes de iniciar cualquier tarea funcional. Ver también docs/PLAN_IMPLEMENTACION.md para el plan completo con cronograma.
 
 Prioridad 0 — URGENTE (bugs activos en la UI):
-1. **Overlays (SignalOverlay + AnalysisOverlay) — flecha scroll y botón cerrar mal posicionados**: Se aplicaron múltiples intentos de corrección. Estado actual del código:
-   - Wrapper: `relative glass-strong rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col animate-slide-in`
-   - Close button: `absolute top-3 right-3 z-10` (hijo directo del wrapper)
-   - Scroll indicator: `absolute bottom-3 right-3 z-20 pointer-events-none` (hijo directo del wrapper)
-   - Scroll container: `flex-1 min-h-0 overflow-y-auto overlay-scroll` (hijo directo del wrapper)
-   - Problema: El botón de cerrar y la flecha NO aparecen en la esquina inferior derecha del cuadro visible. Posiblemente el `glass-strong` (que tiene `backdrop-filter`) crea un nuevo stacking context que interfere con `absolute`, o el wrapper no tiene altura resuelta al momento del render. Investigar con DevTools inspeccionando los computed styles del wrapper.
+1. ~~**Overlays (SignalOverlay + AnalysisOverlay) — flecha scroll y botón cerrar mal posicionados**~~ ✅ RESUELTO (sesión 2026-04-29)
+   - Causa raíz: `backdrop-filter` (en `.glass-strong`) + `transform` (en `.animate-slide-in`) creaban stacking contexts que interferían con el posicionamiento `absolute` de los controles.
+   - Solución: Separar en dos capas — contenedor exterior `relative` SIN backdrop-filter/transform para los controles `absolute` (close button z-30, scroll indicator z-30), y contenedor interior `glass-strong` solo para el fondo visual.
+   - Timing: Añadido `requestAnimationFrame` en useEffect para asegurar reflow del DOM tras carga de `fullContent` antes de calcular scroll hint.
    - Archivos: `src/components/SignalOverlay.tsx`, `src/components/AnalysisOverlay.tsx`
-   - NOTA: No ejecutar bun run dev manualmente. Usar bash .zscripts/dev.sh o dejar que el sandbox lo maneje.
 2. Crear shared analysis prompt en `src/lib/analysis-prompt.ts` y unificar en `analyze/route.ts` y `compare/route.ts`
 
 Prioridad 0.5 — PRE-IMPLEMENTACIÓN (auditoría y correcciones documentales):
