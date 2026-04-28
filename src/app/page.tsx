@@ -124,7 +124,7 @@ export default function Home() {
 
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0A0F1C] text-[#F1F5F9]">
+    <div className="min-h-screen lg:h-screen lg:overflow-hidden flex flex-col bg-[#0A0F1C] text-[#F1F5F9]">
       {/* HEADER */}
       <header className="w-full glass-strong border-b border-white/[0.06] sticky top-0 z-50">
         <div className="max-w-screen-2xl mx-auto px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-2">
@@ -200,15 +200,15 @@ export default function Home() {
       </aside>
 
       {/* MAIN */}
-      <main className="flex-1 max-w-screen-2xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-5">
+      <main className="flex-1 max-w-screen-2xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-5 min-h-0 lg:overflow-hidden">
         <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr_260px] gap-4 h-full">
           {/* Sidebar — desktop only */}
-          <div className="hidden lg:block">
+          <div className="hidden lg:block lg:overflow-y-auto min-h-0">
             <MGSidebar selectedRegion={selectedRegion} selectedClassifier={selectedClassifier} onRegionSelect={setSelectedRegion} onClassifierSelect={setSelectedClassifier} />
           </div>
 
           {/* Center column — contenido principal */}
-          <div className={`${mobileTab === 'tv' ? 'hidden lg:flex' : 'flex'} flex-col gap-3 sm:gap-4 min-w-0`}>
+          <div className={`${mobileTab === 'tv' ? 'hidden lg:flex' : 'flex'} flex-col gap-3 sm:gap-4 min-w-0 min-h-0 lg:overflow-y-auto`}>
             {/* ── 1. TÍTULO DINÁMICO (cambia según tab activo) ── */}
             {(() => {
               const tab = CONTENT_TABS.find((t) => t.id === contentTab);
@@ -237,8 +237,8 @@ export default function Home() {
             {/* ── 2. BUSCADOR ── */}
             <SearchBar value={searchQuery} onChange={setSearchQuery} />
 
-            {/* ── 3. PESTAÑAS ── */}
-            <div className="flex gap-1 p-1 rounded-xl glass border border-white/[0.06]">
+            {/* ── 3. PESTAÑAS (sin glass para evitar reflow con header sticky) ── */}
+            <div className="flex gap-1 p-1 rounded-xl bg-[#111827]/90 border border-white/[0.06]">
               {CONTENT_TABS.map((tab) => {
                 const Icon = tab.icon;
                 const isActive = contentTab === tab.id;
@@ -327,7 +327,7 @@ export default function Home() {
           </div>
 
           {/* Right column — TV en Vivo + sidebars */}
-          <div className={`${mobileTab !== 'tv' ? 'hidden lg:flex' : 'flex lg:flex'} flex-col gap-3`}>
+          <div className={`${mobileTab !== 'tv' ? 'hidden lg:flex' : 'flex lg:flex'} flex-col gap-3 min-h-0 lg:overflow-y-auto`}>
             <LivePlayer onOpenFloating={(ch) => setFloatingChannel(ch)} />
             <div className="hidden lg:flex flex-col gap-3">
               <LatestSignals onSignalClick={setSelectedSignal} />
