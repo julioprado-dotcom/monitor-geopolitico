@@ -52,11 +52,11 @@ Deployment: Z.ai sandbox + GitHub
 ## 4. ESTRUCTURA DEL PROYECTO
 
 /home/z/my-project/
-src/app/ — layout.tsx (JSON-LD SEO, metadata), page.tsx (Dashboard + mobile tabs), globals.css, api/analyze/route.ts (8 secciones, 5 filtros, bidireccionalidad), api/content-proxy/route.ts (proxy anti-censura), api/hls-proxy/route.ts (150 líneas), api/youtube-live/route.ts (432 líneas), api/route.ts
-src/components/ — 11 componentes: FloatingProjector.tsx (293 líneas), ProyectorWindow.tsx (481 líneas), HLSPlayer.tsx (271 líneas), LivePlayer.tsx, LatestSignals.tsx ("Últimas Señales Geopolíticas"), SignalCard.tsx (footer: clasificadores → región → separador → fuente + nivel badge), SignalOverlay.tsx (overlay de noticia ampliada: metadata → imagen → título → panel fuente → contenido → tags → advertencias nivel C/D → análisis IA → disclaimer; cierre al clic fuera; X roja; indicador de scroll; sin botones de compartir), SearchBar.tsx, SourceClassifier.tsx, MGSidebar.tsx, MetricsBar.tsx (barras de relevancia exclusivas con botón limpiar, cuenta desde allSignals)
+src/app/ — layout.tsx (JSON-LD SEO, metadata), page.tsx (Dashboard + mobile tabs), globals.css, api/analyze/route.ts (7 dimensiones de análisis, 5 filtros, 2 tipos simple/profundo, bidireccionalidad), api/content-proxy/route.ts (proxy anti-censura), api/hls-proxy/route.ts (150 líneas), api/youtube-live/route.ts (432 líneas), api/route.ts
+src/components/ — 13 componentes: FloatingProjector.tsx (293 líneas), ProyectorWindow.tsx (481 líneas), HLSPlayer.tsx (271 líneas), LivePlayer.tsx, LatestSignals.tsx ("Últimas Señales Geopolíticas"), SignalCard.tsx (footer: clasificadores → región → separador → fuente + nivel badge), SignalOverlay.tsx (overlay de noticia ampliada: metadata → imagen → título → panel fuente → contenido → tags → advertencias nivel C/D → análisis IA → disclaimer; cierre al clic fuera; X roja; indicador de scroll; sin botones de compartir), AnalysisCard.tsx (tarjetas de análisis con overlay), AnalysisOverlay.tsx (overlay de análisis, mismo patrón que SignalOverlay, fuente de datos en analysisContent.ts), SearchBar.tsx, SourceClassifier.tsx, MGSidebar.tsx, MetricsBar.tsx (barras de relevancia exclusivas con botón limpiar, cuenta desde allSignals)
 src/components/ui/ — 53 componentes shadcn/ui (accordion, alert, badge, button, card, dialog, drawer, select, tabs, tooltip, etc.)
-src/data/ — channels.ts (14 canales de TV con metadatos de streaming), signals.ts (tipos TypeScript + datos demo + sourceCountry compartido + DISCLAIMER actualizado con marca Newsconnect)
-src/lib/ — db.ts (Prisma ORM), utils.ts
+src/data/ — channels.ts (14 canales de TV con metadatos de streaming), signals.ts (tipos TypeScript + datos demo + sourceCountry compartido + DISCLAIMER actualizado con marca Newsconnect), signalContent.ts (contenido completo de señales SIG-xxx, lazy load), analysis.ts (tipos TypeScript + datos de análisis ANL-xxx), analysisContent.ts (contenido completo de análisis, lazy load)
+src/lib/ — db.ts (Prisma ORM), utils.ts, analysisPrompt.ts (prompt compartido de análisis con 7 dimensiones y 2 tipos), rateLimit.ts
 src/hooks/ — use-toast.ts, use-mobile.ts, useMounted.ts
 docs/ — 14 documentos estratégicos (ver §22-23) + 3 PDFs (Marco_Conceptual.pdf NO cambiar)
 CONTEXTO.md, PROTOCOLO_GIT.md, .gitignore (incluye .zscripts/, worklog.md, download/)
@@ -104,7 +104,16 @@ Multi-clasificación: classifiers es string[] (una señal puede tener múltiples
 
 Bidireccionalidad de la Relevancia: Toda señal se evalúa en DOS dimensiones: Amenaza (riesgo para el Sur Global) y Emancipación (oportunidad de liberación)
 
-8 Secciones del Análisis IA: 1.Clasificación primaria y secundaria, 2.Resumen ejecutivo, 3.Análisis contextual, 4.Perspectiva Sur Global, 5.Cadenas causales, 6.Evaluación de relevancia bidireccional, 7.Conexiones interregionales, 8.Implicaciones prospectivas
+7 Dimensiones de Análisis IA (ver Marco_Conceptual.pdf Tabla 11): Son criterios de razonamiento, NO subtítulos. El análisis es texto fluido. Única excepción: "Escenarios Prospectivos" como última parte.
+1. Contexto Geopolítico (Filtro: Coherencia Histórica)
+2. Intereses y Actores (Filtro: Congruencia Inversa)
+3. Dimensión de Amenaza
+4. Dimensión de Emancipación (Filtro: Integridad Epistémica)
+5. Dimensiones Transversales
+6. Voces del Sur (Filtro: Confiabilidad Asimétrica)
+7. Escenarios Prospectivos (Filtro: Flexibilidad Pragmática)
+
+2 Tipos de Análisis: Simple (MEDIA/BAJA/INFORMATIVA, ~500-800 tokens, sin subtítulos) y En Profundidad (CRÍTICA/ALTA, ~2000-3000 tokens, subtítulos opcionales descriptivos del contenido, nunca los nombres de los criterios). El Monitor NO incluye conclusiones ni recomendaciones: proporciona criterios de análisis y enfoque desde el Sur Global; el lector formula sus propias conclusiones.
 
 Metadatos de Señal: sourceLevel (A/B/C/D), accessLevel (ABIERTO/RESTRINGIDO/CLASIFICADO), verified (boolean), language (código ISO)
 

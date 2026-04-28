@@ -26,11 +26,14 @@ export async function POST(request: NextRequest) {
     }
 
     const classifierList = classifiers?.join(', ') || 'N/A';
+    const relevanceUpper = (relevance || '').toUpperCase();
+    const isDeep = ['CRÍTICA', 'CRITICA', 'ALTA'].includes(relevanceUpper);
+    const analysisType = isDeep ? 'EN PROFUNDIDAD' : 'SIMPLE';
     const userMessage = `Analiza el siguiente evento geopolítico aplicando la ÓPTICA SUR GLOBAL (fundamentada en los Parámetros Cognitivos y las Epistemologías del Sur) y la BIDIRECCIONALIDAD de la Relevancia (amenaza + emancipación):
 
+**Tipo de análisis**: ${analysisType} (relevancia: ${relevance})
 **Señal**: ${title}
 **Clasificadores**: ${classifierList}
-**Relevancia**: ${relevance} (recuerda: evalúa tanto la dimensión de amenaza como la de emancipación)
 **Región**: ${region}
 **Fuente**: ${source}
 **Idioma del análisis**: ${language === 'es' ? 'Español' : language === 'en' ? 'English' : language === 'pt' ? 'Português' : language === 'zh' ? '中文' : language === 'ar' ? 'العربية' : 'Español'}
@@ -39,13 +42,14 @@ export async function POST(request: NextRequest) {
 
 **Contenido completo**: ${fullContent || summary}
 
-Genera un análisis completo siguiendo las 8 secciones definidas en tus instrucciones. Asegúrate de:
+Genera un análisis ${analysisType.toLowerCase()} incorporando las 7 dimensiones de análisis definidas en tus instrucciones. Asegúrate de:
 1. Aplicar el alcance semántico ampliado de cada clasificador desde la óptica Sur Global.
 2. Identificar explícitamente las dimensiones de amenaza Y de emancipación.
 3. Explorar las conexiones transversales entre los clasificadores asignados (${classifierList}).
 4. Visibilizar voces, resistencias y procesos del Sur Global que los análisis convencionales omiten.
 5. Aplicar los cinco filtros analíticos: CONGRUENCIA INVERSA (detectar doble moral), COHERENCIA HISTÓRICA (conectar con raíces coloniales/neocoloniales), INTEGRIDAD EPISTÉMICA (criticar también opresión desde el Sur), CONFIABILIDAD ASIMÉTRICA (auditar sesgo de fuentes), y FLEXIBILIDAD PRAGMÁTICA (reconocer complejidad de alianzas).
-6. Fundamentar el análisis en las bases semánticas: Ecología de Saberes, Economía Política Crítica, Materialismo Histórico, Pensamiento Decolonial y Panafricanismo, y Geopolítica Crítica Periférica.`;
+6. Fundamentar el análisis en las bases semánticas: Ecología de Saberes, Economía Política Crítica, Materialismo Histórico, Pensamiento Decolonial y Panafricanismo, y Geopolítica Crítica Periférica.
+7. Terminar con "Escenarios Prospectivos" como última parte.${isDeep ? '\n8. Al ser análisis en profundidad, usa subtítulos descriptivos del contenido cuando faciliten la comprensión, pero NUNCA uses los nombres de los 7 criterios como subtítulos.' : ''}`;
 
     const zai = await ZAI.create();
 
