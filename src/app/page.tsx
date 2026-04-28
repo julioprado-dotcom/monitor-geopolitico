@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import dynamic from 'next/dynamic';
-import { Radar, Menu, Tv, Radio, Brain, Compass } from 'lucide-react';
+import { Radar, Menu, Tv, Radio, Brain, GitBranch } from 'lucide-react';
 import { demoSignals, type Relevance, type Region, type Signal } from '@/data/signals';
 import { demoAnalysis, type Analysis } from '@/data/analysis';
 import { demoThreads, type Thread, type ThreadStatus } from '@/data/threads';
@@ -63,7 +63,7 @@ type MobileTab = ContentTab | 'tv';
 const CONTENT_TABS: { id: ContentTab; label: string; icon: typeof Radio; color: string }[] = [
   { id: 'signals', label: 'Señales Geopolíticas', icon: Radio, color: '#00E5A0' },
   { id: 'analysis', label: 'Análisis', icon: Brain, color: '#D4A017' },
-  { id: 'explorer', label: 'Explorador', icon: Compass, color: '#38BDF8' },
+  { id: 'explorer', label: 'Hilos Geopolíticos', icon: GitBranch, color: '#38BDF8' },
 ];
 
 export default function Home() {
@@ -206,14 +206,14 @@ export default function Home() {
 
       {/* MAIN */}
       <main className="flex-1 max-w-screen-2xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-5 overflow-x-hidden">
-        <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr_260px] gap-4 h-full">
+        <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr_260px] gap-4 h-full overflow-hidden">
           {/* Sidebar — desktop only (mobile usa offcanvas) */}
           <div className="hidden lg:block">
             <MGSidebar selectedRegion={selectedRegion} selectedClassifier={selectedClassifier} onRegionSelect={setSelectedRegion} onClassifierSelect={setSelectedClassifier} />
           </div>
 
           {/* Center column */}
-          <div className={`flex flex-col gap-3 sm:gap-4 min-w-0 ${mobileTab === 'tv' ? 'hidden lg:flex' : 'flex'}`}>
+          <div className={`flex flex-col gap-3 sm:gap-4 min-w-0 overflow-hidden ${mobileTab === 'tv' ? 'hidden lg:flex' : 'flex'}`}>
             {/* 1. Barras de señales (MetricsBar) */}
             <MetricsBar allSignals={demoSignals} filteredCount={filteredSignals.length} selectedRelevances={selectedRelevances} onToggleRelevance={toggleRelevance} onClearRelevance={() => setSelectedRelevances(new Set())} />
 
@@ -343,7 +343,7 @@ export default function Home() {
                     {filteredThreads.length === 0 && (
                       <div className="text-center py-16">
                         <div className="w-16 h-16 rounded-2xl bg-white/[0.03] flex items-center justify-center mx-auto mb-4 border border-white/[0.06]">
-                          <Compass className="w-8 h-8 text-[#38BDF8]/20" />
+                          <GitBranch className="w-8 h-8 text-[#38BDF8]/20" />
                         </div>
                         <p className="text-sm text-white/25 font-[family-name:var(--font-space-grotesk)]">No hay hilos con los filtros actuales</p>
                       </div>

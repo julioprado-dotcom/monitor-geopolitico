@@ -90,10 +90,15 @@ export default function SignalOverlay({ signal, onClose }: SignalOverlayProps) {
     setLoading(true);
     setError(null);
     try {
+      // Incluir fullContent cargado desde signalContent.ts — el Signal original tiene fullContent vacío
+      const payload = {
+        ...signal,
+        fullContent: fullContent || signal.fullContent || signal.summary,
+      };
       const res = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(signal),
+        body: JSON.stringify(payload),
       });
 
       const contentType = res.headers.get('content-type') || '';
@@ -333,10 +338,17 @@ export default function SignalOverlay({ signal, onClose }: SignalOverlayProps) {
             {!analysis && !loading && !error && (
               <button
                 onClick={fetchAnalysis}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#00E5A0]/10 border border-[#00E5A0]/20 text-[#00E5A0] hover:bg-[#00E5A0]/20 transition-colors duration-150 font-[family-name:var(--font-space-grotesk)]"
+                disabled={!fullContent}
+                className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl transition-colors duration-150 font-[family-name:var(--font-space-grotesk)] ${
+                  fullContent
+                    ? 'bg-[#00E5A0]/10 border border-[#00E5A0]/20 text-[#00E5A0] hover:bg-[#00E5A0]/20'
+                    : 'bg-white/[0.03] border border-white/[0.06] text-white/20 cursor-not-allowed'
+                }`}
               >
-                <Brain className="w-4 h-4" />
-                <span className="text-sm font-bold">Análisis IA — Perspectiva Sur Global</span>
+                <Brain className={`w-4 h-4 ${!fullContent ? 'animate-pulse' : ''}`} />
+                <span className="text-sm font-bold">
+                  {fullContent ? 'Análisis IA — Perspectiva Sur Global' : 'Cargando contenido...'}
+                </span>
               </button>
             )}
 
