@@ -130,8 +130,8 @@ export default function SignalOverlay({ signal, onClose }: SignalOverlayProps) {
       onClick={onClose}
     >
       {/* Wrapper visual — glass-strong con backdrop-filter */}
-      {/* h-[90vh] explicito para que absolute y h-full funcionen correctamente */}
-      <div className="relative glass-strong rounded-2xl w-full max-w-3xl h-[90vh] overflow-hidden animate-slide-in">
+      {/* flex flex-col + flex-1 min-h-0: patron CSS para scroll dentro de contenedor con max-height */}
+      <div className="relative glass-strong rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col animate-slide-in">
         {/* Close button — absolute al wrapper, no scroll */}
         <button
           onClick={onClose}
@@ -154,9 +154,9 @@ export default function SignalOverlay({ signal, onClose }: SignalOverlayProps) {
             </svg>
           </div>
         </div>
-        {/* Scroll container — SIN backdrop-filter para que absolute funcione correctamente */}
+        {/* Scroll container — flex-1 min-h-0 permite scroll dentro de contenedor flex */}
         <div
-          className="h-full overflow-y-auto overlay-scroll"
+          className="flex-1 min-h-0 overflow-y-auto overlay-scroll"
           ref={scrollRef}
           onClick={(e) => e.stopPropagation()}
         >
