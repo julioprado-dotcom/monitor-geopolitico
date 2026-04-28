@@ -207,14 +207,14 @@ export default function Home() {
 
       {/* MAIN */}
       <main className="flex-1 max-w-screen-2xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-5 overflow-x-hidden">
-        <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr_260px] gap-4 h-full overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr_260px] gap-4 h-full">
           {/* Sidebar — desktop only (mobile usa offcanvas) */}
           <div className="hidden lg:block">
             <MGSidebar selectedRegion={selectedRegion} selectedClassifier={selectedClassifier} onRegionSelect={setSelectedRegion} onClassifierSelect={setSelectedClassifier} />
           </div>
 
           {/* Center column */}
-          <div className={`flex flex-col gap-3 sm:gap-4 min-w-0 overflow-hidden ${mobileTab === 'tv' ? 'hidden lg:flex' : 'flex'}`}>
+          <div className={`flex flex-col gap-3 sm:gap-4 min-w-0 ${mobileTab === 'tv' ? 'hidden lg:flex' : 'flex'}`}>
             {/* 1. Barras de señales (MetricsBar) */}
             <MetricsBar allSignals={demoSignals} filteredCount={filteredSignals.length} selectedRelevances={selectedRelevances} onToggleRelevance={toggleRelevance} onClearRelevance={() => setSelectedRelevances(new Set())} />
 
