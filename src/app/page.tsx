@@ -54,7 +54,6 @@ const MGSidebarFallback = () => (
   </div>
 );
 
-// ── Tipos de pestañas ──
 type ContentTab = 'signals' | 'analysis' | 'explorer';
 type MobileTab = ContentTab | 'tv';
 
@@ -70,18 +69,12 @@ export default function Home() {
   const [selectedClassifier, setSelectedClassifier] = useState<string | null>(null);
   const [selectedRelevances, setSelectedRelevances] = useState<Set<Relevance>>(new Set());
   const [selectedSignal, setSelectedSignal] = useState<Signal | null>(null);
-  const [selectedAnalysis, setSelectedAnalysis] = useState<Analysis | null>(null);
   const [floatingChannel, setFloatingChannel] = useState<TVChannel | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [contentTab, setContentTab] = useState<ContentTab>('signals');
   const [mobileTab, setMobileTab] = useState<MobileTab>('signals');
+  const [selectedAnalysis, setSelectedAnalysis] = useState<Analysis | null>(null);
   const [comparisonSignal, setComparisonSignal] = useState<Signal | null>(null);
-
-  // Sync: al cambiar contentTab, salir de TV en mobile
-  const handleContentTabChange = (tab: ContentTab) => {
-    setContentTab(tab);
-    setMobileTab(tab);
-  };
 
   const filteredSignals = useMemo(() => {
     return demoSignals.filter((s) => {
@@ -106,7 +99,7 @@ export default function Home() {
 
   const handleRegionSelect = useCallback((r: Region | null) => {
     setSelectedRegion(r);
-    setSidebarOpen(false);
+    setSidebarOpen(false); // Cerrar sidebar en mobile al seleccionar
   }, []);
 
   const handleClassifierSelect = useCallback((c: string | null) => {
@@ -114,17 +107,8 @@ export default function Home() {
     setSidebarOpen(false);
   }, []);
 
-  const handleMobileTabChange = (tab: MobileTab) => {
-    setMobileTab(tab);
-    if (tab !== 'tv') {
-      setContentTab(tab as ContentTab);
-    }
-  };
-
-
-
   return (
-    <div className="min-h-screen lg:h-screen lg:overflow-hidden flex flex-col bg-[#0A0F1C] text-[#F1F5F9]">
+    <div className="min-h-screen flex flex-col bg-[#0A0F1C] text-[#F1F5F9]">
       {/* HEADER */}
       <header className="w-full glass-strong border-b border-white/[0.06] sticky top-0 z-50">
         <div className="max-w-screen-2xl mx-auto px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-2">
@@ -154,26 +138,46 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Right: TV toggle (mobile) + status badge */}
-          <div className="flex items-center gap-2 shrink-0">
-            <button
-              onClick={() => handleMobileTabChange(mobileTab === 'tv' ? contentTab : 'tv')}
-              className={`lg:hidden flex items-center justify-center w-9 h-9 rounded-lg border transition-colors ${
-                mobileTab === 'tv'
-                  ? 'bg-[#00E5A0]/15 border-[#00E5A0]/30 text-[#00E5A0]'
-                  : 'bg-white/5 border-white/[0.08] text-white/50 hover:text-white/80 hover:bg-white/10'
-              }`}
-              aria-label="TV en Vivo"
-            >
-              <Tv className="w-4 h-4" />
-            </button>
-            <div className="flex items-center gap-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl glass border border-[#00E5A0]/15">
-              <span className="h-2 w-2 rounded-full bg-[#00E5A0] animate-pulse" />
-              <span className="text-[9px] sm:text-[10px] font-bold text-[#00E5A0]/70 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">En línea</span>
-            </div>
+          {/* Right: status badge */}
+          <div className="flex items-center gap-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl glass border border-[#00E5A0]/15 shrink-0">
+            <span className="h-2 w-2 rounded-full bg-[#00E5A0] animate-pulse" />
+            <span className="text-[9px] sm:text-[10px] font-bold text-[#00E5A0]/70 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">En línea</span>
           </div>
         </div>
 
+        {/* Mobile tab bar — solo visible en < lg */}
+        <div className="lg:hidden flex border-t border-white/[0.04]">
+          {CONTENT_TABS.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = mobileTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => { setMobileTab(tab.id); setContentTab(tab.id); }}
+                className={`flex-1 flex items-center justify-center gap-1 py-2 text-[10px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] transition-colors ${
+                  isActive
+                    ? 'border-b-2 bg-white/[0.03]'
+                    : 'text-white/35 hover:text-white/55'
+                }`}
+                style={isActive ? { color: tab.color, borderColor: tab.color } : undefined}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                <span>{tab.label.split(' ')[0]}</span>
+              </button>
+            );
+          })}
+          <button
+            onClick={() => setMobileTab('tv')}
+            className={`flex items-center justify-center gap-1 py-2 px-4 text-[10px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] transition-colors ${
+              mobileTab === 'tv'
+                ? 'text-[#00E5A0] border-b-2 border-[#00E5A0] bg-[#00E5A0]/5'
+                : 'text-white/35 hover:text-white/55'
+            }`}
+          >
+            <Tv className="w-3.5 h-3.5" />
+            <span>TV</span>
+          </button>
+        </div>
       </header>
 
       {/* ── SIDEBAR OFFCANVAS (mobile) + OVERLAY ── */}
@@ -200,44 +204,34 @@ export default function Home() {
       </aside>
 
       {/* MAIN */}
-      <main className="flex-1 max-w-screen-2xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-5 min-h-0 lg:overflow-hidden">
-        <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr_260px] gap-4 h-full lg:overflow-hidden">
-          {/* Sidebar — desktop only */}
-          <div className="hidden lg:block lg:overflow-y-auto min-h-0">
+      <main className="flex-1 max-w-screen-2xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-5">
+        <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr_260px] gap-4 h-full">
+          {/* Sidebar — desktop only (mobile usa offcanvas) */}
+          <div className="hidden lg:block">
             <MGSidebar selectedRegion={selectedRegion} selectedClassifier={selectedClassifier} onRegionSelect={setSelectedRegion} onClassifierSelect={setSelectedClassifier} />
           </div>
 
-          {/* Center column — contenido principal */}
-          <div className={`${mobileTab === 'tv' ? 'hidden lg:flex' : 'flex'} flex-col gap-3 sm:gap-4 min-w-0 min-h-0 lg:overflow-y-auto lg:max-h-full`}>
-            {/* ── 1. TÍTULO DINÁMICO (cambia según tab activo) ── */}
+          {/* Center column */}
+          <div className={`flex flex-col gap-3 sm:gap-4 min-w-0 ${mobileTab === 'tv' ? 'hidden lg:flex' : 'flex'}`}>
+            {/* 1. Título dinámico según tab activo */}
             {(() => {
               const tab = CONTENT_TABS.find((t) => t.id === contentTab);
               if (!tab) return null;
               const Icon = tab.icon;
-              const count = contentTab === 'signals' ? filteredSignals.length : contentTab === 'analysis' ? demoAnalysis.length : 0;
               return (
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <div className="flex items-center justify-center w-8 h-8 rounded-lg" style={{ backgroundColor: `${tab.color}12` }}>
-                      <Icon className="w-4 h-4" style={{ color: tab.color }} />
-                    </div>
-                    <h2 className="text-sm sm:text-base font-bold text-white/80 font-[family-name:var(--font-space-grotesk)]">
-                      {tab.label}
-                    </h2>
+                <div className="flex items-center gap-2.5">
+                  <div className="flex items-center justify-center w-7 h-7 rounded-lg" style={{ backgroundColor: `${tab.color}12` }}>
+                    <Icon className="w-3.5 h-3.5" style={{ color: tab.color }} />
                   </div>
-                  {count > 0 && (
-                    <span className="text-[9px] font-bold font-[family-name:var(--font-jetbrains-mono)] px-2 py-0.5 rounded-md" style={{ color: `${tab.color}60`, backgroundColor: `${tab.color}08` }}>
-                      {count} {contentTab === 'signals' ? 'señales' : 'artículos'}
-                    </span>
-                  )}
+                  <h2 className="text-sm sm:text-base font-bold text-white/80 font-[family-name:var(--font-space-grotesk)]">{tab.label}</h2>
                 </div>
               );
             })()}
 
-            {/* ── 2. BUSCADOR ── */}
+            {/* 2. Buscador */}
             <SearchBar value={searchQuery} onChange={setSearchQuery} />
 
-            {/* ── 3. PESTAÑAS (sin glass para evitar reflow con header sticky) ── */}
+            {/* 3. Pestañas */}
             <div className="flex gap-1 p-1 rounded-xl bg-[#111827]/90 border border-white/[0.06]">
               {CONTENT_TABS.map((tab) => {
                 const Icon = tab.icon;
@@ -245,17 +239,11 @@ export default function Home() {
                 return (
                   <button
                     key={tab.id}
-                    onClick={() => handleContentTabChange(tab.id)}
+                    onClick={() => { setContentTab(tab.id); if (mobileTab !== 'tv') setMobileTab(tab.id); }}
                     className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-2 sm:px-3 rounded-lg text-[10px] sm:text-[11px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] transition-all duration-150 ${
-                      isActive
-                        ? 'shadow-sm'
-                        : 'text-white/35 hover:text-white/55 hover:bg-white/[0.03]'
+                      isActive ? 'shadow-sm' : 'text-white/35 hover:text-white/55 hover:bg-white/[0.03]'
                     }`}
-                    style={isActive ? {
-                      color: tab.color,
-                      backgroundColor: `${tab.color}12`,
-                      boxShadow: `0 0 12px ${tab.color}10, inset 0 1px 0 ${tab.color}15`,
-                    } : undefined}
+                    style={isActive ? { color: tab.color, backgroundColor: `${tab.color}12`, boxShadow: `0 0 12px ${tab.color}10` } : undefined}
                   >
                     <Icon className="w-3.5 h-3.5" />
                     <span className="hidden sm:inline">{tab.label}</span>
@@ -265,7 +253,7 @@ export default function Home() {
               })}
             </div>
 
-            {/* ── 4. TARJETAS (contenido según tab activo) ── */}
+            {/* 4. Tarjetas — Señales Geopolíticas */}
             {contentTab === 'signals' && (
               <>
                 <MetricsBar allSignals={demoSignals} filteredCount={filteredSignals.length} selectedRelevances={selectedRelevances} onToggleRelevance={toggleRelevance} onClearRelevance={() => setSelectedRelevances(new Set())} />
@@ -276,9 +264,7 @@ export default function Home() {
                   {filteredSignals.length > 0 && (
                     <div className="sm:col-span-2 flex justify-center">
                       <button
-                        onClick={() => {
-                          if (filteredSignals.length >= 2) setComparisonSignal(filteredSignals[0]);
-                        }}
+                        onClick={() => { if (filteredSignals.length >= 2) setComparisonSignal(filteredSignals[0]); }}
                         className="mt-2 flex items-center gap-2 px-4 py-2 rounded-xl bg-[#00E5A0]/5 border border-[#00E5A0]/15 text-[#00E5A0]/60 hover:bg-[#00E5A0]/10 hover:text-[#00E5A0]/80 transition-colors text-[11px] font-bold font-[family-name:var(--font-space-grotesk)]"
                       >
                         <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M11 18H8a2 2 0 0 1-2-2V9"/></svg>
@@ -298,7 +284,7 @@ export default function Home() {
               </>
             )}
 
-            {/* TAB: Análisis */}
+            {/* 4. Tarjetas — Análisis */}
             {contentTab === 'analysis' && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {demoAnalysis.map((analysis) => (
@@ -307,28 +293,23 @@ export default function Home() {
               </div>
             )}
 
-            {/* TAB: Explorador (pendiente) */}
+            {/* 4. Tarjetas — Explorador (pendiente) */}
             {contentTab === 'explorer' && (
               <div className="text-center py-20">
                 <div className="w-16 h-16 rounded-2xl bg-white/[0.03] flex items-center justify-center mx-auto mb-4 border border-white/[0.06]">
                   <Compass className="w-8 h-8 text-[#38BDF8]/20" />
                 </div>
-                <h3 className="text-sm font-bold text-white/30 mb-2 font-[family-name:var(--font-space-grotesk)]">
-                  Explorador Geopolítico
-                </h3>
-                <p className="text-xs text-white/20 max-w-xs mx-auto font-[family-name:var(--font-space-grotesk)]">
-                  Herramienta interactiva de exploración geopolítica en desarrollo.
-                </p>
-                <span className="inline-block mt-4 px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-wider bg-[#38BDF8]/8 text-[#38BDF8]/30 font-[family-name:var(--font-jetbrains-mono)]">
-                  Próximamente
-                </span>
+                <h3 className="text-sm font-bold text-white/30 mb-2 font-[family-name:var(--font-space-grotesk)]">Explorador Geopolítico</h3>
+                <p className="text-xs text-white/20 max-w-xs mx-auto font-[family-name:var(--font-space-grotesk)]">Herramienta interactiva de exploración geopolítica en desarrollo.</p>
+                <span className="inline-block mt-4 px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-wider bg-[#38BDF8]/8 text-[#38BDF8]/30 font-[family-name:var(--font-jetbrains-mono)]">Próximamente</span>
               </div>
             )}
           </div>
 
-          {/* Right column — TV en Vivo + sidebars */}
-          <div className={`${mobileTab !== 'tv' ? 'hidden lg:flex' : 'flex lg:flex'} flex-col gap-3 min-h-0 lg:overflow-y-auto`}>
+          {/* Right column — desktop always visible, mobile only on TV tab */}
+          <div className={`flex-col gap-3 ${mobileTab !== 'tv' ? 'hidden lg:flex' : 'flex lg:flex'}`}>
             <LivePlayer onOpenFloating={(ch) => setFloatingChannel(ch)} />
+            {/* LatestSignals + SourceClassifier solo en desktop o en TV tab con espacio */}
             <div className="hidden lg:flex flex-col gap-3">
               <LatestSignals onSignalClick={setSelectedSignal} />
               <SourceClassifier />
@@ -351,7 +332,7 @@ export default function Home() {
         <SignalOverlay signal={selectedSignal} onClose={() => setSelectedSignal(null)} />
       )}
 
-      {/* ANALYSIS OVERLAY — reutiliza SignalOverlay temporalmente */}
+      {/* ANALYSIS OVERLAY */}
       {selectedAnalysis && (
         <SignalOverlay
           signal={{
