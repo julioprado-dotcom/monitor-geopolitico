@@ -37,19 +37,12 @@ export default function SignalOverlay({ signal, onClose }: SignalOverlayProps) {
   const mounted = useMounted();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showScrollHint, setShowScrollHint] = useState(false);
-  // Lazy load fullContent desde signalContent.ts o analysisContent.ts (no incluido en bundle inicial)
+  // Lazy load fullContent desde signalContent.ts (incluye señales SIG-xxx y análisis ANL-xxx)
   const [fullContent, setFullContent] = useState<string | null>(null);
 
   useEffect(() => {
     import('@/data/signalContent').then(({ signalFullContent }) => {
-      if (signalFullContent[signal.id]) {
-        setFullContent(signalFullContent[signal.id]);
-      } else {
-        // Buscar en analysisContent.ts si el ID es de un análisis (ANL-xxx)
-        import('@/data/analysisContent').then(({ analysisFullContent }) => {
-          setFullContent(analysisFullContent[signal.id] || signal.summary);
-        });
-      }
+      setFullContent(signalFullContent[signal.id] || signal.summary);
     });
   }, [signal.id]);
 
