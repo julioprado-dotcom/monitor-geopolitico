@@ -180,28 +180,13 @@ export default function Home() {
 
           {/* Center column */}
           <div className={`flex flex-col gap-3 sm:gap-4 min-w-0 ${mobileTab === 'tv' ? 'hidden lg:flex' : 'flex'}`}>
-            {/* 1. Título dinámico según tab activo */}
-            {(() => {
-              const tab = CONTENT_TABS.find((t) => t.id === contentTab);
-              if (!tab) return null;
-              const Icon = tab.icon;
-              return (
-                <div className="flex items-center gap-2.5">
-                  <div className="flex items-center justify-center w-7 h-7 rounded-lg" style={{ backgroundColor: `${tab.color}12` }}>
-                    <Icon className="w-3.5 h-3.5" style={{ color: tab.color }} />
-                  </div>
-                  <h2 className="text-sm sm:text-base font-bold text-white/80 font-[family-name:var(--font-space-grotesk)]">{tab.label}</h2>
-                </div>
-              );
-            })()}
-
-            {/* 2. Barras de señales */}
+            {/* 1. Barras de señales (incluye título "Señales Geopolíticas") */}
             <MetricsBar allSignals={demoSignals} filteredCount={filteredSignals.length} selectedRelevances={selectedRelevances} onToggleRelevance={toggleRelevance} onClearRelevance={() => setSelectedRelevances(new Set())} />
 
-            {/* 3. Buscador */}
+            {/* 2. Buscador */}
             <SearchBar value={searchQuery} onChange={setSearchQuery} />
 
-            {/* 4. Pestañas */}
+            {/* 3. Pestañas */}
             <div className="flex gap-1 p-1 rounded-xl bg-[#111827]/90 border border-white/[0.06]">
               {CONTENT_TABS.map((tab) => {
                 const Icon = tab.icon;
@@ -223,7 +208,7 @@ export default function Home() {
               })}
             </div>
 
-            {/* 5. Tarjetas — Señales Geopolíticas */}
+            {/* 4. Tarjetas — Señales Geopolíticas */}
             {contentTab === 'signals' && (
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
