@@ -201,14 +201,14 @@ export default function Home() {
 
       {/* MAIN */}
       <main className="flex-1 max-w-screen-2xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-5 min-h-0 lg:overflow-hidden">
-        <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr_260px] gap-4 h-full">
+        <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr_260px] gap-4 h-full lg:overflow-hidden">
           {/* Sidebar — desktop only */}
           <div className="hidden lg:block lg:overflow-y-auto min-h-0">
             <MGSidebar selectedRegion={selectedRegion} selectedClassifier={selectedClassifier} onRegionSelect={setSelectedRegion} onClassifierSelect={setSelectedClassifier} />
           </div>
 
           {/* Center column — contenido principal */}
-          <div className={`${mobileTab === 'tv' ? 'hidden lg:flex' : 'flex'} flex-col gap-3 sm:gap-4 min-w-0 min-h-0 lg:overflow-y-auto`}>
+          <div className={`${mobileTab === 'tv' ? 'hidden lg:flex' : 'flex'} flex-col gap-3 sm:gap-4 min-w-0 min-h-0 lg:overflow-y-auto lg:max-h-full`}>
             {/* ── 1. TÍTULO DINÁMICO (cambia según tab activo) ── */}
             {(() => {
               const tab = CONTENT_TABS.find((t) => t.id === contentTab);
