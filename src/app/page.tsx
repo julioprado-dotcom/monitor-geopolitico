@@ -205,7 +205,7 @@ export default function Home() {
       </aside>
 
       {/* MAIN */}
-      <main className="flex-1 max-w-screen-2xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-5">
+      <main className="flex-1 max-w-screen-2xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-5 overflow-x-hidden">
         <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr_260px] gap-4 h-full">
           {/* Sidebar — desktop only (mobile usa offcanvas) */}
           <div className="hidden lg:block">
