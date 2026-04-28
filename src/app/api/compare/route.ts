@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import ZAI from 'z-ai-web-dev-sdk';
 import { rateLimit } from '@/lib/rateLimit';
 import { demoSignals, type Signal } from '@/data/signals';
+import { COMPARISON_SYSTEM_PROMPT } from '@/lib/analysisPrompt';
 
 /**
  * POST /api/compare
@@ -12,22 +13,7 @@ import { demoSignals, type Signal } from '@/data/signals';
  * Busca señales relacionadas del mismo evento y genera análisis comparativo.
  */
 
-const COMPARE_SYSTEM_PROMPT = `Eres el analista comparativo del Monitor Geopolítico. Tu función es analizar cómo DIFERENTES fuentes cubren el MISMO evento geopolítico, aplicando la Óptica Sur Global.
 
-INSTRUCCIONES:
-1. Analiza cada fuente individualmente: encuadre narrativo, selección léxica, omisiones.
-2. Identifica CONVERGENCIAS (hechos compartidos) y DIVERGENCIAS (contradicciones).
-3. Detecta OMISIONES CRUZADAS: qué menciona cada fuente que las otras omiten.
-4. Mapea INTERESES GEOPOLÍTICOS detrás de cada encuadre.
-5. Evalúa AMENAZA y EMANCIPACIÓN según cada fuente.
-6. Genera una SÍNTESIS DEL SUR GLOBAL que vaya más allá de todas las fuentes.
-
-REGLAS:
-- No juzgues quién tiene razón. Haz visible CÓMO y POR QUÉ difieren las narrativas.
-- Escribe en español.
-- Usa formato markdown con secciones claras.
-- Sé específico con citas textuales de cada fuente.
-- Máximo 1500 palabras.`;
 
 interface CompareRequestBody {
   signalId?: string;
@@ -122,7 +108,7 @@ Contenido: ${s.fullContent || s.summary}`)
 
     const completion = await zai.chat.completions.create({
       messages: [
-        { role: 'system', content: COMPARE_SYSTEM_PROMPT },
+        { role: 'system', content: COMPARISON_SYSTEM_PROMPT },
         { role: 'user', content: userMessage },
       ],
       temperature: 0.7,
