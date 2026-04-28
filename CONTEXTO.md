@@ -181,15 +181,15 @@ Prioridad 0 — URGENTE (bugs activos en la UI):
    - El overlay se cierra clickeando fuera del contenido o con Escape. El scroll es evidente por la barra del contenedor.
    - Se removió: `X as XIcon` import, `scrollRef`, `showScrollHint`, `handleScroll`, `useEffect` de scroll detection, botón close `<button>`, div indicador scroll, y importaciones `useRef`.
    - Archivos: `src/components/SignalOverlay.tsx`, `src/components/AnalysisOverlay.tsx`
-2. Crear shared analysis prompt en `src/lib/analysis-prompt.ts` y unificar en `analyze/route.ts` y `compare/route.ts`
+2. ~~Crear shared analysis prompt en `src/lib/analysisPrompt.ts` y unificar en `analyze/route.ts` y `compare/route.ts`~~ ✅ HECHO (sesión 2026-04-28, archivo: `src/lib/analysisPrompt.ts`, ambos routes lo importan)
 
 Prioridad 0.5 — PRE-IMPLEMENTACIÓN (auditoría y correcciones documentales):
-- Corregir 23 inconsistencias entre documentos y código (ver docs/PLAN_IMPLEMENTACION.md §0)
-- Ejecutar migraciones M1-M5 de docs/PLAN_MIGRACION.md
+- Corregir 23 inconsistencias entre documentos y código (ver docs/PLAN_IMPLEMENTACION.md §0) — PARCIALMENTE HECHO: MIG-10 labels (✅), MIG-13 CONTEXTO §4 (✅), MIG-18 prisma deps (✅), MIG-14 versiones (✅ ya 0.9.0). Restantes 19 inconsistencias PENDIENTES (ver lista en worklog.md).
+- Ejecutar migraciones M1-M5 de docs/PLAN_MIGRACION.md — PENDIENTE (M1 parcial, M2-M5 sin iniciar)
 
 Prioridad 1 — MÁXIMA (implementar primero, requiere migraciones completadas):
 1. Sanitización XSS del content-proxy (URGENTE — ver docs/PROPUESTAS_MEJORA.md)
-2. Rate limiting para /api/analyze y /api/translate (URGENTE — ver docs/PROPUESTAS_MEJORA.md)
+2. ~~Rate limiting para /api/analyze y /api/translate~~ PARCIALMENTE HECHO: `src/lib/rateLimit.ts` existe con limiting por IP (10/hr analyze, 5/hr compare). PENDIENTE: tier-based (requiere autenticación MIG-08)
 3. Accesibilidad básica (a11y) — ver docs/PROPUESTAS_MEJORA.md
 4. Verificar acceso del servidor a RT (precondición para proxy anti-censura)
 5. Implementar proxy anti-censura: image-proxy y rss-proxy (content-proxy ya existe, requiere XSS + política de fuentes — ver docs/PLAN_PROXY_ANTICENSURA.md)
@@ -217,9 +217,9 @@ Prioridad media:
 UI mejoradas (implementadas en sesión 2026-04-28):
 - SignalOverlay: reordenado (metadata → imagen → título → panel fuente → contenido → tags → análisis IA → disclaimer)
 - Panel de fuente destacado: bandera + código país + fuente + idioma + "Ir al artículo" con color de nivel
-- Botón X de cierre en rojo (bg-red-500/20, hover bg-red-500/40, text-red-400)
+- ~~Botón X de cierre en rojo~~ — ELIMINADO (sesión 2026-04-29, estrategia: cierre por clic fuera + Escape)
 - Cierre al hacer clic fuera del overlay (backdrop onClick)
-- Indicador de scroll: flecha animada en esquina inferior derecha, se oculta al llegar al fondo (PENDIENTE: posicionamiento incorrecto, ver Prioridad 0 #1)
+- ~~Indicador de scroll~~ — ELIMINADO (sesión 2026-04-29, el scroll es evidente por la barra del contenedor)
 - sourceCountry extraído a signals.ts para reutilización entre SignalCard y SignalOverlay
 - AnalysisOverlay creado con mismo patrón que SignalOverlay (fuentes en analysisContent.ts)
 - Explorer renombrado a "Hilos Geopolíticos" en tabs
