@@ -132,11 +132,11 @@ NOTA: prisma fue eliminada de esta lista — está activamente usada en src/lib/
 
 ## 9. ESTADO DE DOCUMENTACIÓN
 
-Marco_Conceptual.pdf — Completo y vigente, NO modificar
+Marco_Conceptual.pdf — Vigente, modificado en sesión 2026-04-29 (Tabla 11: 8→7 dimensiones, nota §9 y §12 sobre no conclusiones/recomendaciones)
 Arquitectura_Tecnica.pdf — Desactualizado, actualizar para consistencia con MC e implementación real
-Historial_Desarrollo.pdf — Desactualizado, actualizar con: items implementados pero no registrados, 8 clasificadores, 8 secciones análisis, 5 filtros, bidireccionalidad, 6 regiones, multi-clasificación, metadatos, subsistema TV, JSON-LD SEO, mobile tabs
+Historial_Desarrollo.pdf — Desactualizado, actualizar con: items implementados pero no registrados, 8 clasificadores, 7 dimensiones de análisis, 5 filtros, bidireccionalidad, 6 regiones, multi-clasificación, metadatos, subsistema TV, JSON-LD SEO, mobile tabs
 
-Principales gaps en Historial de Desarrollo: Subsistema TV completo no registrado, JSON-LD SEO no registrado, mobile tabs no registrados, dice 6 clasificadores pero son 8, dice 6 secciones de análisis pero son 8, no menciona 5 filtros analíticos, no menciona bidireccionalidad, no menciona 5 bases semánticas, dice 5 regiones pero son 6 (falta NORTEAMÉRICA), no menciona multi-clasificación, no documenta metadatos de señal, versión dice 0.8.0 pero es 0.9.0
+Principales gaps en Historial de Desarrollo: Subsistema TV completo no registrado, JSON-LD SEO no registrado, mobile tabs no registrados, dice 6 clasificadores pero son 8, dice 6 secciones de análisis pero son 7 dimensiones, no menciona 5 filtros analíticos, no menciona bidireccionalidad, no menciona 5 bases semánticas, dice 5 regiones pero son 6 (falta NORTEAMÉRICA), no menciona multi-clasificación, no documenta metadatos de señal, versión dice 0.8.0 pero es 0.9.0
 
 ## 10. VERSIONES
 
@@ -185,7 +185,6 @@ Prioridad 0 — URGENTE (bugs activos en la UI):
    - Archivos: `src/components/SignalOverlay.tsx`, `src/components/AnalysisOverlay.tsx`
    - NOTA: No ejecutar bun run dev manualmente. Usar bash .zscripts/dev.sh o dejar que el sandbox lo maneje.
 2. Crear shared analysis prompt en `src/lib/analysis-prompt.ts` y unificar en `analyze/route.ts` y `compare/route.ts`
-3. Remover sección "Recomendaciones" del análisis IA
 
 Prioridad 0.5 — PRE-IMPLEMENTACIÓN (auditoría y correcciones documentales):
 - Corregir 23 inconsistencias entre documentos y código (ver docs/PLAN_IMPLEMENTACION.md §0)
