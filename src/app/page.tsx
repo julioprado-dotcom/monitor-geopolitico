@@ -207,9 +207,37 @@ export default function Home() {
             <MGSidebar selectedRegion={selectedRegion} selectedClassifier={selectedClassifier} onRegionSelect={setSelectedRegion} onClassifierSelect={setSelectedClassifier} />
           </div>
 
-          {/* Center column — tabs de contenido */}
-          <div className={`${mobileTab === 'tv' ? 'hidden lg:flex' : 'flex'} flex-col gap-4 sm:gap-5 min-w-0`}>
-            {/* ── TAB BAR en columna central ── */}
+          {/* Center column — contenido principal */}
+          <div className={`${mobileTab === 'tv' ? 'hidden lg:flex' : 'flex'} flex-col gap-3 sm:gap-4 min-w-0`}>
+            {/* ── 1. TÍTULO DINÁMICO (cambia según tab activo) ── */}
+            {(() => {
+              const tab = CONTENT_TABS.find((t) => t.id === contentTab);
+              if (!tab) return null;
+              const Icon = tab.icon;
+              const count = contentTab === 'signals' ? filteredSignals.length : contentTab === 'analysis' ? demoAnalysis.length : 0;
+              return (
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex items-center justify-center w-8 h-8 rounded-lg" style={{ backgroundColor: `${tab.color}12` }}>
+                      <Icon className="w-4 h-4" style={{ color: tab.color }} />
+                    </div>
+                    <h2 className="text-sm sm:text-base font-bold text-white/80 font-[family-name:var(--font-space-grotesk)]">
+                      {tab.label}
+                    </h2>
+                  </div>
+                  {count > 0 && (
+                    <span className="text-[9px] font-bold font-[family-name:var(--font-jetbrains-mono)] px-2 py-0.5 rounded-md" style={{ color: `${tab.color}60`, backgroundColor: `${tab.color}08` }}>
+                      {count} {contentTab === 'signals' ? 'señales' : 'artículos'}
+                    </span>
+                  )}
+                </div>
+              );
+            })()}
+
+            {/* ── 2. BUSCADOR ── */}
+            <SearchBar value={searchQuery} onChange={setSearchQuery} />
+
+            {/* ── 3. PESTAÑAS ── */}
             <div className="flex gap-1 p-1 rounded-xl glass border border-white/[0.06]">
               {CONTENT_TABS.map((tab) => {
                 const Icon = tab.icon;
@@ -236,11 +264,11 @@ export default function Home() {
                 );
               })}
             </div>
-            {/* ── TAB: Señales Geopolíticas ── */}
+
+            {/* ── 4. TARJETAS (contenido según tab activo) ── */}
             {contentTab === 'signals' && (
               <>
                 <MetricsBar allSignals={demoSignals} filteredCount={filteredSignals.length} selectedRelevances={selectedRelevances} onToggleRelevance={toggleRelevance} onClearRelevance={() => setSelectedRelevances(new Set())} />
-                <SearchBar value={searchQuery} onChange={setSearchQuery} />
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {filteredSignals.map((signal) => (
                     <SignalCard key={signal.id} signal={signal} onRegionClick={setSelectedRegion} onClassifierClick={setSelectedClassifier} onSignalClick={setSelectedSignal} />
@@ -270,30 +298,16 @@ export default function Home() {
               </>
             )}
 
-            {/* ── TAB: Análisis ── */}
+            {/* TAB: Análisis */}
             {contentTab === 'analysis' && (
-              <>
-                {/* Header de sección */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Brain className="w-4 h-4 text-[#D4A017]/60" />
-                    <h2 className="text-xs font-bold text-white/50 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">
-                      Análisis y Perspectivas
-                    </h2>
-                  </div>
-                  <span className="text-[9px] text-[#D4A017]/40 font-[family-name:var(--font-jetbrains-mono)]">
-                    {demoAnalysis.length} artículos
-                  </span>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {demoAnalysis.map((analysis) => (
-                    <AnalysisCard key={analysis.id} analysis={analysis} onClick={setSelectedAnalysis} />
-                  ))}
-                </div>
-              </>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {demoAnalysis.map((analysis) => (
+                  <AnalysisCard key={analysis.id} analysis={analysis} onClick={setSelectedAnalysis} />
+                ))}
+              </div>
             )}
 
-            {/* ── TAB: Explorador (pendiente) ── */}
+            {/* TAB: Explorador (pendiente) */}
             {contentTab === 'explorer' && (
               <div className="text-center py-20">
                 <div className="w-16 h-16 rounded-2xl bg-white/[0.03] flex items-center justify-center mx-auto mb-4 border border-white/[0.06]">
