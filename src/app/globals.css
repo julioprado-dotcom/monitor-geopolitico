@@ -213,6 +213,15 @@
   background: rgba(0, 229, 160, 0.3);
 }
 
+/* Overlay — ocultar scrollbar manteniendo scroll funcional */
+.overlay-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.overlay-scroll::-webkit-scrollbar {
+  display: none;
+}
+
 ::selection {
   background: rgba(0, 229, 160, 0.3);
   color: #F1F5F9;

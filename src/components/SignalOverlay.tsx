@@ -129,7 +129,7 @@ export default function SignalOverlay({ signal, onClose }: SignalOverlayProps) {
       style={{ backdropFilter: 'blur(8px)', backgroundColor: 'rgba(0,0,0,0.7)' }}
       onClick={onClose}
     >
-      <div className="relative glass-strong rounded-2xl w-full max-w-3xl max-h-[90vh] animate-slide-in">
+      <div className="relative glass-strong rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden animate-slide-in">
         {/* Indicador de scroll — flecha animada en esquina inferior derecha (fuera del scroll) */}
         <div
           className="absolute bottom-3 right-3 z-20 pointer-events-none transition-opacity duration-300"
@@ -155,7 +155,7 @@ export default function SignalOverlay({ signal, onClose }: SignalOverlayProps) {
           <XIcon className="w-4 h-4 text-red-400" />
         </button>
         <div
-          className="overflow-y-auto max-h-[90vh]"
+          className="overflow-y-auto h-full overlay-scroll"
           ref={scrollRef}
           onClick={(e) => e.stopPropagation()}
         >
