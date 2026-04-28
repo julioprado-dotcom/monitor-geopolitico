@@ -284,8 +284,8 @@ export default function Home() {
             {/* 4. Explorador Geopolítico */}
             {contentTab === 'explorer' && (
               <>
-                {/* Filtros rápidos — 2 filas fijas */}
-                <div className="flex flex-wrap gap-1.5">
+                {/* Filtros rápidos — 2 filas de 3 */}
+                <div className="grid grid-cols-3 gap-1.5">
                   {([
                     { id: null as ThreadStatus | 'SEGUIDOS' | null, label: 'Todos', color: '#64748B' },
                     { id: 'EN_VIVO' as ThreadStatus, label: 'En Vivo', color: '#EF4444' },
