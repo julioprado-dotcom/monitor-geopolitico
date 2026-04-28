@@ -145,39 +145,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Mobile tab bar — solo visible en < lg */}
-        <div className="lg:hidden flex border-t border-white/[0.04]">
-          {CONTENT_TABS.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = mobileTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => { setMobileTab(tab.id); setContentTab(tab.id); }}
-                className={`flex-1 flex items-center justify-center gap-1 py-2 text-[10px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] transition-colors ${
-                  isActive
-                    ? 'border-b-2 bg-white/[0.03]'
-                    : 'text-white/35 hover:text-white/55'
-                }`}
-                style={isActive ? { color: tab.color, borderColor: tab.color } : undefined}
-              >
-                <Icon className="w-3.5 h-3.5" />
-                <span>{tab.label.split(' ')[0]}</span>
-              </button>
-            );
-          })}
-          <button
-            onClick={() => setMobileTab('tv')}
-            className={`flex items-center justify-center gap-1 py-2 px-4 text-[10px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] transition-colors ${
-              mobileTab === 'tv'
-                ? 'text-[#00E5A0] border-b-2 border-[#00E5A0] bg-[#00E5A0]/5'
-                : 'text-white/35 hover:text-white/55'
-            }`}
-          >
-            <Tv className="w-3.5 h-3.5" />
-            <span>TV</span>
-          </button>
-        </div>
       </header>
 
       {/* ── SIDEBAR OFFCANVAS (mobile) + OVERLAY ── */}
