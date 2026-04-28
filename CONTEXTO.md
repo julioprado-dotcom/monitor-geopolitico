@@ -69,18 +69,19 @@ CONTEXTO.md, PROTOCOLO_GIT.md, .gitignore (incluye .zscripts/, worklog.md, downl
 3. Diversidad de gramáticas emancipadoras — Múltiples caminos de liberación, no un solo modelo
 
 ### 5 Bases Semánticas / Parámetros Cognitivos
-1. Multipolaridad Epistémica — Pluralidad de marcos interpretativos, no hegemonía occidental
-2. Justicia Cognitiva — Equidad entre sistemas de conocimiento del Norte y Sur
-3. Soberanía Cognitiva — Derecho de los pueblos a sus propios marcos de sentido
-4. Hermenéutica Crítica — Interpretación que revela relaciones de poder ocultas
-5. Pragmatismo Emancipador — El conocimiento debe servir a la liberación, no solo describir
+(Nombres académicos completos — ver Marco_Conceptual.pdf §3 para desarrollo detallado)
+1. Ecología de Saberes — Legitimación de la diversidad de formas de conocimiento sin subordinarlas a un paradigma hegemónico. Autores: Boaventura de Sousa Santos, Aníbal Quijano, Walter Mignolo, Catherine Walsh, Arturo Escobar.
+2. Economía Política Crítica — Lectura de fenómenos económicos como relaciones de poder asimétrico, no como procesos neutrales de mercado. Autores: Marx, Luxemburgo, Prebisch, Marini, Rodney, Arrighi.
+3. Materialismo Histórico e Historias desde Abajo — Conexión del presente con estructuras del pasado, reconociendo que quien narra determina qué se ve. Autores: Marx, Wallerstein, Guha, Spivak, C.L.R. James, Galeano.
+4. Pensamiento Decolonial, Panafricanismo y Tradiciones de Liberación — Detección de lógicas coloniales vigentes y diversidad de tradiciones emancipatorias del Sur. Autores: Quijano, Mignolo, Dussel, Nkrumah, Fanon, Said, Mohanty.
+5. Geopolítica Crítica Periférica — Lectura del poder territorial, recursos y soberanía desde la periferia. Autores: Samir Amin, Arrighi, Jalife-Rahme, Mbembe, Mamdani, Hau'ofa.
 
-### Tabla de Correspondencia Bases-Filtros
-Multipolaridad Epistémica → Congruencia Inversa
-Justicia Cognitiva → Coherencia Histórica
-Soberanía Cognitiva → Integridad Epistémica
-Hermenéutica Crítica → Confiabilidad Asimétrica
-Pragmatismo Emancipador → Flexibilidad Pragmática
+### Tabla de Correspondencia Bases-Filtros (Base principal + Base secundaria)
+Congruencia Inversa → Geopolítica Crítica Periférica + Economía Política Crítica
+Coherencia Histórica → Materialismo Histórico + Ecología de Saberes
+Integridad Epistémica → Ecología de Saberes + Pensamiento Decolonial/Panafricanismo
+Confiabilidad Asimétrica → Ecología de Saberes + Geopolítica Crítica Periférica
+Flexibilidad Pragmática → Geopolítica Crítica Periférica + Economía Política Crítica
 
 ### Óptica Sur Global — 6 Principios Operativos
 1. Descentramiento del Norte como referencia
