@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import ReactMarkdown from 'react-markdown';
 import {
-  X as XIcon,
   ShieldCheck,
   ShieldAlert,
   Brain,
@@ -35,8 +34,6 @@ export default function SignalOverlay({ signal, onClose }: SignalOverlayProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const mounted = useMounted();
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [showScrollHint, setShowScrollHint] = useState(false);
   // Lazy load fullContent desde signalContent.ts (incluye señales SIG-xxx y análisis ANL-xxx)
   const [fullContent, setFullContent] = useState<string | null>(null);
 
@@ -50,30 +47,6 @@ export default function SignalOverlay({ signal, onClose }: SignalOverlayProps) {
   const levelColors = sourceLevelColors[signal.sourceLevel];
   const isContrastiva = signal.sourceLevel === 'C';
   const isVigilada = signal.sourceLevel === 'D';
-
-  // Detectar si hay contenido por debajo del viewport del overlay
-  const handleScroll = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const { scrollTop, scrollHeight, clientHeight } = el;
-    // Mostrar hint si no está al fondo (con margen de 20px)
-    setShowScrollHint(scrollTop + clientHeight < scrollHeight - 20);
-  }, []);
-
-  // Mostrar hint después de montar si hay scroll disponible
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    // Usar rAF para asegurar que el DOM se reflowe tras cambios de contenido
-    const rafId = requestAnimationFrame(() => {
-      handleScroll();
-    });
-    el.addEventListener('scroll', handleScroll, { passive: true });
-    return () => {
-      cancelAnimationFrame(rafId);
-      el.removeEventListener('scroll', handleScroll);
-    };
-  }, [handleScroll, analysis, fullContent]);
 
   // Close on Escape
   const handleKeyDown = useCallback(
@@ -127,8 +100,6 @@ export default function SignalOverlay({ signal, onClose }: SignalOverlayProps) {
     }
   };
 
-
-
   return (
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 animate-fade-in"
@@ -137,34 +108,11 @@ export default function SignalOverlay({ signal, onClose }: SignalOverlayProps) {
     >
       {/* Contenedor de posicionamiento — SIN backdrop-filter ni transform para evitar stacking context */}
       <div className="relative rounded-2xl w-full max-w-3xl max-h-[90vh] animate-slide-in">
-        {/* Close button — absolute al contenedor limpio, fuera del glass */}
-        <button
-          onClick={onClose}
-          className="absolute top-3 right-3 z-30 w-8 h-8 flex items-center justify-center rounded-lg bg-red-500/20 hover:bg-red-500/40 transition-colors"
-          aria-label="Cerrar"
-        >
-          <XIcon className="w-4 h-4 text-red-400" />
-        </button>
-        {/* Indicador de scroll — absolute al contenedor limpio, esquina inferior derecha */}
-        <div
-          className="absolute bottom-3 right-3 z-30 pointer-events-none transition-opacity duration-300"
-          style={{ opacity: showScrollHint ? 1 : 0 }}
-        >
-          <div
-            className="flex items-center justify-center w-10 h-6 rounded-full"
-            style={{ background: 'linear-gradient(to top, rgba(0,229,160,0.25) 0%, transparent 100%)' }}
-          >
-            <svg width="14" height="8" viewBox="0 0 16 10" fill="none" className="animate-bounce">
-              <path d="M2 2L8 8L14 2" stroke="rgba(0,229,160,0.7)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </div>
-        </div>
         {/* Wrapper visual — glass-strong con backdrop-filter — hijo interno, NO afecta posicionamiento de controles */}
         <div className="rounded-2xl overflow-hidden flex flex-col max-h-[90vh] glass-strong">
         {/* Scroll container — flex-1 min-h-0 permite scroll dentro de contenedor flex */}
         <div
           className="flex-1 min-h-0 overflow-y-auto overlay-scroll"
-          ref={scrollRef}
           onClick={(e) => e.stopPropagation()}
         >
         <div className="p-4 sm:p-6">

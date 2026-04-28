@@ -53,7 +53,7 @@ Deployment: Z.ai sandbox + GitHub
 
 /home/z/my-project/
 src/app/ — layout.tsx (JSON-LD SEO, metadata), page.tsx (Dashboard + mobile tabs), globals.css, api/analyze/route.ts (7 dimensiones de análisis, 5 filtros, 2 tipos simple/profundo, bidireccionalidad), api/content-proxy/route.ts (proxy anti-censura), api/hls-proxy/route.ts (150 líneas), api/youtube-live/route.ts (432 líneas), api/route.ts
-src/components/ — 13 componentes: FloatingProjector.tsx (293 líneas), ProyectorWindow.tsx (481 líneas), HLSPlayer.tsx (271 líneas), LivePlayer.tsx, LatestSignals.tsx ("Últimas Señales Geopolíticas"), SignalCard.tsx (footer: clasificadores → región → separador → fuente + nivel badge), SignalOverlay.tsx (overlay de noticia ampliada: metadata → imagen → título → panel fuente → contenido → tags → advertencias nivel C/D → análisis IA → disclaimer; cierre al clic fuera; X roja; indicador de scroll; sin botones de compartir), AnalysisCard.tsx (tarjetas de análisis con overlay), AnalysisOverlay.tsx (overlay de análisis, mismo patrón que SignalOverlay, fuente de datos en analysisContent.ts), SearchBar.tsx, SourceClassifier.tsx, MGSidebar.tsx, MetricsBar.tsx (barras de relevancia exclusivas con botón limpiar, cuenta desde allSignals)
+src/components/ — 13 componentes: FloatingProjector.tsx (293 líneas), ProyectorWindow.tsx (481 líneas), HLSPlayer.tsx (271 líneas), LivePlayer.tsx, LatestSignals.tsx ("Últimas Señales Geopolíticas"), SignalCard.tsx (footer: clasificadores → región → separador → fuente + nivel badge), SignalOverlay.tsx (overlay de noticia ampliada: metadata → imagen → título → panel fuente → contenido → tags → advertencias nivel C/D → análisis IA → disclaimer; cierre al clic fuera o Escape; sin botones de compartir, sin X ni indicador de scroll), AnalysisCard.tsx (tarjetas de análisis con overlay), AnalysisOverlay.tsx (overlay de análisis, mismo patrón que SignalOverlay, fuente de datos en analysisContent.ts; cierre al clic fuera o Escape; sin X ni indicador de scroll), SearchBar.tsx, SourceClassifier.tsx, MGSidebar.tsx, MetricsBar.tsx (barras de relevancia exclusivas con botón limpiar, cuenta desde allSignals)
 src/components/ui/ — 53 componentes shadcn/ui (accordion, alert, badge, button, card, dialog, drawer, select, tabs, tooltip, etc.)
 src/data/ — channels.ts (14 canales de TV con metadatos de streaming), signals.ts (tipos TypeScript + datos demo + sourceCountry compartido + DISCLAIMER actualizado con marca Newsconnect), signalContent.ts (contenido completo de señales SIG-xxx, lazy load), analysis.ts (tipos TypeScript + datos de análisis ANL-xxx), analysisContent.ts (contenido completo de análisis, lazy load)
 src/lib/ — db.ts (Prisma ORM), utils.ts, analysisPrompt.ts (prompt compartido de análisis con 7 dimensiones y 2 tipos), rateLimit.ts
@@ -176,10 +176,10 @@ Ver plan completo: /home/z/my-project/docs/PLAN_PROXY_ANTICENSURA.md
 PRE-REQUISITO: Ejecutar migraciones de docs/PLAN_MIGRACION.md (22 migraciones, ~3 días) antes de iniciar cualquier tarea funcional. Ver también docs/PLAN_IMPLEMENTACION.md para el plan completo con cronograma.
 
 Prioridad 0 — URGENTE (bugs activos en la UI):
-1. ~~**Overlays (SignalOverlay + AnalysisOverlay) — flecha scroll y botón cerrar mal posicionados**~~ ✅ RESUELTO (sesión 2026-04-29)
-   - Causa raíz: `backdrop-filter` (en `.glass-strong`) + `transform` (en `.animate-slide-in`) creaban stacking contexts que interferían con el posicionamiento `absolute` de los controles.
-   - Solución: Separar en dos capas — contenedor exterior `relative` SIN backdrop-filter/transform para los controles `absolute` (close button z-30, scroll indicator z-30), y contenedor interior `glass-strong` solo para el fondo visual.
-   - Timing: Añadido `requestAnimationFrame` en useEffect para asegurar reflow del DOM tras carga de `fullContent` antes de calcular scroll hint.
+1. ~~**Overlays (SignalOverlay + AnalysisOverlay) — flecha scroll y botón cerrar**~~ ✅ RESUELTO (sesión 2026-04-29)
+   - Estrategia final: Eliminación completa de ambos elementos (botón X rojo + flecha indicadora de scroll).
+   - El overlay se cierra clickeando fuera del contenido o con Escape. El scroll es evidente por la barra del contenedor.
+   - Se removió: `X as XIcon` import, `scrollRef`, `showScrollHint`, `handleScroll`, `useEffect` de scroll detection, botón close `<button>`, div indicador scroll, y importaciones `useRef`.
    - Archivos: `src/components/SignalOverlay.tsx`, `src/components/AnalysisOverlay.tsx`
 2. Crear shared analysis prompt en `src/lib/analysis-prompt.ts` y unificar en `analyze/route.ts` y `compare/route.ts`
 
