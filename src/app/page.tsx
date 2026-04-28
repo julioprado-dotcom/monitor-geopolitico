@@ -21,6 +21,7 @@ const SourceClassifier = dynamic(() => import('@/components/SourceClassifier'));
 
 // ── Dynamic imports: solo se cargan cuando se necesitan (cero impacto en carga inicial) ──
 const SignalOverlay = dynamic(() => import('@/components/SignalOverlay'), { ssr: false });
+const AnalysisOverlay = dynamic(() => import('@/components/AnalysisOverlay'), { ssr: false });
 const FloatingProjector = dynamic(() => import('@/components/FloatingProjector'), { ssr: false });
 const SourceComparisonView = dynamic(() => import('@/components/SourceComparisonView'), { ssr: false });
 // LivePlayer: carga diferida — se renderiza DESPUÉS de las tarjetas de señales
@@ -382,26 +383,7 @@ export default function Home() {
 
       {/* ANALYSIS OVERLAY */}
       {selectedAnalysis && (
-        <SignalOverlay
-          signal={{
-            id: selectedAnalysis.id,
-            title: selectedAnalysis.title,
-            summary: selectedAnalysis.summary,
-            fullContent: selectedAnalysis.fullContent || selectedAnalysis.summary,
-            region: selectedAnalysis.region as any,
-            classifiers: selectedAnalysis.tags,
-            relevance: 'MEDIA',
-            source: selectedAnalysis.author,
-            sourceUrl: '',
-            language: 'es',
-            timestamp: selectedAnalysis.timestamp,
-            verified: true,
-            sourceLevel: 'A',
-            accessLevel: 'ABIERTO',
-            image: selectedAnalysis.image,
-          }}
-          onClose={() => setSelectedAnalysis(null)}
-        />
+        <AnalysisOverlay analysis={selectedAnalysis} onClose={() => setSelectedAnalysis(null)} />
       )}
 
       {/* SOURCE COMPARISON VIEW */}
