@@ -128,8 +128,9 @@ export default function AnalysisOverlay({ analysis: analysisData, onClose }: Ana
       style={{ backdropFilter: 'blur(8px)', backgroundColor: 'rgba(0,0,0,0.7)' }}
       onClick={onClose}
     >
-      {/* Wrapper visual — glass-strong con backdrop-filter (NO sticky aquí) */}
-      <div className="relative glass-strong rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden animate-slide-in">
+      {/* Wrapper visual — glass-strong con backdrop-filter */}
+      {/* h-[90vh] explicito para que absolute y h-full funcionen correctamente */}
+      <div className="relative glass-strong rounded-2xl w-full max-w-3xl h-[90vh] overflow-hidden animate-slide-in">
         {/* Close button — absolute al wrapper, no scroll */}
         <button
           onClick={onClose}
