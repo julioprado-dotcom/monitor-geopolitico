@@ -284,8 +284,8 @@ export default function Home() {
             {/* 4. Explorador Geopolítico */}
             {contentTab === 'explorer' && (
               <>
-                {/* Filtros rápidos */}
-                <div className="flex gap-1.5 overflow-x-auto pb-0.5 -mx-1 px-1">
+                {/* Filtros rápidos — 2 filas fijas */}
+                <div className="flex flex-wrap gap-1.5">
                   {([
                     { id: null as ThreadStatus | 'SEGUIDOS' | null, label: 'Todos', color: '#64748B' },
                     { id: 'EN_VIVO' as ThreadStatus, label: 'En Vivo', color: '#EF4444' },
@@ -304,7 +304,7 @@ export default function Home() {
                       <button
                         key={f.label}
                         onClick={() => setThreadFilter(isActive ? null : f.id)}
-                        className={`shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] transition-all duration-150 border ${
+                        className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] transition-all duration-150 border ${
                           isActive ? 'shadow-sm' : 'text-white/35 hover:text-white/55 border-white/[0.04] hover:border-white/[0.08]'
                         }`}
                         style={isActive ? { color: f.color, backgroundColor: `${f.color}12`, borderColor: `${f.color}30` } : undefined}
