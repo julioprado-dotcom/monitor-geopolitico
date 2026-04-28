@@ -128,37 +128,20 @@ export default function AnalysisOverlay({ analysis: analysisData, onClose }: Ana
       style={{ backdropFilter: 'blur(8px)', backgroundColor: 'rgba(0,0,0,0.7)' }}
       onClick={onClose}
     >
-      <div className="relative glass-strong rounded-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden animate-slide-in">
-        {/* Indicador de scroll — flecha animada en esquina inferior derecha (fuera del scroll) */}
-        <div
-          className="absolute bottom-3 right-3 z-20 pointer-events-none transition-opacity duration-300"
-          style={{ opacity: showScrollHint ? 1 : 0 }}
+      <div
+          className="relative glass-strong rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto overlay-scroll animate-slide-in"
+          ref={scrollRef}
+          onClick={(e) => e.stopPropagation()}
         >
-          <div
-            className="flex items-center justify-center w-10 h-6 rounded-full"
-            style={{
-              background: `linear-gradient(to top, ${ACCENT}40 0%, transparent 100%)`,
-            }}
-          >
-            <svg width="14" height="8" viewBox="0 0 16 10" fill="none" className="animate-bounce">
-              <path d="M2 2L8 8L14 2" stroke={ACCENT_LIGHT} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </div>
-        </div>
-
-        {/* Close button — fuera del scroll */}
+        {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-lg bg-red-500/20 hover:bg-red-500/40 transition-colors"
+          className="sticky top-3 float-right mr-3 z-10 w-8 h-8 flex items-center justify-center rounded-lg bg-red-500/20 hover:bg-red-500/40 transition-colors"
           aria-label="Cerrar"
         >
           <XIcon className="w-4 h-4 text-red-400" />
         </button>
-        <div
-          className="flex-1 min-h-0 overflow-y-auto overlay-scroll"
-          ref={scrollRef}
-          onClick={(e) => e.stopPropagation()}
-        >
+
         <div className="p-4 sm:p-6">
           {/* 1. Metadata row — badge de análisis + tiempo lectura + fecha */}
           <div className="flex items-center flex-wrap gap-2 mb-3">
@@ -366,7 +349,20 @@ export default function AnalysisOverlay({ analysis: analysisData, onClose }: Ana
               Los análisis publicados en esta sección reflejan la perspectiva editorial de Óptica Sur Global. Las fuentes citadas son verificables y públicas. Este contenido se ofrece con acceso libre bajo principios de inteligencia geopolítica abierta.
             </p>
           </div>
-        </div>
+          {/* Indicador de scroll — sticky en esquina inferior derecha */}
+          <div
+            className="sticky bottom-3 flex justify-end -mr-1 z-20 pointer-events-none transition-opacity duration-300"
+            style={{ opacity: showScrollHint ? 1 : 0 }}
+          >
+            <div
+              className="flex items-center justify-center w-10 h-6 rounded-full"
+              style={{ background: `linear-gradient(to top, ${ACCENT}40 0%, transparent 100%)` }}
+            >
+              <svg width="14" height="8" viewBox="0 0 16 10" fill="none" className="animate-bounce">
+                <path d="M2 2L8 8L14 2" stroke={ACCENT_LIGHT} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+          </div>
         </div>
       </div>
     </div>
