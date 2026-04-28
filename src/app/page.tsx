@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import dynamic from 'next/dynamic';
-import { Radar, Menu, Tv, Radio, Brain, BookOpen, Compass } from 'lucide-react';
+import { Radar, Menu, Tv, Radio, Brain, Compass } from 'lucide-react';
 import { demoSignals, type Relevance, type Region, type Signal } from '@/data/signals';
 import { demoAnalysis, type Analysis } from '@/data/analysis';
 import { type TVChannel } from '@/data/channels';
@@ -77,8 +77,11 @@ export default function Home() {
   const [mobileTab, setMobileTab] = useState<MobileTab>('signals');
   const [comparisonSignal, setComparisonSignal] = useState<Signal | null>(null);
 
-  // Sync mobile tab with content tab
-  const activeTab: MobileTab = mobileTab === 'tv' ? 'tv' : contentTab;
+  // Sync: al cambiar contentTab, salir de TV en mobile
+  const handleContentTabChange = (tab: ContentTab) => {
+    setContentTab(tab);
+    setMobileTab(tab);
+  };
 
   const filteredSignals = useMemo(() => {
     return demoSignals.filter((s) => {
@@ -118,8 +121,7 @@ export default function Home() {
     }
   };
 
-  const activeTabConfig = CONTENT_TABS.find((t) => t.id === activeTab);
-  const activeColor = activeTabConfig?.color || '#00E5A0';
+
 
   return (
     <div className="min-h-screen flex flex-col bg-[#0A0F1C] text-[#F1F5F9]">
@@ -152,53 +154,26 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Right: status badge */}
-          <div className="flex items-center gap-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl glass border border-[#00E5A0]/15 shrink-0">
-            <span className="h-2 w-2 rounded-full bg-[#00E5A0] animate-pulse" />
-            <span className="text-[9px] sm:text-[10px] font-bold text-[#00E5A0]/70 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">En línea</span>
+          {/* Right: TV toggle (mobile) + status badge */}
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => handleMobileTabChange(mobileTab === 'tv' ? contentTab : 'tv')}
+              className={`lg:hidden flex items-center justify-center w-9 h-9 rounded-lg border transition-colors ${
+                mobileTab === 'tv'
+                  ? 'bg-[#00E5A0]/15 border-[#00E5A0]/30 text-[#00E5A0]'
+                  : 'bg-white/5 border-white/[0.08] text-white/50 hover:text-white/80 hover:bg-white/10'
+              }`}
+              aria-label="TV en Vivo"
+            >
+              <Tv className="w-4 h-4" />
+            </button>
+            <div className="flex items-center gap-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl glass border border-[#00E5A0]/15">
+              <span className="h-2 w-2 rounded-full bg-[#00E5A0] animate-pulse" />
+              <span className="text-[9px] sm:text-[10px] font-bold text-[#00E5A0]/70 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">En línea</span>
+            </div>
           </div>
         </div>
 
-        {/* Tab bar — siempre visible */}
-        <div className="flex border-t border-white/[0.04]">
-          {CONTENT_TABS.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => handleMobileTabChange(tab.id)}
-                className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] transition-all duration-150 ${
-                  isActive
-                    ? 'border-b-2'
-                    : 'text-white/35 hover:text-white/55'
-                }`}
-                style={isActive ? {
-                  color: tab.color,
-                  borderColor: tab.color,
-                  backgroundColor: `${tab.color}08`,
-                } : undefined}
-              >
-                <Icon className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">{tab.label}</span>
-                <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
-              </button>
-            );
-          })}
-          {/* TV en Vivo */}
-          <button
-            onClick={() => handleMobileTabChange('tv')}
-            className={`flex items-center justify-center gap-1.5 px-4 py-2.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] transition-all duration-150 ${
-              mobileTab === 'tv'
-                ? 'border-b-2 border-[#00E5A0] text-[#00E5A0] bg-[#00E5A0]/8'
-                : 'text-white/35 hover:text-white/55'
-            }`}
-          >
-            <Tv className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">TV en Vivo</span>
-            <span className="sm:hidden">TV</span>
-          </button>
-        </div>
       </header>
 
       {/* ── SIDEBAR OFFCANVAS (mobile) + OVERLAY ── */}
@@ -234,6 +209,33 @@ export default function Home() {
 
           {/* Center column — tabs de contenido */}
           <div className={`${mobileTab === 'tv' ? 'hidden lg:flex' : 'flex'} flex-col gap-4 sm:gap-5 min-w-0`}>
+            {/* ── TAB BAR en columna central ── */}
+            <div className="flex gap-1 p-1 rounded-xl glass border border-white/[0.06]">
+              {CONTENT_TABS.map((tab) => {
+                const Icon = tab.icon;
+                const isActive = contentTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => handleContentTabChange(tab.id)}
+                    className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-2 sm:px-3 rounded-lg text-[10px] sm:text-[11px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] transition-all duration-150 ${
+                      isActive
+                        ? 'shadow-sm'
+                        : 'text-white/35 hover:text-white/55 hover:bg-white/[0.03]'
+                    }`}
+                    style={isActive ? {
+                      color: tab.color,
+                      backgroundColor: `${tab.color}12`,
+                      boxShadow: `0 0 12px ${tab.color}10, inset 0 1px 0 ${tab.color}15`,
+                    } : undefined}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">{tab.label}</span>
+                    <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
+                  </button>
+                );
+              })}
+            </div>
             {/* ── TAB: Señales Geopolíticas ── */}
             {contentTab === 'signals' && (
               <>
