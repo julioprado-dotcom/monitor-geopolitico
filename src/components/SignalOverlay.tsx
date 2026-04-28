@@ -129,12 +129,8 @@ export default function SignalOverlay({ signal, onClose }: SignalOverlayProps) {
       style={{ backdropFilter: 'blur(8px)', backgroundColor: 'rgba(0,0,0,0.7)' }}
       onClick={onClose}
     >
-      <div
-        className="relative glass-strong rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto animate-slide-in"
-        ref={scrollRef}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Indicador de scroll — flecha animada en borde inferior */}
+      <div className="relative glass-strong rounded-2xl w-full max-w-3xl max-h-[90vh] animate-slide-in">
+        {/* Indicador de scroll — flecha animada en esquina inferior derecha (fuera del scroll) */}
         <div
           className="absolute bottom-3 right-3 z-20 pointer-events-none transition-opacity duration-300"
           style={{ opacity: showScrollHint ? 1 : 0 }}
@@ -150,7 +146,7 @@ export default function SignalOverlay({ signal, onClose }: SignalOverlayProps) {
             </svg>
           </div>
         </div>
-        {/* Close button */}
+        {/* Close button — fuera del scroll */}
         <button
           onClick={onClose}
           className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-lg bg-red-500/20 hover:bg-red-500/40 transition-colors"
@@ -158,7 +154,11 @@ export default function SignalOverlay({ signal, onClose }: SignalOverlayProps) {
         >
           <XIcon className="w-4 h-4 text-red-400" />
         </button>
-
+        <div
+          className="overflow-y-auto max-h-[90vh]"
+          ref={scrollRef}
+          onClick={(e) => e.stopPropagation()}
+        >
         <div className="p-4 sm:p-6">
           {/* 1. Metadata row */}
           <div className="flex items-center flex-wrap gap-2 mb-3">
@@ -432,6 +432,7 @@ export default function SignalOverlay({ signal, onClose }: SignalOverlayProps) {
               {DISCLAIMER}
             </p>
           </div>
+        </div>
         </div>
       </div>
     </div>
