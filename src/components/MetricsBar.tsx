@@ -23,13 +23,13 @@ export default function MetricsBar({ allSignals, filteredCount, selectedRelevanc
 
   return (
     <div className="glass-strong rounded-xl px-3 py-2.5">
-      {/* Fila 1: Señales Geopolíticas + total */}
-      <div className="flex items-center gap-2 mb-2">
-        <span className="text-[10px] font-bold text-white/40 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">
-          Señales Geopolíticas
+      {/* Barras de severidad — filtradas: {filteredCount}/{allSignals.length} */}
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-[9px] font-bold text-white/30 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">
+          Severidad
         </span>
-        <span className="text-base font-bold text-[#00E5A0] font-[family-name:var(--font-space-grotesk)] leading-none">
-          {filteredCount}
+        <span className="text-[9px] text-white/25 font-[family-name:var(--font-jetbrains-mono)]">
+          {filteredCount}<span className="text-white/15">/{allSignals.length}</span>
         </span>
       </div>
 

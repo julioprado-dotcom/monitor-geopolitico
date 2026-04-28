@@ -180,7 +180,7 @@ export default function Home() {
 
           {/* Center column */}
           <div className={`flex flex-col gap-3 sm:gap-4 min-w-0 ${mobileTab === 'tv' ? 'hidden lg:flex' : 'flex'}`}>
-            {/* 1. Barras de señales (incluye título "Señales Geopolíticas") */}
+            {/* 1. Barras de señales (MetricsBar) */}
             <MetricsBar allSignals={demoSignals} filteredCount={filteredSignals.length} selectedRelevances={selectedRelevances} onToggleRelevance={toggleRelevance} onClearRelevance={() => setSelectedRelevances(new Set())} />
 
             {/* 2. Buscador */}

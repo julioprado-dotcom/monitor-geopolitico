@@ -1,7 +1,7 @@
 'use client';
 
 import { type Region, type Signal, demoSignals } from '@/data/signals';
-import { ChevronRight, Globe, Info, Filter } from 'lucide-react';
+import { ChevronRight, Globe, Info, Filter, Radio } from 'lucide-react';
 
 interface MGSidebarProps {
   selectedRegion: Region | null;
@@ -40,6 +40,18 @@ export default function MGSidebar({
 }: MGSidebarProps) {
   return (
     <div className="flex flex-col gap-3">
+      {/* Señales Geopolíticas — título + indicador */}
+      <div className="glass rounded-xl px-3 py-2.5">
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 rounded-lg bg-[#00E5A0]/10 flex items-center justify-center">
+            <Radio className="w-3.5 h-3.5 text-[#00E5A0]" />
+          </div>
+          <span className="text-[11px] font-bold text-white/60 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">
+            Señales Geopolíticas
+          </span>
+        </div>
+      </div>
+
       {/* Region Section */}
       <div className="glass rounded-xl overflow-hidden">
         <details className="mg-collapse" open>
