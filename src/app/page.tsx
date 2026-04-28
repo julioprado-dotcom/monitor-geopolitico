@@ -195,10 +195,13 @@ export default function Home() {
               );
             })()}
 
-            {/* 2. Buscador */}
+            {/* 2. Barras de señales */}
+            <MetricsBar allSignals={demoSignals} filteredCount={filteredSignals.length} selectedRelevances={selectedRelevances} onToggleRelevance={toggleRelevance} onClearRelevance={() => setSelectedRelevances(new Set())} />
+
+            {/* 3. Buscador */}
             <SearchBar value={searchQuery} onChange={setSearchQuery} />
 
-            {/* 3. Pestañas */}
+            {/* 4. Pestañas */}
             <div className="flex gap-1 p-1 rounded-xl bg-[#111827]/90 border border-white/[0.06]">
               {CONTENT_TABS.map((tab) => {
                 const Icon = tab.icon;
@@ -220,10 +223,9 @@ export default function Home() {
               })}
             </div>
 
-            {/* 4. Tarjetas — Señales Geopolíticas */}
+            {/* 5. Tarjetas — Señales Geopolíticas */}
             {contentTab === 'signals' && (
               <>
-                <MetricsBar allSignals={demoSignals} filteredCount={filteredSignals.length} selectedRelevances={selectedRelevances} onToggleRelevance={toggleRelevance} onClearRelevance={() => setSelectedRelevances(new Set())} />
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {filteredSignals.map((signal) => (
                     <SignalCard key={signal.id} signal={signal} onRegionClick={setSelectedRegion} onClassifierClick={setSelectedClassifier} onSignalClick={setSelectedSignal} />
