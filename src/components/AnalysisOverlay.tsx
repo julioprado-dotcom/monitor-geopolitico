@@ -135,7 +135,7 @@ export default function AnalysisOverlay({ analysis: analysisData, onClose }: Ana
       >
         {/* Indicador de scroll — flecha animada en borde inferior */}
         <div
-          className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 pointer-events-none transition-opacity duration-300"
+          className="absolute bottom-3 right-3 z-20 pointer-events-none transition-opacity duration-300"
           style={{ opacity: showScrollHint ? 1 : 0 }}
         >
           <div
