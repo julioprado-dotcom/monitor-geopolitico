@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { Radar, Menu, Tv, Radio, Brain, GitBranch } from 'lucide-react';
-import { demoSignals, type Relevance, type Region, type Signal } from '@/data/signals';
+import { demoSignals, type Relevance, type Region, type Signal, relevanceColors } from '@/data/signals';
 import { demoAnalysis, type Analysis } from '@/data/analysis';
 import { demoThreads, type Thread, type ThreadStatus } from '@/data/threads';
 import { type TVChannel } from '@/data/channels';
@@ -143,7 +143,8 @@ export default function Home() {
   }, [threadFilter, followedThreads, searchQuery]);
 
   // ── Sistema de Foco Dinámico: navegación por deslizamiento horizontal ──
-  const scrollToFoco = () => {
+  const handleSelectSignal = (signal: Signal) => {
+    setSelectedSignal(signal);
     const focoPanel = document.getElementById('foco-panel');
     if (focoPanel) {
       focoPanel.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
@@ -224,7 +225,7 @@ export default function Home() {
         {/* Horizontal scroll container */}
         <div className="flex-1 flex flex-row overflow-x-auto snap-x snap-mandatory" style={{ scrollBehavior: 'smooth' }}>
           {/* Panel 1: Contexto (current dashboard) */}
-          <section className="min-w-full snap-start overflow-y-auto">
+          <section id="panel-contexto" className="min-w-full snap-start overflow-y-auto">
             <div className="max-w-screen-2xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-5">
               <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-4 h-full">
 
@@ -263,7 +264,7 @@ export default function Home() {
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 content-auto">
                   {filteredSignals.map((signal) => (
-                    <SignalCard key={signal.id} signal={signal} onRegionClick={setSelectedRegion} onClassifierClick={setSelectedClassifier} onSignalClick={setSelectedSignal} onScrollToFoco={scrollToFoco} />
+                    <SignalCard key={signal.id} signal={signal} onRegionClick={setSelectedRegion} onClassifierClick={setSelectedClassifier} onSignalClick={handleSelectSignal} />
                   ))}
                   {filteredSignals.length > 0 && (
                     <div className="sm:col-span-2 flex justify-center">
@@ -384,10 +385,50 @@ export default function Home() {
           </section>
 
           {/* Panel 2: Foco */}
-          <section id="foco-panel" className="min-w-full snap-start bg-slate-950 p-8 flex items-center justify-center">
-            <div className="text-center max-w-lg">
-              <p className="text-white/60 text-lg font-[family-name:var(--font-space-grotesk)]">PANEL DE FOCO - Aquí irá la señal expandida y el análisis de IA</p>
-            </div>
+          <section id="foco-panel" className="min-w-full snap-start overflow-y-auto bg-[#0A0F1C]" style={{ padding: '2rem' }}>
+            {!selectedSignal ? (
+              <p className="text-slate-500">Selecciona una señal para ver el análisis detallado.</p>
+            ) : (
+              <div className="max-w-3xl mx-auto">
+                {/* Botón de Volver */}
+                <button
+                  onClick={() => {
+                    document.getElementById('panel-contexto')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="text-slate-400 hover:text-white mb-6 flex items-center gap-2 text-sm"
+                >
+                  ← Volver al panel
+                </button>
+
+                {/* Cabecera de la Señal */}
+                <div className="mb-6">
+                  <div className="flex items-center gap-2 mb-2 text-xs text-slate-400">
+                    <span className={`px-2 py-0.5 rounded font-bold`} style={{ backgroundColor: `${relevanceColors[selectedSignal.relevance]}22`, color: relevanceColors[selectedSignal.relevance] }}>
+                      {selectedSignal.relevance}
+                    </span>
+                    <span>{selectedSignal.source}</span>
+                  </div>
+                  <h2 className="text-2xl font-bold text-white leading-tight mb-4" style={{ fontFamily: 'Space Grotesk' }}>
+                    {selectedSignal.title}
+                  </h2>
+                  <p className="text-slate-300 text-lg leading-relaxed">
+                    {selectedSignal.summary}
+                  </p>
+                </div>
+
+                {/* Contenido Completo */}
+                {selectedSignal.fullContent && (
+                  <div className="mb-8 text-slate-300 leading-relaxed whitespace-pre-line border-l-2 border-slate-700 pl-4">
+                    {selectedSignal.fullContent}
+                  </div>
+                )}
+
+                {/* Botón de IA */}
+                <button className="w-full py-3 px-6 bg-[#00E5A0] text-[#0A0F1C] font-bold rounded-lg hover:opacity-90 transition-opacity" style={{ fontFamily: 'Space Grotesk' }}>
+                  Analizar con IA desde el Sur Global
+                </button>
+              </div>
+            )}
           </section>
         </div>
       </div>

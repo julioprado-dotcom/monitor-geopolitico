@@ -11,10 +11,9 @@ interface SignalCardProps {
   onRegionClick: (r: Region) => void;
   onClassifierClick: (c: string) => void;
   onSignalClick: (s: Signal) => void;
-  onScrollToFoco?: () => void;
 }
 
-export default function SignalCard({ signal, onRegionClick, onClassifierClick, onSignalClick, onScrollToFoco }: SignalCardProps) {
+export default function SignalCard({ signal, onRegionClick, onClassifierClick, onSignalClick }: SignalCardProps) {
   const relevanceColor = relevanceColors[signal.relevance];
   const mounted = useMounted();
   // isRecent solo en cliente para evitar hydration mismatch (Date.now() difiere server vs client)
@@ -49,7 +48,7 @@ export default function SignalCard({ signal, onRegionClick, onClassifierClick, o
     <div
       className="glass rounded-xl overflow-hidden hover:bg-white/[0.04] cursor-pointer transition-colors duration-150 group flex flex-col"
       style={{ borderLeft: `3px solid ${relevanceColor}` }}
-      onClick={() => { onSignalClick(signal); onScrollToFoco?.(); }}
+      onClick={() => onSignalClick(signal)}
     >
       {/* Thumbnail — arriba de todo, solo si hay imagen */}
       {signal.image && (
