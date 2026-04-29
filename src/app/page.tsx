@@ -417,12 +417,10 @@ export default function Home() {
                   </p>
                 </div>
 
-                {/* Contenido Completo */}
-                {selectedSignal.fullContent && (
-                  <div className="mb-8 text-slate-300 leading-relaxed whitespace-pre-line border-l-2 border-slate-700 pl-4">
-                    {selectedSignal.fullContent}
-                  </div>
-                )}
+                {/* Contenido Completo — usa fullContent si existe, sino muestra summary como cuerpo */}
+                <div className="mb-8 text-slate-300 leading-relaxed whitespace-pre-line border-l-2 border-slate-700 pl-4">
+                  {selectedSignal.fullContent || selectedSignal.summary}
+                </div>
 
                 {/* Botón de IA */}
                 <button className="w-full py-3 px-6 bg-[#00E5A0] text-[#0A0F1C] font-bold rounded-lg hover:opacity-90 transition-opacity" style={{ fontFamily: 'Space Grotesk' }}>
