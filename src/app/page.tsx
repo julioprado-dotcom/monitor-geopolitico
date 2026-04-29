@@ -162,7 +162,17 @@ export default function Home() {
     setAnalysis(null);
 
     try {
-      const payload = { ...signal };
+      const payload = {
+        id: signal.id,
+        title: signal.title,
+        summary: signal.summary,
+        fullContent: signal.fullContent,
+        region: signal.region,
+        classifiers: signal.classifiers,
+        relevance: signal.relevance,
+        language: signal.language,
+        source: signal.source,
+      };
       const res = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -170,10 +180,33 @@ export default function Home() {
         signal: controller.signal,
       });
 
-      const data = await res.json();
+      // Verificar status HTTP ANTES de intentar parsear JSON
       if (!res.ok) {
         if (res.status === 429) throw new Error('Límite diario de análisis alcanzado. Intenta más tarde.');
-        throw new Error(data.error || 'Error al generar el análisis');
+        // Intentar leer como JSON primero, si falla leer como texto
+        const contentType = res.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          const data = await res.json();
+          throw new Error(data.error || 'Error al generar el análisis');
+        }
+        const text = await res.text();
+        throw new Error(`Error ${res.status}: ${text.slice(0, 120)}`);
+      }
+
+      // Leer como texto primero para evitar JSON.parse errors silenciosos
+      const raw = await res.text();
+      let data: { analysis?: string; error?: string };
+      try {
+        data = JSON.parse(raw);
+      } catch {
+        throw new Error('La respuesta del servidor no es válida. Intenta de nuevo.');
+      }
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      if (!data.analysis) {
+        throw new Error('El análisis no se generó correctamente. Intenta de nuevo.');
       }
       setAnalysis(data.analysis);
     } catch (err: any) {
