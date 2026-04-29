@@ -2,22 +2,28 @@
 
 ## 1. PROTOCOLO DE ACCIÓN INMEDIATA
 
-### Diagnóstico del Preview (5 pasos)
-1. Verificar si el servidor Next.js corre: curl -s -o /dev/null -w "%{http_code}" http://localhost:3000
-2. Si devuelve 000 → servidor caído. NO ejecutar bun run dev manualmente.
-3. Verificar si .zscripts/dev.sh existe: ls -la .zscripts/dev.sh
-4. Si NO existe, crearlo con este contenido:
-#!/bin/bash
-cd /home/z/my-project
-bun install 2>/dev/null || true
-bun run db:push 2>/dev/null || true
-nohup bun run dev > /tmp/next-dev.log 2>&1 &
-echo $! > /tmp/next-dev.pid
-echo "Dev server started with PID $(cat /tmp/next-dev.pid)"
-5. Verificar Caddy: curl -s -o /dev/null -w "%{http_code}" http://localhost:81
+### Restaurar Preview (3 pasos)
+El preview funciona así: `bun run dev` levanta Next.js en puerto 3000, y Caddy (que ya corre de fondo) redirige automáticamente el puerto 81 al 3000. El preview URL (`https://preview-<bot-id>.space.chatglm.site/`) apunta a ese proxy. No hay comando adicional ni paso extra.
+
+Si el preview no funciona:
+```bash
+# 1. Verificar si hay proceso en el puerto 3000
+lsof -i :3000
+
+# 2. Si existe, matarlo
+kill -9 <PID>
+
+# 3. Arrancar el servidor (ejecutar dentro de subshell para que corra en background)
+(bun run dev > /dev/null 2>&1 &)
+
+# 4. Esperar ~10 segundos y verificar
+sleep 10 && curl -s -o /dev/null -w "%{http_code}" http://localhost:3000
+# Debe devolver 200
+```
 
 ### LO QUE NO SE DEBE HACER
-- NUNCA ejecutar bun run dev manualmente desde consola — interfiere con el auto-start del sandbox y colapsa el panel de preview
+- NUNCA usar `nohup bun run dev > /tmp/next-dev.log 2>&1 &` — no funciona correctamente en este sandbox, el proceso muere inmediatamente
+- NUNCA ejecutar `bun run dev` en foreground — bloquea la consola del agente
 - NUNCA hacer commit o trackear archivos en .zscripts/ — son infraestructura del sandbox, causan merge conflicts mortales
 - NUNCA dejar merge conflicts sin resolver — el health check del sandbox bloquea TODAS las herramientas
 - NUNCA hacer git reset --hard HEAD sin verificar primero qué commit es HEAD
