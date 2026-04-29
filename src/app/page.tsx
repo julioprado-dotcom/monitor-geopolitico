@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useRef } from 'react';
 import dynamic from 'next/dynamic';
-import { Radar, Menu, Tv, Radio, Brain, GitBranch } from 'lucide-react';
+import { Radar, Menu, Tv, Radio, Brain, GitBranch, Loader2 } from 'lucide-react';
 import { demoSignals, type Relevance, type Region, type Signal, relevanceColors } from '@/data/signals';
 import { demoAnalysis, type Analysis } from '@/data/analysis';
 import { demoThreads, type Thread, type ThreadStatus } from '@/data/threads';
@@ -15,6 +15,9 @@ import ThreadCard from '@/components/Explorer/ThreadCard';
 import ThreadDetail from '@/components/Explorer/ThreadDetail';
 import KpiDashboard from '@/components/KpiDashboard';
 import PatternList from '@/components/PatternList';
+
+// Lazy: react-markdown solo se carga cuando se genera análisis IA
+const ReactMarkdown = dynamic(() => import('react-markdown'), { ssr: false });
 
 // Lazy imports: componentes secundarios no críticos para carga inicial
 const MGSidebar = dynamic(() => import('@/components/MGSidebar'), { loading: () => <MGSidebarFallback /> });
@@ -143,9 +146,52 @@ export default function Home() {
     return threads;
   }, [threadFilter, followedThreads, searchQuery]);
 
+  // ── Análisis IA en Panel de Foco ──
+  const [analysis, setAnalysis] = useState<string | null>(null);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
+
+  const fetchAnalysis = useCallback(async (signal: Signal) => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    setAnalyzing(true);
+    setAnalysisError(null);
+    setAnalysis(null);
+
+    try {
+      const payload = { ...signal };
+      const res = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: controller.signal,
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        if (res.status === 429) throw new Error('Límite diario de análisis alcanzado. Intenta más tarde.');
+        throw new Error(data.error || 'Error al generar el análisis');
+      }
+      setAnalysis(data.analysis);
+    } catch (err: any) {
+      if (err.name !== 'AbortError') setAnalysisError(err.message || 'Error de conexión');
+    } finally {
+      setAnalyzing(false);
+    }
+  }, []);
+
+  // Limpiar fetch al desmontar
+  // (React 19 useCallback cleanup handled by AbortController)
+
   // ── Sistema de Foco Dinámico: navegación por deslizamiento horizontal ──
   const handleSelectSignal = (signal: Signal) => {
     setSelectedSignal(signal);
+    setAnalysis(null);
+    setAnalysisError(null);
+    abortRef.current?.abort();
     const focoPanel = document.getElementById('foco-panel');
     if (focoPanel) {
       focoPanel.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
@@ -429,10 +475,75 @@ export default function Home() {
                   {selectedSignal.fullContent || selectedSignal.summary}
                 </div>
 
-                {/* Botón de IA */}
-                <button className="w-full py-3 px-6 bg-[#00E5A0] text-[#0A0F1C] font-bold rounded-lg hover:opacity-90 transition-opacity" style={{ fontFamily: 'Space Grotesk' }}>
-                  Analizar con IA desde el Sur Global
-                </button>
+                {/* Botón de IA + Análisis */}
+                <div className="mb-8">
+                  {!analysis && !analyzing && !analysisError && (
+                    <button
+                      onClick={() => selectedSignal && fetchAnalysis(selectedSignal)}
+                      className="w-full flex items-center justify-center gap-2 py-3 px-6 bg-[#00E5A0]/10 border border-[#00E5A0]/20 text-[#00E5A0] rounded-xl hover:bg-[#00E5A0]/20 transition-colors font-bold font-[family-name:var(--font-space-grotesk)]"
+                    >
+                      <Brain className="w-4 h-4" />
+                      Analizar con IA desde el Sur Global
+                    </button>
+                  )}
+
+                  {analyzing && (
+                    <div className="flex flex-col items-center gap-3 py-8">
+                      <Loader2 className="w-6 h-6 text-[#00E5A0] animate-spin" />
+                      <span className="text-sm text-white/50 font-[family-name:var(--font-space-grotesk)]">Generando análisis...</span>
+                    </div>
+                  )}
+
+                  {analysisError && (
+                    <div className="glass rounded-xl p-4 flex flex-col items-center gap-3">
+                      <p className="text-sm text-red-400 font-[family-name:var(--font-space-grotesk)]">{analysisError}</p>
+                      <button
+                        onClick={() => selectedSignal && fetchAnalysis(selectedSignal)}
+                        className="px-4 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold hover:bg-red-500/20 transition-colors font-[family-name:var(--font-jetbrains-mono)]"
+                      >
+                        Reintentar
+                      </button>
+                    </div>
+                  )}
+
+                  {analysis && (
+                    <div className="flex flex-col gap-3">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Brain className="w-4 h-4 text-[#00E5A0]" />
+                        <span className="text-sm font-bold text-[#00E5A0]/80 font-[family-name:var(--font-space-grotesk)]">Análisis IA — Perspectiva Sur Global</span>
+                      </div>
+                      <div className="glass rounded-xl p-4 prose-invert">
+                        <ReactMarkdown
+                          components={{
+                            h3: ({ children }) => (
+                              <h3 className="text-xs font-bold text-[#00E5A0]/70 uppercase tracking-wider mb-2 mt-4 first:mt-0 font-[family-name:var(--font-jetbrains-mono)]">{children}</h3>
+                            ),
+                            h2: ({ children }) => (
+                              <h2 className="text-xs font-bold text-[#00E5A0]/70 uppercase tracking-wider mb-2 mt-4 first:mt-0 font-[family-name:var(--font-jetbrains-mono)]">{children}</h2>
+                            ),
+                            strong: ({ children }) => (
+                              <strong className="text-white/90 font-bold">{children}</strong>
+                            ),
+                            p: ({ children }) => (
+                              <p className="text-sm text-white/65 leading-relaxed mb-3 last:mb-0 font-[family-name:var(--font-space-grotesk)]">{children}</p>
+                            ),
+                            ul: ({ children }) => (
+                              <ul className="text-sm text-white/65 leading-relaxed mb-3 pl-4 list-disc font-[family-name:var(--font-space-grotesk)]">{children}</ul>
+                            ),
+                            ol: ({ children }) => (
+                              <ol className="text-sm text-white/65 leading-relaxed mb-3 pl-4 list-decimal font-[family-name:var(--font-space-grotesk)]">{children}</ol>
+                            ),
+                            li: ({ children }) => (
+                              <li className="mb-1">{children}</li>
+                            ),
+                          }}
+                        >
+                          {analysis}
+                        </ReactMarkdown>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </section>
