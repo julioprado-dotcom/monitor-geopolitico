@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { type Signal, type Relevance, relevanceColors } from '@/data/signals';
 import { X } from 'lucide-react';
 
@@ -14,10 +15,11 @@ interface MetricsBarProps {
 const relevances: Relevance[] = ['CRÍTICA', 'ALTA', 'MEDIA', 'BAJA', 'INFORMATIVA'];
 
 export default function MetricsBar({ allSignals, filteredCount, selectedRelevances, onToggleRelevance, onClearRelevance }: MetricsBarProps) {
-  const counts: Record<string, number> = {};
-  relevances.forEach((sev) => {
-    counts[sev] = allSignals.filter((s) => s.relevance === sev).length;
-  });
+  const counts = useMemo(() => {
+    const c: Record<string, number> = {};
+    relevances.forEach((sev) => { c[sev] = allSignals.filter((s) => s.relevance === sev).length; });
+    return c;
+  }, [allSignals]);
 
   const maxCount = Math.max(...relevances.map((s) => counts[s]), 1);
 

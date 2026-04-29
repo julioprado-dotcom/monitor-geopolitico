@@ -4,32 +4,13 @@ import { useState, useEffect, useRef } from 'react';
 import { type Signal, type Region, relevanceColors, sourceLevelLabels, sourceLevelColors, sourceCountry } from '@/data/signals';
 import { ShieldCheck, ShieldAlert, Clock, Eye } from 'lucide-react';
 import { useMounted } from '@/hooks/useMounted';
+import { timeAgo, isRecent } from '@/lib/utils-time';
 
 interface SignalCardProps {
   signal: Signal;
   onRegionClick: (r: Region) => void;
   onClassifierClick: (c: string) => void;
   onSignalClick: (s: Signal) => void;
-}
-
-function timeAgo(timestamp: string): string {
-  const now = new Date();
-  const date = new Date(timestamp);
-  const diffMs = now.getTime() - date.getTime();
-  const diffMin = Math.floor(diffMs / 60000);
-  const diffHr = Math.floor(diffMin / 60);
-  const diffDay = Math.floor(diffHr / 24);
-
-  if (diffMin < 1) return 'ahora';
-  if (diffMin < 60) return `hace ${diffMin}m`;
-  if (diffHr < 24) return `hace ${diffHr}h`;
-  return `hace ${diffDay}d`;
-}
-
-/** Señal "nueva" si tiene menos de 2 horas */
-function isRecent(timestamp: string): boolean {
-  const diff = Date.now() - new Date(timestamp).getTime();
-  return diff < 2 * 60 * 60 * 1000;
 }
 
 export default function SignalCard({ signal, onRegionClick, onClassifierClick, onSignalClick }: SignalCardProps) {

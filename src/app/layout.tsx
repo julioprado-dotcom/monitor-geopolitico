@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "@/components/ui/toaster";
+
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
@@ -140,7 +140,6 @@ export default function RootLayout({
       >
         <JsonLd />
         {children}
-        <Toaster />
       </body>
     </html>
   );

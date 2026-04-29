@@ -1,31 +1,22 @@
 'use client';
 
+import { useMemo } from 'react';
 import { type Signal, demoSignals, relevanceColors } from '@/data/signals';
 import { useMounted } from '@/hooks/useMounted';
+import { timeAgo } from '@/lib/utils-time';
 
 interface LatestSignalsProps {
   onSignalClick: (s: Signal) => void;
 }
 
-function timeAgo(timestamp: string): string {
-  const now = new Date();
-  const date = new Date(timestamp);
-  const diffMs = now.getTime() - date.getTime();
-  const diffMin = Math.floor(diffMs / 60000);
-  const diffHr = Math.floor(diffMin / 60);
-  const diffDay = Math.floor(diffHr / 24);
-
-  if (diffMin < 60) return `hace ${diffMin}m`;
-  if (diffHr < 24) return `hace ${diffHr}h`;
-  return `hace ${diffDay}d`;
-}
-
 export default function LatestSignals({ onSignalClick }: LatestSignalsProps) {
   const mounted = useMounted();
 
-  const latestSignals = [...demoSignals]
-    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-    .slice(0, 8);
+  const latestSignals = useMemo(() =>
+    [...demoSignals]
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+      .slice(0, 8)
+  , []);
 
   return (
     <div className="glass rounded-xl overflow-hidden">

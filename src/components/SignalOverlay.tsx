@@ -1,7 +1,6 @@
 'use client';
 // SignalOverlay v3 — close via backdrop click or Escape (B5/B6 eliminated)
 import { useState, useEffect, useCallback } from 'react';
-import Image from 'next/image';
 import ReactMarkdown from 'react-markdown';
 import {
   ShieldCheck,
@@ -154,12 +153,14 @@ export default function SignalOverlay({ signal, onClose }: SignalOverlayProps) {
           {/* 2. Hero image */}
           {signal.image && (
             <div className="relative w-full h-48 overflow-hidden rounded-xl mb-3">
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src={signal.image}
                 alt={signal.title}
-                fill
-                className="object-cover"
-                unoptimized
+                className="w-full h-full object-cover"
+                loading="lazy"
+                decoding="async"
+                fetchPriority="low"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0A0F1C] to-transparent" />
             </div>

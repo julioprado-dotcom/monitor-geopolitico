@@ -133,7 +133,12 @@ Proxy anti-censura: content-proxy ya implementado en src/app/api/content-proxy/r
 
 ## 8. DEPENDENCIAS NO UTILIZADAS
 
-next-auth, zustand, @tanstack/react-query, @dnd-kit/core, @dnd-kit/sortable, @mdxeditor/editor, framer-motion, recharts
+TODAS eliminadas en sesión 2026-04-29 (25 paquetes removidos con bun remove):
+next-auth, zustand, @tanstack/react-query, @dnd-kit/core, @dnd-kit/sortable, @dnd-kit/utilities,
+@mdxeditor/editor, framer-motion, recharts, next-intl, next-themes, react-hook-form,
+@hookform/resolvers, @tanstack/react-table, react-day-picker, react-resizable-panels,
+react-syntax-highlighter, date-fns, embla-carousel-react, input-otp, vaul, cmdk, sonner,
+@reactuses/core, uuid
 NOTA: prisma fue eliminada de esta lista — está activamente usada en src/lib/db.ts
 
 ## 9. ESTADO DE DOCUMENTACIÓN

@@ -246,7 +246,7 @@ export default function Home() {
             {/* 4. Tarjetas — Señales Geopolíticas */}
             {contentTab === 'signals' && (
               <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 content-auto">
                   {filteredSignals.map((signal) => (
                     <SignalCard key={signal.id} signal={signal} onRegionClick={setSelectedRegion} onClassifierClick={setSelectedClassifier} onSignalClick={setSelectedSignal} />
                   ))}
@@ -275,7 +275,7 @@ export default function Home() {
 
             {/* 4. Tarjetas — Análisis */}
             {contentTab === 'analysis' && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 content-auto">
                 {demoAnalysis.map((analysis) => (
                   <AnalysisCard key={analysis.id} analysis={analysis} onClick={setSelectedAnalysis} />
                 ))}

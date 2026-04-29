@@ -1,6 +1,7 @@
 'use client';
 
-import { type Region, type Signal, demoSignals } from '@/data/signals';
+import { useMemo } from 'react';
+import { type Region, demoSignals } from '@/data/signals';
 import { ChevronRight, Globe, Info, Filter, Radio } from 'lucide-react';
 
 interface MGSidebarProps {
@@ -38,6 +39,18 @@ export default function MGSidebar({
   onRegionSelect,
   onClassifierSelect,
 }: MGSidebarProps) {
+  const regionCounts = useMemo(() => {
+    const c: Record<string, number> = {};
+    regions.forEach((r) => { c[r] = demoSignals.filter((s) => s.region === r).length; });
+    return c;
+  }, []);
+
+  const classifierCounts = useMemo(() => {
+    const c: Record<string, number> = {};
+    classifiers.forEach((cls) => { c[cls] = demoSignals.filter((s) => s.classifiers.includes(cls)).length; });
+    return c;
+  }, []);
+
   return (
     <div className="flex flex-col gap-3">
       {/* Señales Geopolíticas — título + indicador */}
@@ -76,7 +89,6 @@ export default function MGSidebar({
               Todas
             </button>
             {regions.map((region) => {
-              const count = demoSignals.filter((s: Signal) => s.region === region).length;
               return (
                 <button
                   key={region}
@@ -91,7 +103,7 @@ export default function MGSidebar({
                     <span className="text-xs">{regionIcons[region]}</span>
                     {region}
                   </span>
-                  <span className="text-[10px] text-white/25">{count}</span>
+                  <span className="text-[10px] text-white/25">{regionCounts[region]}</span>
                 </button>
               );
             })}
@@ -123,7 +135,6 @@ export default function MGSidebar({
               Todos
             </button>
             {classifiers.map((cls) => {
-              const count = demoSignals.filter((s: Signal) => s.classifiers.includes(cls)).length;
               return (
                 <button
                   key={cls}
@@ -135,7 +146,7 @@ export default function MGSidebar({
                   }`}
                 >
                   {cls}
-                  <span className="text-[10px] text-white/25">{count}</span>
+                  <span className="text-[10px] text-white/25">{classifierCounts[cls]}</span>
                 </button>
               );
             })}
