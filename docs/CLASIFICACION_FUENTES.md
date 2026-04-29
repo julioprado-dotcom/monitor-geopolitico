@@ -122,13 +122,13 @@ El proceso de incorporación tiene cinco pasos: Propuesta (cualquier usuario Pre
 
 ## 6. Niveles de Usuario y Acceso a Fuentes
 
-**Usuario Gratuito**: Acceso a fuentes de Nivel A y B en el flujo principal. Las fuentes de Nivel C requieren acción explícita del usuario ("Mostrar fuentes contrastivas") y siempre muestran notas de contextualización. No tiene acceso a fuentes de Nivel D. Máximo 2 comparaciones de fuentes por día.
+**Usuario Gratuito**: Acceso a fuentes de Nivel A y B en el flujo principal. Las fuentes de Nivel C requieren acción explícita del usuario ("Mostrar fuentes contrastivas") y siempre muestran notas de contextualización. No tiene acceso a fuentes de Nivel D. Máximo 2 comparaciones de señales por día.
 
-**Usuario Premium ($5/mes)**: Todo lo del nivel Gratuito más acceso completo a fuentes de Nivel C sin restricciones, notas de contextualización personalizables, 10 comparaciones de fuentes por día, y puede proponer nuevas fuentes para evaluación. Histórico de señales de 1 año.
+**Usuario Premium ($5/mes)**: Todo lo del nivel Gratuito más acceso completo a fuentes de Nivel C sin restricciones, notas de contextualización personalizables, 10 comparaciones de señales por día, y puede proponer nuevas fuentes para evaluación. Histórico de señales de 1 año.
 
-**Usuario Profesional ($25/mes)**: Todo lo del nivel Premium más acceso a fuentes de Nivel D (vigilancia de narrativas) con advertencias obligatorias, panel de vigilancia de narrativas en tiempo real, alertas de operaciones de información detectadas, 50 comparaciones de fuentes por día, exportación de análisis comparativos, y puede crear grupos personalizados de fuentes. Histórico completo.
+**Usuario Profesional ($25/mes)**: Todo lo del nivel Premium más acceso a fuentes de Nivel D (vigilancia de narrativas) con advertencias obligatorias, panel de vigilancia de narrativas en tiempo real, alertas de operaciones de información detectadas, 50 comparaciones de señales por día, exportación de análisis comparativos, y puede crear grupos personalizados de fuentes. Histórico completo.
 
-**Usuario Institucional ($200/mes)**: Todo lo del nivel Profesional más API de acceso a la base de datos de fuentes y clasificaciones, informes personalizables de vigilancia de narrativas, acceso a datos históricos de clasificación de fuentes, comparaciones de fuentes ilimitadas, soporte dedicado, y capacidad de solicitar evaluaciones prioritarias de fuentes específicas.
+**Usuario Institucional ($200/mes)**: Todo lo del nivel Profesional más API de acceso a la base de datos de fuentes y clasificaciones, informes personalizables de vigilancia de narrativas, acceso a datos históricos de clasificación de fuentes, comparaciones de señales ilimitadas, soporte dedicado, y capacidad de solicitar evaluaciones prioritarias de fuentes específicas.
 
 ---
 

@@ -1,4 +1,4 @@
-# PROPUESTA — Vista de Comparación de Fuentes
+# PROPUESTA — Vista de Comparación de Señales
 
 ## Proyecto: Monitor Geopolítico — News Connect
 ## Versión: 1.0
@@ -9,11 +9,13 @@
 
 ## 1. CONCEPTO
 
-La Vista de Comparación de Fuentes permite seleccionar un evento y ver cómo lo cubren múltiples fuentes internacionales simultáneamente, lado a lado, con los 5 filtros analíticos aplicados a cada versión y un meta-análisis que revela convergencias, divergencias y los intereses de poder detrás de cada narrativa.
+La Vista de Comparación de Señales permite seleccionar un evento y comparar cómo distintas fuentes emiten señales sobre ese mismo evento — lado a lado, con los 5 filtros analíticos aplicados a cada señal y un meta-análisis que revela convergencias, divergencias y los intereses de poder detrás de cada narrativa.
 
-Esto NO es un agregador que pone artículos uno al lado del otro. Es una herramienta de análisis que descompone las diferencias entre fuentes, expresa los sesgos de poder, y permite al usuario ver cómo un mismo hecho se transforma según quién lo cuenta.
+La distinción es importante: no se comparan fuentes como entidades (eso sería un ranking), sino las señales que cada fuente emite sobre un mismo evento. La fuente es el vector, la señal es lo que se compara. Esto es coherente con los principios de Epistemologías del Sur: no se juzga quién es mejor fuente, sino cómo difieren las narrativas sobre un mismo hecho.
 
-Analogía: Si Google News es un índice de biblioteca, nuestra Vista de Comparación es un seminario crítico donde 4 expertos debaten el mismo tema y un moderador señala las contradicciones.
+Esto NO es un agregador que pone artículos uno al lado del otro. Es una herramienta de análisis que descompone las diferencias entre señales, expresa los sesgos de poder, y permite al usuario ver cómo un mismo hecho se transforma según quién lo cuenta.
+
+Analogía: Si Google News es un índice de biblioteca, nuestra Vista de Comparación de Señales es un seminario crítico donde 4 expertos debaten el mismo tema y un moderador señala las contradicciones.
 
 ---
 
@@ -26,9 +28,9 @@ Al Jazeera: "Ataque israelí mata a 15 civiles en Gaza"
 BBC: "Israel carry out strike in Gaza amid escalating tensions"
 France 24: "Frappe israélienne à Gaza dans un contexte d'escalade"
 
-Las 4 cubren el mismo evento. Las 4 seleccionan palabras distintas. Las 4 omiten información diferente. Las 4 encuadran el hecho de manera que revela su posición.
+Las 4 fuentes emiten señales distintas sobre el mismo evento. Las 4 seleccionan palabras distintas. Las 4 omiten información diferente. Las 4 encuadran el hecho de manera que revela su posición.
 
-El lector individual no tiene forma de comparar sistemáticamente. Lee una fuente, tal vez dos, y forma opinión con información incompleta. La Vista de Comparación resuelve esto haciendo visible lo invisible: el encuadre, la omisión, la selección léxica, y los intereses detrás de cada versión.
+El lector individual no tiene forma de comparar sistemáticamente estas señales. Lee una fuente, tal vez dos, y forma opinión con información incompleta. La Vista de Comparación de Señales resuelve esto haciendo visible lo invisible: el encuadre, la omisión, la selección léxica, y los intereses detrás de cada versión.
 
 ---
 
@@ -38,11 +40,11 @@ El lector individual no tiene forma de comparar sistemáticamente. Lee una fuent
 
 El usuario puede activar la comparación de 3 formas:
 
-Forma A — Desde una señal individual: El usuario ve una señal en el dashboard y hace clic en "Comparar fuentes". El sistema busca automáticamente otras señales sobre el mismo evento en otras fuentes.
+Forma A — Desde una señal individual: El usuario ve una señal en el dashboard y hace clic en "Comparar señales". El sistema busca automáticamente otras señales sobre el mismo evento emitidas por otras fuentes.
 
 Forma B — Desde el clasificador: El usuario selecciona un clasificador (ej: Conflicto) y una región (ej: Medio Oriente) y ve los eventos del día. Cada evento tiene un badge "3 fuentes" o "5 fuentes" indicando cuántas fuentes lo cubren. Clic en el evento abre la comparación.
 
-Forma C — Búsqueda directa: El usuario describe un evento ("atentado Damasco hoy") y el sistema busca señales coincidentes en todas las fuentes y genera la comparación.
+Forma C — Búsqueda directa: El usuario describe un evento ("atentado Damasco hoy") y el sistema busca señales coincidentes emitidas por todas las fuentes y genera la comparación.
 
 ### 3.2 Pantalla de Comparación
 
@@ -50,12 +52,12 @@ La pantalla tiene 4 zonas:
 
 ZONA 1 — Encabezado del evento (arriba):
 Título generado por IA que sintetiza el evento: "Ataque militar en Gaza — 28 de abril 2026"
-Subtítulo сon cantidad de fuentes: "Cobertura de 4 fuentes: RT, Al Jazeera, BBC, France 24"
+Subtítulo con cantidad de señales: "Señales de 4 fuentes: RT, Al Jazeera, BBC, France 24"
 Tags de clasificadores y región
 Indicador de nivel de amenaza/emancipación promedio
 
-ZONA 2 — Columnas de fuentes (centro, scroll horizontal):
-Cada fuente ocupa una columna vertical con:
+ZONA 2 — Columnas de señales (centro, scroll horizontal):
+Cada señal de una fuente ocupa una columna vertical con:
 
 ENCABEZADO DE COLUMNA:
 Logo de la fuente + nombre
@@ -81,24 +83,24 @@ ANÁLISIS IA (expandible):
    - Flexibilidad Pragmática: ¿Qué acción o inacción justifica este encuadre?
 
 ZONA 3 — Meta-análisis (abajo, ancho completo):
-Análisis transversal generado por IA que compara las fuentes:
+Análisis transversal generado por IA que compara las señales:
 
-CONVERGENCIAS: Datos o afirmaciones que todas las fuentes comparten (probablemente hechos verificables).
+CONVERGENCIAS: Datos o afirmaciones que todas las señales comparten (probablemente hechos verificables).
 
-DIVERGENCIAS: Afirmaciones que contradicen entre fuentes (probablemente sesgo narrativo). Se destacan visualmente con color.
+DIVERGENCIAS: Afirmaciones que contradicen entre señales (probablemente sesgo narrativo). Se destacan visualmente con color.
 
-OMISIONES CRUZADAS: Qué menciona cada fuente que las otras omiten. Ejemplo: "RT menciona víctimas civiles (omitted by BBC). BBC menciona contexto de ataques previos (omitted by RT)."
+OMISIONES CRUZADAS: Qué menciona cada señal que las otras omiten. Ejemplo: "La señal de RT menciona víctimas civiles (omitted by BBC). La señal de BBC menciona contexto de ataques previos (omitted by RT)."
 
 MAPA DE INTERESES: Análisis de qué intereses geopolíticos se alinean con cada encuadre. Ejemplo: "El encuadre de RT cuestiona la legitimidad de la operación israelí, alineado con la posición rusa en ONU. El encuadre de BBC contextualiza la operación como respuesta, alineado con la posición occidental."
 
 EVALUACIÓN BIDIRECCIONAL COMPARADA:
-Tabla que muestra amenaza y emancipación según cada fuente:
+Tabla que muestra amenaza y emancipación según cada señal:
 - RT: Amenaza alta (escala militar), Emancipación baja (poco margen de acción)
 - Al Jazeera: Amenaza alta (crisis humanitaria), Emancipación media (solidaridad internacional)
 - BBC: Amenaza media (tensión regional), Emancipación baja (enfoque diplomático)
 - France 24: Amenaza media (escalada), Emancipación media (presión diplomática europea)
 
-SÍNTESIS DEL SUR GLOBAL: Evaluación desde la Óptica Sur Global que va más allá de las fuentes individuales y pregunta: ¿Cómo afecta esto al Sur Global? ¿Qué perspectiva está ausente en TODAS las fuentes? ¿Qué voces no están siendo escuchadas?
+SÍNTESIS DEL SUR GLOBAL: Evaluación desde la Óptica Sur Global que va más allá de las señales individuales y pregunta: ¿Cómo afecta esto al Sur Global? ¿Qué perspectiva está ausente en TODAS las señales? ¿Qué voces no están siendo escuchadas?
 
 ZONA 4 — Acciones (barra inferior):
 - Compartir comparación (genera imagen card con las 4 columnas resumidas)
@@ -139,8 +141,8 @@ POST /api/compare
 Body (desde una señal):
 {
   signalId: "abc123",     // Señal semilla
-  maxSources: 4,          // Máximo fuentes a comparar
-  includeAnalysis: true   // Incluir análisis por fuente
+  maxSources: 4,          // Máximo señales de distintas fuentes a comparar
+  includeAnalysis: true   // Incluir análisis por señal
 }
 
 Body (desde búsqueda):
@@ -216,11 +218,11 @@ Respuesta:
 
 SourceComparisonView.tsx — Компонент principal que orquesta la vista completa. Layout responsive: columnas en desktop, tabs en móvil.
 
-SourceColumn.tsx — Columna individual de cada fuente. Muestra titular, extracto, análisis expandible, filtros сon score visual, evaluación amenaza/emancipación.
+SourceColumn.tsx — Columna individual de cada señal. Muestra titular, extracto, análisis expandible, filtros сon score visual, evaluación amenaza/emancipación.
 
 MetaAnalysisPanel.tsx — Panel inferior сon convergencias, divergencias, omisiones cruzadas, mapa de intereses, y síntesis del Sur Global. Tabs para cada sección.
 
-ComparisonHeader.tsx — Encabezado сon título del evento, fuentes incluidas, clasificadores, región.
+ComparisonHeader.tsx — Encabezado сon título del evento, señales incluidas, clasificadores, región.
 
 RelevanceComparisonChart.tsx — Gráfico comparativo de amenaza/emancipación por fuente. Barras horizontales lado a lado.
 
@@ -238,7 +240,7 @@ El system prompt para la comparación es diferente del análisis individual. Deb
 6. Mapear intereses geopolíticos
 7. Producir la síntesis del Sur Global
 
-El prompt debe ser explícito: "Estás analizando cómo DIFERENTES fuentes cubren el MISMO evento. Tu trabajo no es juzgar quién tiene razón sino hacer visible CÓMO y POR QUÉ difieren las narrativas."
+El prompt debe ser explícito: "Estás comparando cómo DIFERENTES fuentes emiten SEÑALES sobre el MISMO evento. Tu trabajo no es juzgar quién tiene razón ni evaluar las fuentes como entidades, sino hacer visible CÓMO y POR QUÉ difieren las narrativas expresadas en cada señal."
 
 ---
 
@@ -246,7 +248,7 @@ El prompt debe ser explícito: "Estás analizando cómo DIFERENTES fuentes cubre
 
 ### 5.1 Layout Desktop (3+ columnas)
 
-La vista usa un grid de columnas, una por fuente, сon el meta-análisis debajo. Las columnas se pueden reordenar arrastrando. Se puede ocultar/mostrar columnas. El scroll horizontal permite comparar más de 4 fuentes.
+La vista usa un grid de columnas, una por señal de fuente, сon el meta-análisis debajo. Las columnas se pueden reordenar arrastrando. Se puede ocultar/mostrar columnas. El scroll horizontal permite comparar señales de más de 4 fuentes.
 
 Colores por fuente (consistentes en toda la plataforma):
 - RT: Verde (#4CAF50)
@@ -260,7 +262,7 @@ Colores por fuente (consistentes en toda la plataforma):
 
 ### 5.2 Layout Mobile (tabs)
 
-En móvil, las columnas se convierten en tabs horizontales сon el nombre de cada fuente. El meta-análisis es un tab adicional "Comparación". Swipe entre tabs.
+En móvil, las columnas se convierten en tabs horizontales сon el nombre de cada fuente. El meta-análisis es un tab adicional "Comparación de señales". Swipe entre tabs.
 
 ### 5.3 Elementos visuales clave
 
@@ -305,9 +307,9 @@ El texto de compartir incluye:
 
 ## 7. CONSUMO DE RECURSOS
 
-### 7.1 Tokens de IA por comparación
+### 7.1 Tokens de IA por comparación de señales
 
-Análisis individual por fuente: ~4500 tokens x 4 fuentes = 18,000 tokens
+Análisis individual por señal: ~4500 tokens x 4 señales = 18,000 tokens
 Meta-análisis transversal: ~6,000 tokens
 Clustering (si es primera vez): ~2,000 tokens
 Traducciones (si aplica): ~3,500 tokens x N idiomas
@@ -317,17 +319,21 @@ Total por comparación: ~26,000-40,000 tokens
 ### 7.2 Estrategia de optimización
 
 - Solo generar meta-análisis cuando el usuario lo solicite (lazy)
-- Cache de comparaciones completas (si las fuentes no cambiaron)
-- Máximo 4 fuentes por comparación por defecto (ampliable a 6 en premium)
+- Cache de comparaciones completas (si las señales no cambiaron)
+- Máximo 4 señales por comparación por defecto (ampliable a 6 en premium)
 - Análisis individuales se reutilizan si ya existían (no se re-generan)
 - El clustering se ejecuta en background al llegar señales, no al comparar
 
 ### 7.3 Rate limiting
 
-Tier Gratuito: 2 comparaciones/día
-Tier Premium: 10 comparaciones/día
-Tier Profesional: 50 comparaciones/día
-Tier Institucional: Ilimitado
+Los límites de comparación de señales están definidos en CLASIFICACION_FUENTES.md §6 (Niveles de Usuario y Acceso a Fuentes):
+
+- Tier Gratuito: 2 comparaciones de señales/día
+- Tier Premium: 10 comparaciones de señales/día
+- Tier Profesional: 50 comparaciones de señales/día
+- Tier Institucional: Ilimitado
+
+Implementación actual (src/lib/rateLimit.ts): Rate limiting genérico por IP a 5 requests/hora como baseline temporal. La diferenciación por tier requiere autenticación (Tarea 2.3-2.5 en PLAN_IMPLEMENTACION.md).
 
 ---
 
@@ -337,12 +343,12 @@ Tier Institucional: Ilimitado
 
 1. Crear modelo de datos EventCluster (eventId, señales agrupadas, título)
 2. Implementar clustering básico: señales con misma región + clasificador + ventana 24h se agrupan
-3. Crear endpoint /api/compare сon análisis individual por fuente
+3. Crear endpoint /api/compare сon análisis individual por señal
 4. Crear componente SourceColumn сon titular, extracto, análisis básico
 5. Crear vista сon 2-4 columnas side by side
 6. Sin meta-análisis todavía — solo comparación visual manual
 
-Resultado: El usuario puede ver 4 fuentes lado a lado сon sus análisis. El "wow" inicial viene de la yuxtaposición visual.
+Resultado: El usuario puede ver señales de 4 fuentes lado a lado сon sus análisis. El "wow" inicial viene de la yuxtaposición visual de señales divergentes sobre el mismo evento.
 
 ### Fase 2 — Meta-análisis (semana 3-4)
 
@@ -353,14 +359,14 @@ Resultado: El usuario puede ver 4 fuentes lado a lado сon sus análisis. El "wo
 5. Implementar evaluación bidireccional comparada
 6. Agregar síntesis del Sur Global
 
-Resultado: La comparación ya no es solo visual — el AI analiza las diferencias. Este es el momento donde el feature pasa de "interesante" a "indispensable".
+Resultado: La comparación de señales ya no es solo visual — la IA analiza las diferencias. Este es el momento donde el feature pasa de "interesante" a "indispensable".
 
 ### Fase 3 — Clustering inteligente (semana 5-6)
 
 1. Reemplazar clustering básico сon clustering semántico vía IA
 2. Implementar detección de entidades nombradas
 3. Agregar badges "3 fuentes" / "5 fuentes" en el dashboard
-4. Botón "Comparar fuentes" en cada señal
+4. Botón "Comparar señales" en cada señal
 5. Búsqueda directa de eventos para comparación
 
 Resultado: El clustering es automático e inteligente. El usuario descubre comparaciones sin buscarlas.
@@ -410,16 +416,16 @@ model Comparison {
 
 ## 10. ALINEACIÓN EPISTEMOLÓGICA
 
-La Vista de Comparación es la materialización más concreta de los principios del proyecto:
+La Vista de Comparación de Señales es la materialización más concreta de los principios del proyecto:
 
-Multipolaridad Epistémica: No privilegia una fuente sobre otra. Las presenta todas y permite al usuario comparar. La pluralidad es visual y tangible.
+Multipolaridad Epistémica: No privilegia una señal sobre otra. Presenta todas las señales y permite al usuario compararlas. La pluralidad es visual y tangible.
 
-Justicia Cognitiva: Las fuentes del Sur (RT, TeleSUR, Al Jazeera, CGTN) se muestran сon la misma dignidad analítica que las del Norte (BBC, France 24, DW). No hay jerarquía implícita.
+Justicia Cognitiva: Las señales emitidas por fuentes del Sur (RT, TeleSUR, Al Jazeera, CGTN) se muestran сon la misma dignidad analítica que las del Norte (BBC, France 24, DW). No hay jerarquía implícita entre señales.
 
-Soberanía Cognitiva: El usuario no recibe una narrativa prefabricada. Recibe herramientas para construir su propia comprensión comparando. La soberanía está en el usuario, no en el algoritmo.
+Soberanía Cognitiva: El usuario no recibe una narrativa prefabricada. Recibe herramientas para construir su propia comprensión comparando señales. La soberanía está en el usuario, no en el algoritmo.
 
-Hermenéutica Crítica: El meta-análisis revela lo oculto: omisiones, encuadres, intereses. No se limita a describir — desvela las relaciones de poder detrás de cada narrativa.
+Hermenéutica Crítica: El meta-análisis revela lo oculto: omisiones, encuadres, intereses. No se limita a describir — desvela las relaciones de poder detrás de cada narrativa expresada en cada señal.
 
-Pragmatismo Emancipador: Al hacer visibles las omisiones de cada fuente, el usuario puede buscar la información que le ocultan. Al mapear intereses, puede evaluar quién se beneficia de su ignorancia. Esto es pragmatismo emancipador en acción.
+Pragmatismo Emancipador: Al hacer visibles las omisiones de cada señal, el usuario puede buscar la información que le ocultan. Al mapear intereses, puede evaluar quién se beneficia de su ignorancia. Esto es pragmatismo emancipador en acción.
 
-La Síntesis del Sur Global es el momento más poderoso: después de comparar fuentes, el AI pregunta qué perspectiva está AUSENTE en todas. Porque incluso la comparación de 4 fuentes puede dejar fuera la voz más importante: la del propio Sur.
+La Síntesis del Sur Global es el momento más poderoso: después de comparar señales, la IA pregunta qué perspectiva está AUSENTE en todas. Porque incluso la comparación de 4 señales puede dejar fuera la voz más importante: la del propio Sur.

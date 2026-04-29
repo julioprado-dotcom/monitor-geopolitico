@@ -128,9 +128,9 @@ Objetivo: Eliminar vulnerabilidades críticas, establecer la infraestructura de 
 
 Objetivo: Implementar las funcionalidades que definen al producto y generan su propuesta de valor única. Esta fase transforma el prototipo en un producto mínimamente viable.
 
-### Sprint 2A — Vista de Comparación de Fuentes (Semanas 3-4)
+### Sprint 2A — Vista de Comparación de Señales (Semanas 3-4)
 
-**Tarea 2.1 — Vista de Comparación Fase 1 MVP** (Ver docs/PROPUESTA_COMPARACION_FUENTES.md §8)
+**Tarea 2.1 — Vista de Comparación de Señales Fase 1 MVP** (Ver docs/PROPUESTA_COMPARACION_FUENTES.md §8)
 - Archivos: Nuevo `src/app/api/compare/route.ts`, nuevos `src/components/SourceComparisonView.tsx`, `src/components/SourceColumn.tsx`, `src/components/ComparisonHeader.tsx`
 - Acción: Crear modelo EventCluster en Prisma. Implementar clustering básico (misma región + clasificador + ventana 24h). Crear endpoint POST /api/compare con análisis individual por fuente. Crear vista con 2-4 columnas side by side.
 - Criterio de aceptación: Desde una señal, el usuario puede clickear "Comparar fuentes" y ver 2-4 fuentes lado a lado con sus análisis.
@@ -148,7 +148,7 @@ Objetivo: Implementar las funcionalidades que definen al producto y generan su p
 - Criterio de aceptación: Un usuario puede registrarse, iniciar sesión, y ver su tier. El tier controla acceso a funcionalidades.
 
 **Tarea 2.4 — Lógica de acceso por tier** (Ver docs/PROGRAMA_MONETIZACION.md §3.1)
-- Acción: Implementar checks de tier en: análisis IA (rate limiting diferenciado), comparación de fuentes (rate limiting), historial de análisis (30 días / 1 año / ilimitado / ilimitado+export), acceso a fuentes nivel D, funciones de compartir.
+- Acción: Implementar checks de tier en: análisis IA (rate limiting diferenciado), comparación de señales (rate limiting), historial de análisis (30 días / 1 año / ilimitado / ilimitado+export), acceso a fuentes nivel D, funciones de compartir.
 - Criterio de aceptación: Cada funcionalidad respeta los límites del tier del usuario.
 
 **Tarea 2.5 — Rate limiting por tier** (Ver docs/PROPUESTAS_MEJORA.md §1.3)
@@ -270,7 +270,7 @@ Objetivo: Funcionalidades avanzadas que diferencian al producto a largo plazo y 
 |------|---------|--------------|-------|
 | Fase 0: Auditoría | 0 (pre-sprint) | Corregir 23 inconsistencias documentales | $0 |
 | Fase 1: Seguridad | 1-2 | XSS, rate limiting, proxy endpoints, Prisma, SEO F1, i18n F1 | $0 |
-| Fase 2: Core | 3-6 | Comparación de fuentes, autenticación, tiers, a11y, disclaimer | $0-5/mes |
+| Fase 2: Core | 3-6 | Comparación de señales, autenticación, tiers, a11y, disclaimer | $0-5/mes |
 | Fase 3: Mejoras | 7-12 | Alertas, mobile-first, monetización, contenido SEO | $5-20/mes |
 | Fase 4: Innovación | 13-24 | Multilingue completo, PWA, mapa, newsletter, API | $20-100/mes |
 
@@ -287,4 +287,4 @@ Objetivo: Funcionalidades avanzadas que diferencian al producto a largo plazo y 
 
 ## ALINEACIÓN EPISTEMOLÓGICA
 
-Este plan de implementación respeta los principios del proyecto al priorizar la seguridad (Hermenéutica Crítica — revelar vectores de ataque), la accesibilidad (Justicia Cognitiva — el análisis debe ser accesible para todos), y la transparencia (Soberanía Cognitiva — el usuario debe saber qué fuentes consume y cómo se clasifican). La Vista de Comparación de Fuentes, como killer feature, es la máxima expresión de la Multipolaridad Epistémica: poner todas las voces al mismo nivel y dejar que el usuario, no el algoritmo, evalúe las diferencias.
+Este plan de implementación respeta los principios del proyecto al priorizar la seguridad (Hermenéutica Crítica — revelar vectores de ataque), la accesibilidad (Justicia Cognitiva — el análisis debe ser accesible para todos), y la transparencia (Soberanía Cognitiva — el usuario debe saber qué fuentes consume y cómo se clasifican). La Vista de Comparación de Señales, como killer feature, es la máxima expresión de la Multipolaridad Epistémica: poner todas las voces al mismo nivel y dejar que el usuario, no el algoritmo, evalúe las diferencias entre las señales emitidas sobre un mismo evento.

@@ -198,14 +198,14 @@ Prioridad 1 — MÁXIMA (implementar primero, requiere migraciones completadas):
 8. Implementar Fase 1 de estrategia SEO (ver docs/ESTRATEGIA_SEO.md)
 9. Definir estrategia de almacenamiento de análisis por tier junto con modelo de datos Analysis (ver docs/PROGRAMA_MONETIZACION.md y docs/POLITICA_FUENTES.md sección 2.4)
 10. Implementar Fase 1 de estrategia multilingue: UI en es/en con selector de idioma (ver docs/ESTRATEGIA_MULTILINGUE.md)
-11. Implementar Vista de Comparación de Fuentes Fase 1 MVP (ver docs/PROPUESTA_COMPARACION_FUENTES.md)
+11. Implementar Vista de Comparación de Señales Fase 1 MVP (ver docs/PROPUESTA_COMPARACION_FUENTES.md)
 12. Implementar sistema de clasificación de fuentes en la interfaz del Monitor (etiquetas por nivel A/B/C/D, notas de contextualización automáticas para nivel C, acceso restringido para nivel D — ver docs/CLASIFICACION_FUENTES.md)
 13. Actualizar Historial_Desarrollo.pdf
 14. Actualizar Arquitectura_Tecnica.pdf
 
 Prioridad media:
 15. Implementar Fase 1 de programa de monetización (ver docs/PROGRAMA_MONETIZACION.md)
-16. Vista de Comparación de Fuentes Fase 2 — meta-análisis IA (ver docs/PROPUESTA_COMPARACION_FUENTES.md)
+16. Vista de Comparación de Señales Fase 2 — meta-análisis IA (ver docs/PROPUESTA_COMPARACION_FUENTES.md)
 17. Sistema de Alertas configurables (ver docs/PROPUESTAS_MEJORA.md)
 18. Mobile-first redesign (ver docs/PROPUESTAS_MEJORA.md)
 19. Limpiar dependencias no utilizadas en package.json
@@ -238,7 +238,7 @@ Prioridad baja:
 30. Glosario interactivo de términos epistemológicos
 31. Modo Offline / PWA
 32. Vista de Mapa geográfico
-33. Vista de Comparación de Fuentes Fases 3-4 — clustering inteligente + compartir (ver docs/PROPUESTA_COMPARACION_FUENTES.md)
+33. Vista de Comparación de Señales Fases 3-4 — clustering inteligente + compartir (ver docs/PROPUESTA_COMPARACION_FUENTES.md)
 34. Sistema automatizado de evaluación de honestidad periodística (ver docs/CLASIFICACION_FUENTES.md §7)
 
 ## 16. ESTRATEGIA SEO
@@ -263,13 +263,13 @@ Resumen: Interfaz por defecto en español, contenido en idioma original con badg
 
 Ver documento completo: docs/PROPUESTAS_MEJORA.md
 
-Killer feature: Vista de Comparación de Fuentes (ver mismo evento cubierto por múltiples fuentes con filtros aplicados). Advertencias críticas: XSS en proxy, sesgo IA, costos IA. Ver docs/PROPUESTAS_MEJORA.md para lista completa y priorización.
+Killer feature: Vista de Comparación de Señales (ver mismo evento cubierto por múltiples fuentes con filtros aplicados). Advertencias críticas: XSS en proxy, sesgo IA, costos IA. Ver docs/PROPUESTAS_MEJORA.md para lista completa y priorización.
 
-## 20. VISTA DE COMPARACIÓN DE FUENTES
+## 20. VISTA DE COMPARACIÓN DE SEÑALES
 
 Ver documento completo: docs/PROPUESTA_COMPARACION_FUENTES.md
 
-Killer feature del proyecto. Seleccionar un evento → ver cobertura de 4+ fuentes lado a lado → meta-análisis con convergencias, divergencias, omisiones cruzadas, mapa de intereses, evaluación bidireccional comparada, síntesis del Sur Global. Endpoint /api/compare. Componentes: SourceComparisonView, SourceColumn, MetaAnalysisPanel, FilterComparisonRadar. 4 fases: MVP visual, meta-análisis IA, clustering inteligente, compartir/difusión.
+Killer feature del proyecto. Seleccionar un evento → ver señales de 4+ fuentes lado a lado → meta-análisis con convergencias, divergencias, omisiones cruzadas, mapa de intereses, evaluación bidireccional comparada, síntesis del Sur Global. Endpoint /api/compare. Componentes: SourceComparisonView, SourceColumn, MetaAnalysisPanel, FilterComparisonRadar. 4 fases: MVP visual, meta-análisis IA, clustering inteligente, compartir/difusión.
 
 ## 21. CLASIFICACIÓN DE FUENTES
 
@@ -281,7 +281,7 @@ Sistema de clasificación cualitativa (sin puntuaciones numéricas ni rankings).
 
 Ver documento completo: docs/PLAN_IMPLEMENTACION.md
 
-Plan de implementación por prioridades con 4 fases y 5 sprints. Fase 0: Corrección de 23 inconsistencias documentales. Fase 1 (semanas 1-2): Seguridad (XSS, rate limiting), proxy endpoints, Prisma, SEO F1, i18n F1, clasificación de fuentes en UI. Fase 2 (semanas 3-6): Comparación de fuentes, autenticación, tiers, a11y, disclaimer. Fase 3 (semanas 7-12): Alertas, mobile-first, monetización, contenido SEO. Fase 4 (semanas 13-24): Multilingue completo, PWA, mapa, newsletter, API.
+Plan de implementación por prioridades con 4 fases y 5 sprints. Fase 0: Corrección de 23 inconsistencias documentales. Fase 1 (semanas 1-2): Seguridad (XSS, rate limiting), proxy endpoints, Prisma, SEO F1, i18n F1, clasificación de fuentes en UI. Fase 2 (semanas 3-6): Comparación de señales, autenticación, tiers, a11y, disclaimer. Fase 3 (semanas 7-12): Alertas, mobile-first, monetización, contenido SEO. Fase 4 (semanas 13-24): Multilingue completo, PWA, mapa, newsletter, API.
 
 ## 23. PLAN DE MIGRACIÓN
 
