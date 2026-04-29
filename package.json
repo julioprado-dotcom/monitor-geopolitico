@@ -1,6 +1,6 @@
 {
   "name": "monitor-geopolitico",
-  "version": "0.9.3-meridian",
+  "version": "0.9.4-meridian",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000 2>&1 | tee dev.log",
