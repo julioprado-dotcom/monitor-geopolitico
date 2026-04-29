@@ -44,10 +44,13 @@ export default function MetricsBar({ allSignals, filteredCount, selectedRelevanc
           const heightPct = maxCount > 0 ? (count / maxCount) * 100 : 0;
 
           return (
-            <button
+            <div
               key={sev}
+              role="button"
+              tabIndex={0}
               onClick={() => onToggleRelevance(sev)}
-              className="flex-1 flex flex-col items-center gap-1 transition-all duration-150"
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onToggleRelevance(sev); }}
+              className="flex-1 flex flex-col items-center gap-1 transition-all duration-150 cursor-pointer"
             >
               {/* Botón limpiar encima de la barra seleccionada */}
               {isSelected && (
@@ -93,7 +96,7 @@ export default function MetricsBar({ allSignals, filteredCount, selectedRelevanc
               >
                 {sev}
               </span>
-            </button>
+            </div>
           );
         })}
       </div>
