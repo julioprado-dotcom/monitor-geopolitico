@@ -23,7 +23,8 @@ const nextConfig: NextConfig = {
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
         ],
       },
-      // Cache agresivo para assets estáticos (imágenes, fuentes, etc.)
+      // Cache agresivo SOLO para assets estáticos inmutables (imágenes, fuentes)
+      // NO para chunks JS — esos se revalidan con hash en filename
       {
         source: "/signals/(.*)",
         headers: [
@@ -36,21 +37,36 @@ const nextConfig: NextConfig = {
           { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
         ],
       },
+      // Chunks JS: NO cache agresivo — permite revalidación con ETag
+      // Antes: max-age=31536000, immutable → causaba que el navegador sirviera chunks viejos
+      // con botón X y scroll indicator eliminados del código fuente
       {
         source: "/_next/static/(.*)",
         headers: [
-          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+          { key: "Cache-Control", value: "public, max-age=0, must-revalidate" },
         ],
       },
-      // HTML: revalidar pero servir stale mientras revalida
+      // Chunks dev: sin caché — HMR necesita revalidación constante
+      {
+        source: "/_next/dev/(.*)",
+        headers: [
+          { key: "Cache-Control", value: "no-cache, no-store, must-revalidate" },
+        ],
+      },
+      // HTML: sin caché en dev — siempre fresh
       {
         source: "/",
         headers: [
-          { key: "Cache-Control", value: "public, s-maxage=60, stale-while-revalidate=300" },
+          { key: "Cache-Control", value: "no-cache, no-store, must-revalidate" },
         ],
       },
     ];
   },
+
+  // Permitir cross-origin requests desde el panel de preview
+  allowedDevOrigins: [
+    "https://preview-web-f51e802b-ca59-4d1f-84fc-1989cb1896c4.space.chatglm.site",
+  ],
 };
 
 export default nextConfig;
