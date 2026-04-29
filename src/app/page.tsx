@@ -142,8 +142,16 @@ export default function Home() {
     return threads;
   }, [threadFilter, followedThreads, searchQuery]);
 
+  // ── Sistema de Foco Dinámico: navegación por deslizamiento horizontal ──
+  const scrollToFoco = () => {
+    const focoPanel = document.getElementById('foco-panel');
+    if (focoPanel) {
+      focoPanel.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+    }
+  };
+
   return (
-    <div className="min-h-screen flex flex-col bg-[#0A0F1C] text-[#F1F5F9]">
+    <div className="h-screen flex flex-col bg-[#0A0F1C] text-[#F1F5F9] overflow-hidden">
       {/* HEADER */}
       <header className="w-full glass-strong border-b border-white/[0.06] sticky top-0 z-50">
         <div className="max-w-screen-2xl mx-auto px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-2">
@@ -168,6 +176,7 @@ export default function Home() {
           {/* Center: title */}
           <div className="flex-1 text-center min-w-0">
             <h1 className="text-base sm:text-2xl font-bold text-white tracking-tight font-[family-name:var(--font-space-grotesk)] truncate">Monitor Geopolítico</h1>
+            <span className="text-slate-500 text-xs hidden sm:block">Traduciendo señales en patrones de poder.</span>
             <p className="text-[9px] sm:text-[11px] text-white/40 mt-0.5 font-[family-name:var(--font-space-grotesk)] hidden sm:block">
               Inteligencia geopolítica de acceso libre · <span className="text-[#00E5A0]/50">Meridian</span> <span className="text-white/25">v0.9.0</span>
             </p>
@@ -205,16 +214,22 @@ export default function Home() {
         </div>
       </aside>
 
-      {/* MAIN */}
-      <main className="flex-1 max-w-screen-2xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-5 overflow-x-hidden">
-        <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr_260px] gap-4 h-full overflow-hidden">
-          {/* Sidebar — desktop only (mobile usa offcanvas) */}
-          <div className="hidden lg:block">
-            <MGSidebar selectedRegion={selectedRegion} selectedClassifier={selectedClassifier} onRegionSelect={setSelectedRegion} onClassifierSelect={setSelectedClassifier} />
-          </div>
+      {/* MAIN AREA */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Sidebar — desktop only (mobile usa offcanvas) */}
+        <div className="hidden lg:block w-[200px] shrink-0 overflow-y-auto border-r border-white/[0.06] p-2">
+          <MGSidebar selectedRegion={selectedRegion} selectedClassifier={selectedClassifier} onRegionSelect={setSelectedRegion} onClassifierSelect={setSelectedClassifier} />
+        </div>
 
-          {/* Center column */}
-          <div className={`flex flex-col gap-3 sm:gap-4 min-w-0 overflow-hidden ${mobileTab === 'tv' ? 'hidden lg:flex' : 'flex'}`}>
+        {/* Horizontal scroll container */}
+        <div className="flex-1 flex flex-row overflow-x-auto snap-x snap-mandatory" style={{ scrollBehavior: 'smooth' }}>
+          {/* Panel 1: Contexto (current dashboard) */}
+          <section className="min-w-full snap-start overflow-y-auto">
+            <div className="max-w-screen-2xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-5">
+              <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-4 h-full">
+
+                {/* Center column */}
+                <div className={`flex flex-col gap-3 sm:gap-4 min-w-0 ${mobileTab === 'tv' ? 'hidden lg:flex' : 'flex'}`}>
             {/* 1. Barras de señales (MetricsBar) */}
             <MetricsBar allSignals={demoSignals} filteredCount={filteredSignals.length} selectedRelevances={selectedRelevances} onToggleRelevance={toggleRelevance} onClearRelevance={() => setSelectedRelevances(new Set())} />
 
@@ -248,7 +263,7 @@ export default function Home() {
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 content-auto">
                   {filteredSignals.map((signal) => (
-                    <SignalCard key={signal.id} signal={signal} onRegionClick={setSelectedRegion} onClassifierClick={setSelectedClassifier} onSignalClick={setSelectedSignal} />
+                    <SignalCard key={signal.id} signal={signal} onRegionClick={setSelectedRegion} onClassifierClick={setSelectedClassifier} onSignalClick={setSelectedSignal} onScrollToFoco={scrollToFoco} />
                   ))}
                   {filteredSignals.length > 0 && (
                     <div className="sm:col-span-2 flex justify-center">
@@ -355,17 +370,27 @@ export default function Home() {
             )}
           </div>
 
-          {/* Right column — desktop always visible, mobile only on TV tab */}
-          <div className={`flex-col gap-3 ${mobileTab !== 'tv' ? 'hidden lg:flex' : 'flex lg:flex'}`}>
-            <LivePlayer onOpenFloating={(ch) => setFloatingChannel(ch)} />
-            {/* LatestSignals + SourceClassifier solo en desktop o en TV tab con espacio */}
-            <div className="hidden lg:flex flex-col gap-3">
-              <LatestSignals onSignalClick={setSelectedSignal} />
-              <SourceClassifier />
+                {/* Right column — desktop always visible, mobile only on TV tab */}
+                <div className={`flex-col gap-3 ${mobileTab !== 'tv' ? 'hidden lg:flex' : 'flex lg:flex'}`}>
+                  <LivePlayer onOpenFloating={(ch) => setFloatingChannel(ch)} />
+                  {/* LatestSignals + SourceClassifier solo en desktop o en TV tab con espacio */}
+                  <div className="hidden lg:flex flex-col gap-3">
+                    <LatestSignals onSignalClick={setSelectedSignal} />
+                    <SourceClassifier />
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
+          </section>
+
+          {/* Panel 2: Foco */}
+          <section id="foco-panel" className="min-w-full snap-start bg-slate-950 p-8 flex items-center justify-center">
+            <div className="text-center max-w-lg">
+              <p className="text-white/60 text-lg font-[family-name:var(--font-space-grotesk)]">PANEL DE FOCO - Aquí irá la señal expandida y el análisis de IA</p>
+            </div>
+          </section>
         </div>
-      </main>
+      </div>
 
       {/* FLOATING PROJECTOR */}
       {floatingChannel && (
