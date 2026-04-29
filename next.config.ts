@@ -14,6 +14,9 @@ const nextConfig: NextConfig = {
     imageSizes: [32, 64, 128, 260],
   },
 
+  // Compresión gzip/brotli para todas las respuestas — crítico para baja conexión
+  compress: true,
+
   // Headers de cache y compresión para baja conexión
   async headers() {
     return [

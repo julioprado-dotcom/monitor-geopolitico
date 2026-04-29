@@ -1,13 +1,15 @@
 'use client';
 // AnalysisOverlay v3 — close via backdrop click or Escape (B5/B6 eliminated)
-import { useState, useEffect, useCallback } from 'react';
-import ReactMarkdown from 'react-markdown';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import dynamic from 'next/dynamic';
 import {
   Brain,
   Loader2,
   BookOpen,
   User,
 } from 'lucide-react';
+// Lazy: react-markdown (~50KB) solo se carga cuando se genera el análisis IA
+const ReactMarkdown = dynamic(() => import('react-markdown'), { ssr: false });
 import { type Analysis } from '@/data/analysis';
 import { useMounted } from '@/hooks/useMounted';
 
@@ -55,7 +57,14 @@ export default function AnalysisOverlay({ analysis: analysisData, onClose }: Ana
     };
   }, [handleKeyDown]);
 
+  // AbortController para cancelar fetch si el usuario cierra el overlay
+  const abortRef = useRef<AbortController | null>(null);
+
   const fetchAnalysis = async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     setLoading(true);
     setError(null);
     try {
@@ -79,6 +88,7 @@ export default function AnalysisOverlay({ analysis: analysisData, onClose }: Ana
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
+        signal: controller.signal,
       });
 
       const contentType = res.headers.get('content-type') || '';
@@ -95,16 +105,21 @@ export default function AnalysisOverlay({ analysis: analysisData, onClose }: Ana
 
       setAiAnalysis(data.analysis);
     } catch (err: any) {
-      setError(err.message || 'Error de conexión');
+      if (err.name !== 'AbortError') setError(err.message || 'Error de conexión');
     } finally {
       setLoading(false);
     }
   };
 
+  // Limpiar fetch al desmontar
+  useEffect(() => {
+    return () => abortRef.current?.abort();
+  }, []);
+
   return (
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 animate-fade-in"
-      style={{ backdropFilter: 'blur(8px)', backgroundColor: 'rgba(0,0,0,0.7)' }}
+      style={{ backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)', backgroundColor: 'rgba(0,0,0,0.75)' }}
       onClick={onClose}
     >
       {/* Contenedor de posicionamiento — SIN backdrop-filter ni transform */}

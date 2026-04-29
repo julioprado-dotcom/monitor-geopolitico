@@ -1,7 +1,10 @@
 'use client';
 
-import { useState } from 'react';
-import ReactMarkdown from 'react-markdown';
+import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
+
+// Lazy: react-markdown (~50KB) solo se carga cuando se muestra el meta-análisis
+const ReactMarkdown = dynamic(() => import('react-markdown'), { ssr: false });
 import {
   X as XIcon,
   GitCompareArrows,
@@ -52,7 +55,7 @@ export default function SourceComparisonView({ seedSignal, onClose }: SourceComp
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchComparison = async () => {
+  const fetchComparison = async (signal?: AbortSignal) => {
     setLoading(true);
     setError(null);
     try {
@@ -60,6 +63,7 @@ export default function SourceComparisonView({ seedSignal, onClose }: SourceComp
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ signalId: seedSignal.id }),
+        signal,
       });
 
       const result = await res.json();
@@ -71,16 +75,18 @@ export default function SourceComparisonView({ seedSignal, onClose }: SourceComp
 
       setData(result);
     } catch (err: any) {
-      setError(err.message || 'Error de conexión');
+      if (err.name !== 'AbortError') setError(err.message || 'Error de conexión');
     } finally {
       setLoading(false);
     }
   };
 
-  // Auto-fetch on mount
-  useState(() => {
-    if (!data && !loading) fetchComparison();
-  });
+  // Auto-fetch on mount + AbortController para cancelar si se desmonta
+  useEffect(() => {
+    const controller = new AbortController();
+    fetchComparison(controller.signal);
+    return () => controller.abort();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const closeOnEscape = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') onClose();
@@ -89,7 +95,7 @@ export default function SourceComparisonView({ seedSignal, onClose }: SourceComp
   return (
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 animate-fade-in"
-      style={{ backdropFilter: 'blur(8px)', backgroundColor: 'rgba(0,0,0,0.8)' }}
+      style={{ backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)', backgroundColor: 'rgba(0,0,0,0.8)' }}
       onKeyDown={closeOnEscape}
     >
       <div
@@ -139,7 +145,7 @@ export default function SourceComparisonView({ seedSignal, onClose }: SourceComp
             <div className="glass rounded-xl p-4 flex flex-col items-center gap-3 py-12">
               <p className="text-sm text-red-400 font-[family-name:var(--font-space-grotesk)]">{error}</p>
               <button
-                onClick={fetchComparison}
+                onClick={() => fetchComparison()}
                 className="px-4 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold hover:bg-red-500/20 transition-colors font-[family-name:var(--font-jetbrains-mono)]"
               >
                 Reintentar

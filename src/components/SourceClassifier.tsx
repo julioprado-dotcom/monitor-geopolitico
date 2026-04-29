@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { demoSignals, sourceLevelLabels, sourceLevelDescriptions, sourceLevelColors, type SourceLevel } from '@/data/signals';
 
 const sourceLevels: SourceLevel[] = ['A', 'B', 'C', 'D'];
@@ -7,12 +8,12 @@ const sourceLevels: SourceLevel[] = ['A', 'B', 'C', 'D'];
 export default function SourceClassifier() {
   const total = demoSignals.length;
 
-  const distribution = sourceLevels.map((level) => {
+  const distribution = useMemo(() => sourceLevels.map((level) => {
     const count = demoSignals.filter((s) => s.sourceLevel === level).length;
     const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
     const colors = sourceLevelColors[level];
     return { level, count, percentage, label: sourceLevelLabels[level], description: sourceLevelDescriptions[level], colors };
-  });
+  }), [total]);
 
   return (
     <div className="glass rounded-xl overflow-hidden">
