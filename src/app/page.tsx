@@ -24,6 +24,7 @@ const SignalOverlay = dynamic(() => import('@/components/SignalOverlay'), { ssr:
 const AnalysisOverlay = dynamic(() => import('@/components/AnalysisOverlay'), { ssr: false });
 const FloatingProjector = dynamic(() => import('@/components/FloatingProjector'), { ssr: false });
 const SourceComparisonView = dynamic(() => import('@/components/SourceComparisonView'), { ssr: false });
+const FocoPanel = dynamic(() => import('@/components/FocoPanel'), { ssr: false });
 // LivePlayer: carga diferida — se renderiza DESPUÉS de las tarjetas de señales
 const LivePlayer = dynamic(() => import('@/components/LivePlayer'), {
   ssr: false,
@@ -150,6 +151,13 @@ export default function Home() {
     }
   };
 
+  const scrollToContext = () => {
+    const contextPanel = document.getElementById('context-panel');
+    if (contextPanel) {
+      contextPanel.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+    }
+  };
+
   return (
     <div className="h-screen flex flex-col bg-[#0A0F1C] text-[#F1F5F9] overflow-hidden">
       {/* HEADER */}
@@ -224,7 +232,7 @@ export default function Home() {
         {/* Horizontal scroll container */}
         <div className="flex-1 flex flex-row overflow-x-auto snap-x snap-mandatory" style={{ scrollBehavior: 'smooth' }}>
           {/* Panel 1: Contexto (current dashboard) */}
-          <section className="min-w-full snap-start overflow-y-auto">
+          <section id="context-panel" className="min-w-full snap-start overflow-y-auto">
             <div className="max-w-screen-2xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-5">
               <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-4 h-full">
 
@@ -383,11 +391,18 @@ export default function Home() {
             </div>
           </section>
 
-          {/* Panel 2: Foco */}
-          <section id="foco-panel" className="min-w-full snap-start bg-slate-950 p-8 flex items-center justify-center">
-            <div className="text-center max-w-lg">
-              <p className="text-white/60 text-lg font-[family-name:var(--font-space-grotesk)]">PANEL DE FOCO - Aquí irá la señal expandida y el análisis de IA</p>
-            </div>
+          {/* Panel 2: Foco (signal expandida + análisis IA) */}
+          <section id="foco-panel" className="min-w-full snap-start overflow-hidden">
+            {selectedSignal ? (
+              <FocoPanel signal={selectedSignal} onBack={scrollToContext} />
+            ) : (
+              <div className="h-full flex flex-col items-center justify-center gap-4 bg-[#0A0F1C] p-8">
+                <Radar className="w-12 h-12 text-white/10" />
+                <p className="text-white/30 text-sm font-[family-name:var(--font-space-grotesk)] text-center">
+                  Selecciona una señal para ver su análisis en profundidad desde la perspectiva del Sur Global.
+                </p>
+              </div>
+            )}
           </section>
         </div>
       </div>
