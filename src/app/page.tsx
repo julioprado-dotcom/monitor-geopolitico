@@ -20,8 +20,6 @@ const LatestSignals = dynamic(() => import('@/components/LatestSignals'));
 const SourceClassifier = dynamic(() => import('@/components/SourceClassifier'));
 
 // ── Dynamic imports: solo se cargan cuando se necesitan (cero impacto en carga inicial) ──
-// SignalOverlay desactivado — reemplazado por Panel de Foco dinámico (Fase 2)
-// const SignalOverlay = dynamic(() => import('@/components/SignalOverlay'), { ssr: false });
 const AnalysisOverlay = dynamic(() => import('@/components/AnalysisOverlay'), { ssr: false });
 const FloatingProjector = dynamic(() => import('@/components/FloatingProjector'), { ssr: false });
 const SourceComparisonView = dynamic(() => import('@/components/SourceComparisonView'), { ssr: false });
