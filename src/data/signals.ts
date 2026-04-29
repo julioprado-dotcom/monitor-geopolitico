@@ -167,7 +167,7 @@ export const demoSignals: Signal[] = [
     language: 'es',
     timestamp: '2025-12-15T14:30:00Z',
     verified: true,
-    sourceLevel: 'A',
+    sourceLevel: 'B',
     accessLevel: 'ABIERTO',
     image: '/signals/sig-001.webp'
   },
@@ -184,7 +184,7 @@ export const demoSignals: Signal[] = [
     language: 'es',
     timestamp: '2025-12-14T09:15:00Z',
     verified: true,
-    sourceLevel: 'A',
+    sourceLevel: 'B',
     accessLevel: 'ABIERTO',
   },
   {
@@ -217,7 +217,7 @@ export const demoSignals: Signal[] = [
     language: 'es',
     timestamp: '2025-12-13T16:45:00Z',
     verified: true,
-    sourceLevel: 'A',
+    sourceLevel: 'B',
     accessLevel: 'ABIERTO',
     image: '/signals/sig-004.webp'
   },
@@ -234,7 +234,7 @@ export const demoSignals: Signal[] = [
     language: 'es',
     timestamp: '2025-12-12T11:00:00Z',
     verified: true,
-    sourceLevel: 'A',
+    sourceLevel: 'B',
     accessLevel: 'ABIERTO',
   },
   {
@@ -267,7 +267,7 @@ export const demoSignals: Signal[] = [
     language: 'es',
     timestamp: '2025-12-11T19:20:00Z',
     verified: false,
-    sourceLevel: 'B',
+    sourceLevel: 'C',
     accessLevel: 'ABIERTO',
   },
   {
@@ -283,7 +283,7 @@ export const demoSignals: Signal[] = [
     language: 'es',
     timestamp: '2025-12-11T14:00:00Z',
     verified: true,
-    sourceLevel: 'C',
+    sourceLevel: 'B',
     accessLevel: 'RESTRINGIDO',
     image: '/signals/sig-008.webp'
   },
@@ -317,7 +317,7 @@ export const demoSignals: Signal[] = [
     language: 'es',
     timestamp: '2025-12-10T15:30:00Z',
     verified: true,
-    sourceLevel: 'A',
+    sourceLevel: 'B',
     accessLevel: 'ABIERTO',
     image: '/signals/sig-010.webp'
   },
@@ -350,7 +350,7 @@ export const demoSignals: Signal[] = [
     language: 'es',
     timestamp: '2025-12-09T09:45:00Z',
     verified: false,
-    sourceLevel: 'C',
+    sourceLevel: 'B',
     accessLevel: 'ABIERTO',
   },
   {
@@ -366,7 +366,7 @@ export const demoSignals: Signal[] = [
     language: 'es',
     timestamp: '2025-12-08T17:00:00Z',
     verified: true,
-    sourceLevel: 'A',
+    sourceLevel: 'B',
     accessLevel: 'ABIERTO',
     image: '/signals/sig-013.webp'
   },
@@ -416,7 +416,7 @@ export const demoSignals: Signal[] = [
     language: 'es',
     timestamp: '2025-12-07T08:00:00Z',
     verified: true,
-    sourceLevel: 'A',
+    sourceLevel: 'C',
     accessLevel: 'ABIERTO',
   },
   {
@@ -449,7 +449,7 @@ export const demoSignals: Signal[] = [
     language: 'es',
     timestamp: '2025-12-06T11:30:00Z',
     verified: false,
-    sourceLevel: 'C',
+    sourceLevel: 'B',
     accessLevel: 'ABIERTO',
   },
   {
@@ -498,7 +498,7 @@ export const demoSignals: Signal[] = [
     language: 'es',
     timestamp: '2025-12-04T20:00:00Z',
     verified: false,
-    sourceLevel: 'C',
+    sourceLevel: 'B',
     accessLevel: 'ABIERTO',
     image: '/signals/sig-021.webp'
   },
@@ -515,7 +515,7 @@ export const demoSignals: Signal[] = [
     language: 'es',
     timestamp: '2025-12-04T12:00:00Z',
     verified: false,
-    sourceLevel: 'C',
+    sourceLevel: 'B',
     accessLevel: 'ABIERTO',
   },
   {
@@ -580,7 +580,7 @@ export const demoSignals: Signal[] = [
     language: 'es',
     timestamp: '2025-12-02T09:00:00Z',
     verified: true,
-    sourceLevel: 'A',
+    sourceLevel: 'B',
     accessLevel: 'ABIERTO',
     image: '/signals/sig-026.webp'
   },
@@ -597,7 +597,7 @@ export const demoSignals: Signal[] = [
     language: 'es',
     timestamp: '2025-12-01T18:00:00Z',
     verified: true,
-    sourceLevel: 'C',
+    sourceLevel: 'B',
     accessLevel: 'RESTRINGIDO',
   },
   {
@@ -696,7 +696,7 @@ export const demoSignals: Signal[] = [
     language: 'es',
     timestamp: '2026-04-24T18:00:00Z',
     verified: false,
-    sourceLevel: 'C',
+    sourceLevel: 'B',
     accessLevel: 'ABIERTO',
     image: '/signals/sig-033.webp'
   },
@@ -713,7 +713,7 @@ export const demoSignals: Signal[] = [
     language: 'es',
     timestamp: '2026-04-28T07:30:00Z',
     verified: true,
-    sourceLevel: 'C',
+    sourceLevel: 'B',
     accessLevel: 'RESTRINGIDO',
   },
   {
@@ -745,7 +745,7 @@ export const demoSignals: Signal[] = [
     language: 'es',
     timestamp: '2026-04-26T11:30:00Z',
     verified: true,
-    sourceLevel: 'A',
+    sourceLevel: 'B',
     accessLevel: 'ABIERTO',
     image: '/signals/sig-036.webp'
   },
@@ -843,7 +843,7 @@ export const demoSignals: Signal[] = [
     language: 'en',
     timestamp: '2026-04-22T21:00:00Z',
     verified: true,
-    sourceLevel: 'A',
+    sourceLevel: 'B',
     accessLevel: 'RESTRINGIDO',
     image: '/signals/sig-042.webp',
   },
@@ -860,7 +860,7 @@ export const demoSignals: Signal[] = [
     language: 'ar',
     timestamp: '2026-04-28T12:00:00Z',
     verified: true,
-    sourceLevel: 'A',
+    sourceLevel: 'B',
     accessLevel: 'ABIERTO',
   },
   {
@@ -927,7 +927,7 @@ export const demoSignals: Signal[] = [
     language: 'es',
     timestamp: '2026-04-22T17:30:00Z',
     verified: false,
-    sourceLevel: 'C',
+    sourceLevel: 'B',
     accessLevel: 'ABIERTO',
   },
   {
@@ -943,7 +943,7 @@ export const demoSignals: Signal[] = [
     language: 'ar',
     timestamp: '2026-04-28T08:00:00Z',
     verified: true,
-    sourceLevel: 'A',
+    sourceLevel: 'B',
     accessLevel: 'ABIERTO',
     image: '/signals/sig-048.webp'
   },
@@ -976,7 +976,7 @@ export const demoSignals: Signal[] = [
     language: 'en',
     timestamp: '2026-04-21T10:00:00Z',
     verified: true,
-    sourceLevel: 'C',
+    sourceLevel: 'B',
     accessLevel: 'ABIERTO',
     image: '/signals/sig-050.webp'
   },
@@ -993,7 +993,7 @@ export const demoSignals: Signal[] = [
     language: 'es',
     timestamp: '2026-04-20T15:00:00Z',
     verified: false,
-    sourceLevel: 'C',
+    sourceLevel: 'B',
     accessLevel: 'ABIERTO',
   },
   {
@@ -1026,7 +1026,7 @@ export const demoSignals: Signal[] = [
     language: 'es',
     timestamp: '2026-04-26T20:00:00Z',
     verified: true,
-    sourceLevel: 'C',
+    sourceLevel: 'B',
     accessLevel: 'RESTRINGIDO',
   },
   {
@@ -1042,7 +1042,7 @@ export const demoSignals: Signal[] = [
     language: 'es',
     timestamp: '2026-04-24T16:00:00Z',
     verified: true,
-    sourceLevel: 'A',
+    sourceLevel: 'B',
     accessLevel: 'ABIERTO',
     image: '/signals/sig-054.webp'
   },
