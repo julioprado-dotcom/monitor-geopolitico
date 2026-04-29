@@ -275,7 +275,7 @@ Killer feature del proyecto. Seleccionar un evento → ver cobertura de 4+ fuent
 
 Ver documento completo: docs/CLASIFICACION_FUENTES.md
 
-Jerarquía de criterios: (1) Honestidad periodística 40%, (2) Sesgos 25%, (3) Transparencia editorial 20%, (4) Cobertura 10%, (5) Accesibilidad 5%. Cuatro niveles: A Referencial (>80), B Complementaria (60-80), C Contrastiva (40-60), D Vigilada (<40). NOTA: Actualmente ninguna fuente evaluada numéricamente alcanza Nivel A. Todas las fuentes evaluadas están en Nivel B (RT 71.5, Al Jazeera 61.75, Al Mayadeen 71.45, Democracy Now 75.9, Africa News 74.15). Fuentes sin evaluación numérica reclasificadas conservadoramente a B. Selección sugerida por región con 6 zonas. Evaluación comparada con ejemplos numéricos. Revisión trimestral.
+Sistema de clasificación cualitativa (sin puntuaciones numéricas ni rankings). Cinco criterios internos de evaluación (solo equipo e IA): Honestidad periodística, Sesgos, Transparencia editorial, Cobertura del Sur Global, Accesibilidad técnica. Cuatro niveles: A Referencial, B Complementaria, C Contrastiva, D Vigilada. Actualmente no hay fuentes en Nivel A. La mayoría de las fuentes activas están en Nivel B. Fuentes institucionales (OHCHR, CIJ) clasificadas como A por ser organismos internacionales, no medios. Catálogo con identidad del medio + nivel. Revisiones trimestrales. Perfiles detallados de uso interno. Ver documento completo para estructura completa.
 
 ## 22. PLAN DE IMPLEMENTACIÓN
 

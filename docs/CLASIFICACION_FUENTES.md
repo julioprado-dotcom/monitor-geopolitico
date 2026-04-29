@@ -2,94 +2,186 @@
 
 ## 1. Filosofía de Clasificación
 
-El Monitor Geopolítico opera desde la Óptica Sur Global, lo que implica que la clasificación de fuentes no reproduce los criterios de los índices occidentales de "libertad de prensa" que históricamente han deslegitimado medios del Sur Global mientras otorgan credenciales automáticos a medios corporativos occidentales que han avalado guerras ilegales, omitido genocidios y fabricado consensos. Nuestro sistema evalúa fuentes desde una epistemología propia basada en cinco principios: Multipolaridad Epistémica (ninguna región monopoliza la verdad), Justicia Cognitiva (todas las voces merecen ser escuchadas), Soberanía Cognitiva (cada pueblo tiene derecho a su propia narrativa), Hermenéutica Crítica (toda fuente tiene sesgos, la honestidad está en reconocerlos), y Pragmatismo Emancipador (el valor de una fuente se mide por su capacidad de revelar lo que otras ocultan). Esto no significa relativismo donde todo vale igual: significa que la evaluación es contextual, simétrica y explícita sobre sus propios criterios.
+El Monitor Geopolítico opera desde la Óptica Sur Global, lo que implica que la clasificación de fuentes no reproduce los criterios de los índices occidentales de "libertad de prensa" que históricamente han deslegitimado medios del Sur Global mientras otorgan credenciales automáticos a medios corporativos occidentales que han avalado guerras ilegales, omitido genocidios y fabricado consensos. Nuestro sistema evalúa fuentes desde una epistemología propia basada en cinco principios: Multipolaridad Epistémica (ninguna región monopoliza la verdad), Justicia Cognitiva (todas las voces merecen ser escuchadas), Soberanía Cognitiva (cada pueblo tiene derecho a su propia narrativa), Hermenéutica Crítica (toda fuente tiene sesgos, la honestidad está en reconocerlos), y Pragmatismo Emancipador (el valor de una fuente se mide por su capacidad de revelar lo que otras ocultan).
 
-## 2. Jerarquía de Criterios de Evaluación
+La clasificación es cualitativa, no cuantitativa. No se asignan puntuaciones numéricas ni se construyen rankings. Cada fuente se evalúa en su contexto específico y se clasifica según un juicio cualitativo sobre su perfil periodístico, no según la suma de puntajes en una rúbrica. Esto no significa relativismo donde todo vale igual: significa que la evaluación es contextual, simétrica y explícita sobre sus propios criterios.
 
-Los criterios están ordenados por peso descendente. El primero tiene el mayor peso absoluto y es condición necesaria para la incorporación de cualquier fuente al Monitor.
+---
 
-**CRITERIO 1 — Honestidad Periodística (Peso 40%)**: ¿Lo que publican es cierto? ¿Sucedió realmente? ¿Los hechos reportados pueden ser verificados independientemente? Este es el criterio fundamental y no negociable. Una fuente que publica hechos verificables, incluso si tiene una línea editorial clara, es más honesta que una que omite hechos inconvenientes mientras se presenta como "neutral". Se evalúa: proporción de informaciones verificables versus especulación, corrección de errores cuando se detectan, distinción clara entre hecho y opinión, existencia o no de fabricaciones deliberadas, y consistencia factual en el tiempo. Una fuente puede tener una línea editorial pronunciada y seguir siendo honesta periodísticamente si lo que reporta como hecho es verdadero. RT, por ejemplo, reporta hechos verificables —la existencia de una base militar, una declaración oficial, un ataque— y eso es honestidad periodística. Si un medio occidental "neutro" omite sistemáticamente que un país realizó un golpe de Estado, su honestidad periodística es inferior a la de un medio que sí lo reporta, independientemente de la línea editorial de ambos.
+## 2. Criterios de Evaluación [INTERNO — Equipo e IA]
 
-**CRITERIO 2 — Sesgos y Propensiones (Peso 25%)**: Toda fuente tiene sesgos. La pregunta no es si tiene sesgo sino qué tipo de sesgo, qué dirección toma, con qué intensidad se manifiesta, y sobre todo si es predecible. Un sesgo predecible es manejable para el lector informado; un sesgo oculto o variable es peligrosamente engañoso. Se evalúa: dirección del sesgo (hacia qué actores o posiciones tiende), intensidad (sutil vs abrumador), consistencia (siempre el mismo sesgo o varía según el tema), selectividad (qué omite versus qué destaca), y framing (cómo encuadra las noticias: "protestas" vs "disturbios", "intervención" vs "invasión"). Al Jazeera tiene un sesgo variable según los intereses diplomáticos de Qatar: puede ser crítica con un régimen árabe en un momento y silenciosa sobre el mismo régimen en otro contexto. Esa variabilidad hace su sesgo más difícil de navegar que el de RT, que es consistente en su posición pro-rusa. Los medios chinos (Xinhua, CGTN, Global Times) tienen un sesgo pro-PCCh predecible y consistente. Al Mayadeen tiene un sesgo pro-eje de la resistencia claro y declarado. La predecibilidad del sesgo es un activo, no un defecto, porque permite al lector calibrar la información.
+Los siguientes cinco criterios son lentes de lectura para la evaluación cualitativa de fuentes. Son de uso exclusivo del equipo editorial y la IA del Monitor. No se exponen al usuario ni se utilizan como rúbrica de puntuación.
 
-**CRITERIO 3 — Transparencia de Línea Editorial (Peso 20%)**: ¿La fuente declara abiertamente su posición, o la oculta detrás de una pretendida neutralidad? La transparencia sobre la línea editorial es un valor positivo. RT es completamente transparente: se promociona explícitamente como el medio que da "la versión rusa frente a la narrativa occidental". Esa transparencia es éticamente superior a la de medios que pretenden neutralidad mientras operan como portavoces de intereses estatales o corporativos no declarados. Al Jazeera es menos transparente porque se presenta como "independiente" cuando su línea editorial varía según los intereses políticos y diplomáticos del Estado qatarí. Medios como Xinhua o MAAN News Agency son absolutamente transparentes: su posición es evidente y declarada. Africa News es transparente sobre su enfoque panafricano. La transparencia editorial permite al lector contextualizar la información; la opacidad editorial disfraza de objetividad lo que es posición. Se evalúa: si la fuente declara su misión o posición, si su financiación es pública y verificable, si su propiedad es conocida, si sus alineamientos geopolíticos son evidentes versus ocultos, y si distingue entre noticia y opinión en su presentación.
+**CRITERIO 1 — Honestidad Periodística**: ¿Lo que publican es cierto? ¿Los hechos reportados pueden ser verificados independientemente? Este es el criterio fundamental y no negociable. Una fuente que publica hechos verificables, incluso si tiene una línea editorial clara, es más honesta que una que omite hechos inconvenientes mientras se presenta como "neutral". Se evalúa: proporción de informaciones verificables versus especulación, corrección de errores, distinción entre hecho y opinión, existencia de fabricaciones deliberadas, y consistencia factual en el tiempo.
 
-**CRITERIO 4 — Cobertura y Diversidad Temática (Peso 10%)**: ¿La fuente cubre los temas relevantes para el Sur Global o solo replica la agenda mediática occidental? Se evalúa: cobertura de regiones del Sur Global, profundidad versus superficialidad, diversidad de voces incluidas, agenda propia versus agenda impuesta, y cobertura de temas que otros medios ignoran (extractivismo, neocolonialismo, movimientos sociales, soberanía alimentaria, deuda externa).
+**CRITERIO 2 — Sesgos y Propensiones**: Toda fuente tiene sesgos. La pregunta es qué tipo de sesgo, qué dirección toma, con qué intensidad, y sobre todo si es predecible. Un sesgo predecible es manejable para el lector informado; un sesgo oculto o variable es peligrosamente engañoso. Se evalúa: dirección, intensidad, consistencia, selectividad y framing.
 
-**CRITERIO 5 — Accesibilidad Técnica (Peso 5%)**: ¿La fuente es accesible vía RSS, API o scraping ético? ¿Está bloqueada en algunas regiones? ¿Requiere proxy anti-censura? Este criterio es operativo, no valorativo, y no afecta la calidad de la fuente sino la viabilidad técnica de su incorporación.
+**CRITERIO 3 — Transparencia de Línea Editorial**: ¿La fuente declara abiertamente su posición, o la oculta detrás de una pretendida neutralidad? La transparencia sobre la línea editorial es un valor positivo. Se evalúa: si la fuente declara su misión o posición, si su financiación es pública y verificable, si su propiedad es conocida, y si distingue entre noticia y opinión.
 
-## 3. Sistema de Clasificación por Niveles
+**CRITERIO 4 — Cobertura y Diversidad Temática**: ¿La fuente cubre temas relevantes para el Sur Global o replica la agenda mediática occidental? Se evalúa: cobertura de regiones del Sur Global, diversidad de voces incluidas, agenda propia versus agenda impuesta, y cobertura de temas que otros medios ignoran.
 
-Las fuentes se clasifican en cuatro niveles basados en la evaluación combinada de los cinco criterios. El nivel NO es un juicio de valor absoluto sino una indicación del tipo de lectura que el usuario debe hacer y del nivel de contextualización que el Monitor proporciona.
+**CRITERIO 5 — Accesibilidad Técnica**: ¿La fuente es accesible vía RSS, API o scraping ético? ¿Está bloqueada en algunas regiones? Este criterio es operativo, no valorativo.
 
-**NIVEL A — Referencial (Puntuación combinada mayor a 80)**: Fuentes con alta honestidad periodística, sesgo predecible y declarado, línea editorial transparente, y cobertura amplia del Sur Global. Son fuentes que el Monitor cita como referentes primarios y cuyas señales se integran automáticamente en el flujo principal. El Monitor muestra el contenido de fuentes Nivel A con una etiqueta verde "Referencial" y contexto mínimo. NOTA: Actualmente ninguna fuente evaluada numéricamente alcanza el umbral de 80 puntos (ver §8). Las fuentes que en §5 estaban clasificadas como A pero obtienen menos de 80 en §8 han sido reclasificadas a B. La clasificación A queda reservada para fuentes que demuestren consistentemente puntuación superior a 80 en evaluaciones trimestrales.
+---
 
-**NIVEL B — Complementaria (Puntuación combinada entre 60 y 80)**: Fuentes con honestidad periodística aceptable pero con sesgos más variables, línea editorial menos transparente, o cobertura más limitada. Son fuentes valiosas pero que requieren mayor contextualización por parte del Monitor. Sus señales se muestran con etiqueta amarilla "Complementaria" y el Monitor añade notas sobre la posición editorial de la fuente y posibles ángulos omitidos. Ejemplos: RT (71.5, reporta hechos verificables pero con framing pro-ruso consistente), Al Jazeera (61.75, excelente cobertura pero sesgo variable según intereses de Qatar), Al Mayadeen (71.45, transparente sobre eje de resistencia, alta honestidad periodística), Democracy Now (75.9, reportaje factual riguroso pero cobertura centrada en EE.UU.), Africa News (74.15, enfoque panafricano con sesgo declarado y predecible), Xinhua (evaluación numérica pendiente, sesgo pro-PCCh predecible), TeleSUR (evaluación numérica pendiente, línea editorial declarada), Press TV (evaluación numérica pendiente, posición iraní transparente).
+## 3. Niveles de Clasificación [PÚBLICO]
 
-**NIVEL C — Contrastiva (Puntuación combinada entre 40 y 60)**: Fuentes con honestidad periodística cuestionable en ciertos temas, sesgo intenso y/o variable, o línea editorial oculta, pero que proporcionan la perspectiva de actores geopolíticos clave. No se muestran en el flujo principal pero están disponibles para usuarios que desean contrastar. Se muestran con etiqueta naranja "Contrastiva" y el Monitor añade siempre una nota de contextualización sobre la posición de la fuente y qué aspectos de su reportaje deben ser verificados con otras fuentes. Ejemplos: CNN (cobertura amplia pero sesgo pro-estadounidense intenso, fabricación de consensos para intervenciones militares), BBC World (presentación de neutralidad pero alineamiento consistente con política exterior británica), Fox News (sesgo conservador estadounidense intenso, baja distinción hecho-opinión), DW Deutsche Welle (voz del Estado alemán con presentación de neutralidad), France 24 (voz del interés francés en África y Medio Oriente).
+Las fuentes se clasifican en cuatro niveles según un juicio cualitativo sobre su perfil periodístico. El nivel indica al usuario el tipo de lectura que debe hacer y el nivel de contextualización que el Monitor proporciona.
 
-**NIVEL D — Vigilada (Puntuación combinada menor a 40)**: Fuentes con patrón recurrente de desinformación verificable, fabricación deliberada de hechos, o línea editorial encubierta que se presenta como independiente. Solo se incorporan como fuentes de vigilancia —el Monitor rastrea qué narrativas están promoviendo, no para informar al usuario sino para identificar operaciones de información en curso. Se muestran con etiqueta roja "Vigilada" y siempre con la advertencia: "Esta fuente tiene historial de desinformación verificable. Se muestra para fines de vigilancia de narrativas, no como fuente informativa." El acceso a fuentes vigiladas requiere nivel de usuario Profesional o superior. Ejemplos: Medios identificables como portavoces no declarados de agencias de inteligencia, sitios de desinformación documentada, y medios que han retractado informaciones fabricadas sin transparencia sobre el proceso.
+**NIVEL A — Referencial**: Fuentes con honestidad periodística verificable consistente, sesgo predecible y declarado, transparencia editorial completa, y cobertura sustancial del Sur Global. Sus señales se integran en el flujo principal con contextualización mínima. Etiqueta verde. Actualmente el Monitor no tiene fuentes clasificadas en este nivel. El nivel A se asigna cuando una fuente demuestra consistentemente, a lo largo de evaluaciones trimestrales, un perfil que justifique esta categoría.
+
+**NIVEL B — Complementaria**: Fuentes con honestidad periodística aceptable, sesgo identificable (aunque sea variable), y que aportan perspectivas necesarias que no están disponibles en otras fuentes. Requieren contextualización activa por parte del Monitor. Etiqueta amarilla. Es el nivel más común en la selección actual del Monitor.
+
+**NIVEL C — Contrastiva**: Fuentes con honestidad periodística cuestionable en ciertos temas, sesgo intenso u oculto, o línea editorial que se presenta como neutral cuando no lo es. Se incorporan como voces de actores geopolíticos específicos cuyo discurso el usuario necesita conocer y contrastar. Requieren acción explícita del usuario para acceder y siempre muestran nota de contextualización. Etiqueta naranja.
+
+**NIVEL D — Vigilada**: Fuentes con patrón recurrente de desinformación verificable o fabricación deliberada de hechos. Se incorporan exclusivamente para vigilancia de narrativas, no como fuentes informativas. Etiqueta roja. Acceso restringido a usuarios Profesional o superior.
+
+---
 
 ## 4. Criterios de Incorporación
 
-Para que una fuente sea incorporada al Monitor, debe cumplir obligatoriamente lo siguiente: (1) No tener un patrón de fabricación deliberada de hechos —errores puntuales con corrección son aceptables, pero la fabricación sistemática descalifica automáticamente; (2) Cubrir al menos una región del Sur Global con profundidad suficiente —no se incorporan fuentes que solo replican la agenda de medios occidentales sin aportar perspectiva propia; (3) Ser accesible técnicamente vía RSS, API, o scraping ético —si requiere proxy anti-censura, se evalúa la viabilidad del proxy como parte del proceso; (4) No ser un clon o réplica de otra fuente ya incorporada —si dos fuentes comparten más del 80% de su contenido, se mantiene la de mayor puntuación; (5) Aportar algo que las fuentes ya incorporadas no aportan —ya sea una región, una perspectiva, un tipo de cobertura, o un acceso a actores específicos.
+Para que una fuente sea incorporada al Monitor, debe cumplir obligatoriamente lo siguiente: (1) No tener un patrón de fabricación deliberada de hechos — errores puntuales con corrección son aceptables, pero la fabricación sistemática descalifica automáticamente; (2) Cubrir al menos una región del Sur Global con profundidad suficiente — no se incorporan fuentes que solo replican la agenda de medios occidentales sin aportar perspectiva propia; (3) Ser accesible técnicamente vía RSS, API, o scraping ético — si requiere proxy anti-censura, se evalúa la viabilidad del proxy; (4) No ser un clon o réplica de otra fuente ya incorporada; (5) Aportar algo que las fuentes ya incorporadas no aportan — ya sea una región, una perspectiva, un tipo de cobertura, o un acceso a actores específicos.
 
-El proceso de incorporación tiene cinco pasos: Propuesta (cualquier usuario Premium o superior puede proponer una fuente), Evaluación Preliminar (el equipo editorial aplica los 5 criterios con evidencia documentada), Período de Prueba (la fuente se integra como Nivel C por 90 días, se monitorea su rendimiento factual), Reevaluación (se ajusta el nivel según el desempeño en el período de prueba), y Clasificación Final (se asigna el nivel definitivo, revisable anualmente o ante incidentes graves).
+El proceso de incorporación tiene cinco pasos: Propuesta (cualquier usuario Premium o superior puede proponer una fuente), Evaluación Preliminar (el equipo editorial aplica los 5 criterios cualitativamente con evidencia documentada), Período de Prueba (la fuente se integra como Nivel C por 90 días, se monitorea su rendimiento factual), Reevaluación (se ajusta el nivel según el desempeño en el período de prueba), y Clasificación Final (se asigna el nivel definitivo, revisable trimestralmente o ante incidentes graves).
 
-## 5. Selección Sugerida por Región
+---
 
-**LATINOAMÉRICA**: Telesur (B, voz continental declarada — evaluación numérica pendiente, clasificación aspiracional), Página12 (B, perspectiva progresista argentina), La Jornada (B, perspectiva mexicana independiente), Cubadebate (B, perspectiva cubana transparente), Agencia Brasil (B, perspectiva brasileña estatal transparente), El País Uruguay (B, perspectiva del Cono Sur), Resumen Latinoamericano (B, perspectiva anticapitalista declarada — evaluación numérica pendiente, clasificación aspiracional).
+## 5. Catálogo de Fuentes [PÚBLICO]
 
-**MEDIO ORIENTE**: Al Mayadeen (B, transparente sobre eje de resistencia — puntuación 71.45, ver §8), Press TV (B, transparente sobre posición iraní — evaluación numérica pendiente, clasificación ajustada por similitud con fuentes evaluadas), Al Masdar News (B, perspectiva siria), The Cradle (B, perspectiva libanesa declarada), Al Jazeera (B, cobertura amplia pero sesgo variable — puntuación 61.75, ver §8), Middle East Eye (B, perspectiva independiente con sesgo pro-palestino declarado), The New Arab (C, financiamiento qatarí menos transparente), Times of Israel (C, perspectiva israelí útil para contrastar).
+### Fuentes activas en el Monitor
 
-**ASIA-PACÍFICO**: Xinhua (B, sesgo pro-PCCh predecible y declarado — evaluación numérica pendiente, clasificación ajustada conservadoramente), CGTN (B, complemento de Xinhua en inglés — evaluación numérica pendiente, clasificación ajustada conservadoramente), Global Times (B, versión más opinativa del espectro chino declarada), South China Morning Post (B, perspectiva Hong Kong), The Diplomat (C, perspectiva estadounidense sobre Asia), NHK World (B, perspectiva japonesa declarada), Korea Central News Agency (C, perspectiva norcoreana útil para conocer la narrativa del Estado), Hindustan Times (B, perspectiva india).
+**Canales de TV (14)**
 
-**ÁFRICA**: Africa News (B, enfoque panafricano explícito — puntuación 74.15, ver §8), AllAfrica (B, agregador panafricano — evaluación numérica pendiente, clasificación ajustada conservadoramente), Daily Nation Kenya (B, perspectiva keniana), The Mail and Guardian Sudáfrica (B, perspectiva sudafricana independiente), Jeune Afrique (B, perspectiva francófona africana), Premium Times Nigeria (B, perspectiva nigeriana independiente), The East African (B, perspectiva de África Oriental).
+| Fuente | Identidad | Nivel |
+|---|---|---|
+| RT | Portal de noticias y TV, Rusia | B |
+| RT Español | Canal de noticias en español, Rusia | B |
+| Al Jazeera | Cadena de televisión, Qatar | B |
+| CGTN | Canal de televisión internacional, China | B |
+| NHK World | Cadena de televisión pública, Japón | B |
+| WION | Cadena de televisión, India | B |
+| NDTV | Cadena de televisión, India | B |
+| Africanews | Cadena de noticias panafricana, Congo | B |
+| TeleSUR | Canal público multinacional, Venezuela | B |
+| TeleSUR English | Canal en inglés, Venezuela | B |
+| Cubavisión | Cadena de televisión pública, Cuba | B |
+| TRT World | Cadena de televisión, Turquía | B |
+| Al Mayadeen | Cadena de televisión, Líbano | B |
+| Press TV | Cadena de televisión, Irán | B |
 
-**EUROPA**: RT (B, transparente sobre posición rusa), Sputnik (B, complemento de RT), Euronews (B, perspectiva europea multipolar), Mediapart Francia (B, investigación independiente francesa), Der Spiegel (C, perspectiva alemana con sesgo liberal), Novaya Gazeta (B, perspectiva rusa disidente, honestidad periodística alta).
+**Fuentes de señales y análisis**
 
-**NORTEAMÉRICA**: The Intercept (B, investigación independiente declarada), Democracy Now (B, transparente sobre posición progresista — puntuación 75.9, ver §8), Associated Press (B, agencia con sesgo occidental pero factual), The Grayzone (B, perspectiva antiimperialista declarada), Breitbart (D, vigilancia de narrativas de extrema derecha), Fox News (C, perspectiva conservadora estadounidense), New York Times (C, útil para contrastar la narrativa hegemónica).
+| Fuente | Identidad | Nivel |
+|---|---|---|
+| Agencia BRICS de Noticias | Agencia de noticias, BRICS | B |
+| Xinhua | Agencia de noticias estatal, China | B |
+| TASS | Agencia de noticias, Rusia | B |
+| Prensa Latina | Agencia de noticias, Cuba | B |
+| Anadolu Agency | Agencia de noticias, Turquía | B |
+| EFE | Agencia de noticias, España | B |
+| Reuters África | Agencia de noticias, Reino Unido | B |
+| The Hindu | Periódico, India | B |
+| Folha de São Paulo | Periódico, Brasil | B |
+| La Jornada | Periódico, México | B |
+| Página/12 | Periódico, Argentina | B |
+| The East African | Periódico semanal, Kenia | B |
+| Middle East Eye | Portal de noticias, Reino Unido | B |
+| Irrawaddy | Portal de noticias, Myanmar | B |
+| Mongabay Latam | Portal de noticias ambientales, Perú | B |
+| Le Monde Diplomatique | Revista de análisis geopolítico, Francia | B |
+| Africa Renewal | Revista digital, Naciones Unidas | B |
+| CBC News | Cadena de noticias, Canadá | B |
+| Euractiv | Portal de noticias, Unión Europea | B |
+| The National | Periódico, Emiratos Árabes Unidos | B |
+| Nordic Monitor | Portal de noticias, Suecia | C |
+| BBC África | Servicio de noticias, Reino Unido | C |
+| Washington Post | Periódico, Estados Unidos | C |
+
+**Fuentes institucionales** (no son medios — son organismos internacionales citados como fuentes primarias de derecho y datos)
+
+| Fuente | Identidad | Nivel |
+|---|---|---|
+| OHCHR | Oficina del Alto Comisionado para los Derechos Humanos, Naciones Unidas | A |
+| CIJ Official | Corte Internacional de Justicia, Naciones Unidas | A |
+
+### Fuentes sugeridas por región (no incorporadas aún)
+
+**LATINOAMÉRICA**: Cubadebate (portal, Cuba), Agencia Brasil (agencia estatal, Brasil), El País Uruguay (periódico, Uruguay), Resumen Latinoamericano (portal, Argentina).
+
+**MEDIO ORIENTE**: Al Masdar News (portal, Siria), The Cradle (portal, Líbano), The New Arab (portal, Qatar), Times of Israel (periódico, Israel).
+
+**ASIA-PACÍFICO**: Global Times (portal, China), South China Morning Post (periódico, Hong Kong), The Diplomat (revista, Estados Unidos), Korea Central News Agency (agencia, Corea del Norte), Hindustan Times (periódico, India).
+
+**ÁFRICA**: AllAfrica (agregador, Sudáfrica), Daily Nation (periódico, Kenia), Mail & Guardian (periódico, Sudáfrica), Jeune Afrique (revista, Francia), Premium Times (periódico, Nigeria).
+
+**EUROPA**: Sputnik (agencia, Rusia), Euronews (canal, Unión Europea), Mediapart (portal, Francia), Der Spiegel (revista, Alemania), Novaya Gazeta (periódico, Rusia).
+
+**NORTEAMÉRICA**: The Intercept (portal, Estados Unidos), Democracy Now (programa, Estados Unidos), Associated Press (agencia, Estados Unidos), The Grayzone (portal, Estados Unidos), Breitbart (portal, Estados Unidos), Fox News (canal, Estados Unidos), New York Times (periódico, Estados Unidos).
+
+---
 
 ## 6. Niveles de Usuario y Acceso a Fuentes
 
-**Usuario Gratuito**: Acceso a todas las fuentes de Nivel A en el flujo principal. Las fuentes de Nivel B se muestran con contexto ampliado automático. Las fuentes de Nivel C requieren acción explícita del usuario ("Mostrar fuentes contrastivas") y siempre muestran notas de contextualización. No tiene acceso a fuentes de Nivel D. Máximo 2 comparaciones de fuentes por día (alineado con docs/PROPUESTA_COMPARACION_FUENTES.md §7.3).
+**Usuario Gratuito**: Acceso a fuentes de Nivel A y B en el flujo principal. Las fuentes de Nivel C requieren acción explícita del usuario ("Mostrar fuentes contrastivas") y siempre muestran notas de contextualización. No tiene acceso a fuentes de Nivel D. Máximo 2 comparaciones de fuentes por día.
 
-**Usuario Premium ($5/mes)**: Todo lo del nivel Gratuito más acceso completo a fuentes de Nivel C sin restricciones, notas de contextualización personalizables (opcionales, mínimas, completas), 10 comparaciones de fuentes por día, y puede proponer nuevas fuentes para evaluación. Histórico de señales de 1 año.
+**Usuario Premium ($5/mes)**: Todo lo del nivel Gratuito más acceso completo a fuentes de Nivel C sin restricciones, notas de contextualización personalizables, 10 comparaciones de fuentes por día, y puede proponer nuevas fuentes para evaluación. Histórico de señales de 1 año.
 
-**Usuario Profesional ($25/mes)**: Todo lo del nivel Premium más acceso a fuentes de Nivel D (vigilancia de narrativas) con advertencias obligatorias, panel de vigilancia de narrativas en tiempo real, alertas de operaciones de información detectadas, 50 comparaciones de fuentes por día, exportación de análisis comparativos, y puede crear grupos personalizados de fuentes para seguimiento. Histórico completo.
+**Usuario Profesional ($25/mes)**: Todo lo del nivel Premium más acceso a fuentes de Nivel D (vigilancia de narrativas) con advertencias obligatorias, panel de vigilancia de narrativas en tiempo real, alertas de operaciones de información detectadas, 50 comparaciones de fuentes por día, exportación de análisis comparativos, y puede crear grupos personalizados de fuentes. Histórico completo.
 
-**Usuario Institucional ($200/mes)**: Todo lo del nivel Profesional más API de acceso a la base de datos de fuentes y clasificaciones, informes personalizables de vigilancia de narrativas, acceso a datos históricos de clasificación de fuentes (cómo ha evolucionado la evaluación de cada fuente), comparaciones de fuentes ilimitadas, soporte dedicado, y capacidad de solicitar evaluaciones prioritarias de fuentes específicas.
+**Usuario Institucional ($200/mes)**: Todo lo del nivel Profesional más API de acceso a la base de datos de fuentes y clasificaciones, informes personalizables de vigilancia de narrativas, acceso a datos históricos de clasificación de fuentes, comparaciones de fuentes ilimitadas, soporte dedicado, y capacidad de solicitar evaluaciones prioritarias de fuentes específicas.
 
-## 7. Evaluación de Honestidad Periodística — Marco Operativo
+---
 
-La honestidad periodística se evalúa mediante un protocolo de verificación de cinco dimensiones, cada una con indicadores observables:
+## 7. Marco de Evaluación Cualitativa [INTERNO — Equipo e IA]
 
-**Verificabilidad Factual (peso 35% dentro de la honestidad)**: ¿Los hechos reportados pueden ser confirmados por otras fuentes, documentos, registros oficiales, imágenes verificables, o testimonios independientes? Se toma una muestra de 20 reportajes de los últimos 90 días y se intenta verificar los hechos centrales de cada uno. Si 18 o más son verificables, la fuente obtiene la máxima puntuación. Si menos de 12 son verificables, la fuente no supera este criterio. No se requiere que los hechos sean reportados por fuentes occidentales; la verificación puede provenir de agencias multilaterales, ONGs, gobiernos locales, satélites, o cualquier fuente independiente del medio evaluado.
+La evaluación de una fuente produce un perfil cualitativo descriptivo, no una puntuación numérica. El proceso es el siguiente:
 
-**Corrección de Errores (peso 20% dentro de la honestidad)**: Cuando la fuente comete un error factual, ¿lo corrige? ¿Con qué rapidez? ¿La corrección es visible o se hace silenciosamente? Las correcciones visibles y oportunas son señal de honestidad. La ausencia de correcciones puede significar dos cosas opuestas: que la fuente no comete errores (improbable) o que no los reconoce (problemático). Se evalúa el historial de correcciones en los últimos 12 meses.
+1. **Muestreo**: Se toma una muestra representativa de 20 publicaciones de los últimos 90 días.
+2. **Lectura por criterios**: Se analiza la muestra a través de los 5 criterios (§2), identificando patrones consistentes.
+3. **Perfil descriptivo**: Se redacta un perfil que describe el comportamiento observado de la fuente en cada criterio. El perfil es textual, no numérico.
+4. **Asignación de nivel**: Se asigna el nivel (A/B/C/D) según el patrón general del perfil, no por suma de puntajes. El nivel refleja el tipo de lectura que el usuario necesita hacer al consumir esa fuente, no un ranking de calidad.
 
-**Distinción Hecho-Opinión (peso 20% dentro de la honestidad)**: ¿La fuente diferencia claramente entre lo que sucedió y lo que opina sobre lo que sucedió? La mezcla deliberada de hecho y opinión es una forma de deshonestidad periodística más peligrosa que la opinión abierta. Un medio que dice "Rusia invadió Ucrania" y luego en un análisis dice "esta invasión es ilegal e injustificada" está distinguiendo hecho de opinión. Un medio que titula "Rusia lanza ataque ilegal" está mezclando ambos.
+**Dimensiones de la honestidad periodística** (usadas en la lectura cualitativa, no como sub-puntuaciones):
+- **Verificabilidad Factual**: ¿Los hechos centrales pueden confirmarse por fuentes independientes?
+- **Corrección de Errores**: ¿Los errores se corrigen de forma visible y oportuna?
+- **Distinción Hecho-Opinión**: ¿Se diferencia claramente entre lo que sucedió y la interpretación de lo que sucedió?
+- **Consistencia Temporal**: ¿Los estándares se mantienen en el tiempo y entre temas?
+- **Contexto No Manipulado**: ¿Los hechos se presentan con contexto adecuado o se descontextualizan?
 
-**Consistencia Temporal (peso 15% dentro de la honestidad)**: ¿La fuente mantiene sus reportajes a lo largo del tiempo o los borra o modifica cuando se vuelven inconvenientes? ¿Aplica los mismos estándares de verificación a todos los temas o es laxa con unos y rigurosa con otros? La consistencia es indicador de honestidad metodológica. La inconsistencia selectiva —rigurosa con enemigos, laxa con aliados— es indicador de deshonestidad.
+---
 
-**Contexto No Manipulado (peso 10% dentro de la honestidad)**: ¿La fuente presenta los hechos con contexto adecuado o los descontextualiza para alterar su significado? Un dato verdadero fuera de contexto puede ser más engañoso que una mentira directa. Se evalúa si las citas son completas, si las estadísticas están presentadas con la base comparativa adecuada, y si los eventos históricos son referenciados con precisión.
+## 8. Perfiles de Fuentes Evaluadas [INTERNO — Equipo e IA]
 
-## 8. Ejemplo de Evaluación Comparada
+Los perfiles detallados a continuación son de uso interno. No se exponen al usuario. El usuario solo ve la identidad del medio y su nivel (§5).
 
-**RT**: Honestidad periodística 75/100 — reporta hechos verificables consistentemente, errores puntuales con corrección visible, distingue hecho de opinión en formato pero no siempre en titulares, consistencia temporal alta. Sesgos 60/100 — sesgo pro-ruso intenso pero predecible y consistente, selectividad evidente en qué cubre versus qué omite. Transparencia editorial 90/100 — completamente transparente sobre su posición como "la versión rusa", financiación estatal declarada, propiedad pública conocida. Cobertura 65/100 — cobertura amplia de temas que occidente omite, pero vacíos en críticas internas a Rusia. Accesibilidad 40/100 — bloqueado en Europa, requiere proxy. Puntuación combinada: (75x0.40)+(60x0.25)+(90x0.20)+(65x0.10)+(40x0.05)=30+15+18+6.5+2=71.5 — NIVEL B Complementaria.
+**RT** — Reporta hechos verificables de forma consistente (bombardamientos, declaraciones oficiales, despliegues militares). Su sesgo pro-ruso es intenso pero completamente declarado y predecible. Línea editorial transparente: se posiciona como contranarrativa a medios occidentales. Cobertura amplia de temas que la hegemonía mediática omite, con vacíos sistemáticos en autocrítica interna a Rusia. Bloqueada en Europa, requiere proxy. → B
 
-**Al Jazeera**: Honestidad periodística 70/100 — reporta hechos verificables en la mayoría de coberturas, pero hay casos documentados de omisiones selectivas cuando afectan intereses de Qatar. Corrección de errores aceptable. Sesgos 50/100 — sesgo variable según intereses diplomáticos de Qatar, menos predecible que RT, lo que lo hace más difícil de navegar. Transparencia editorial 45/100 — se presenta como "independiente" cuando su línea varía con la política exterior qatarí, financiación estatal menos transparente que RT. Cobertura 80/100 — cobertura amplia y profunda del mundo árabe y África. Accesibilidad 85/100 — accesible globalmente vía RSS y web. Puntuación combinada: (70x0.40)+(50x0.25)+(45x0.20)+(80x0.10)+(85x0.05)=28+12.5+9+8+4.25=61.75 — NIVEL B Complementaria.
+**Al Jazeera** — Reporta hechos verificables en la mayoría de coberturas, con omisiones selectivas documentadas cuando afectan intereses de Qatar. Su sesgo varía según los intereses diplomáticos de Qatar, lo que lo hace menos predecible que RT. Se presenta como independiente cuando su línea editorial responde a la política exterior qatarí. Cobertura amplia y profunda del mundo árabe y África. → B
 
-**Al Mayadeen**: Honestidad periodística 78/100 — reporta hechos verificables sobre Medio Oriente consistentemente, errores corregidos, buena distinción hecho-opinión. Sesgos 55/100 — sesgo pro-eje de la resistencia claro y declarado, predecible, consistente. Transparencia editorial 85/100 — transparente sobre su posición pro-resistencia, financiación conocida, línea editorial declarada. Cobertura 70/100 — cobertura profunda de Medio Oriente pero limitada fuera de la región. Accesibilidad 50/100 — bloqueado en algunos países árabes. Puntuación combinada: (78x0.40)+(55x0.25)+(85x0.20)+(70x0.10)+(50x0.05)=31.2+13.75+17+7+2.5=71.45 — NIVEL B Complementaria, cercana al A por transparencia.
+**Al Mayadeen** — Reporta hechos verificables sobre Medio Oriente de forma consistente. Sesgo pro-eje de la resistencia claro, declarado y predecible. Transparencia editorial alta: línea editorial y financiación conocidas. Cobertura profunda de Medio Oriente pero limitada fuera de la región. Bloqueada en algunos países árabes. → B
 
-**Democracy Now**: Honestidad periodística 82/100 — reportaje factual riguroso, correcciones visibles, clara distinción hecho-opinión, consistencia temporal alta. Sesgos 60/100 — sesgo progresista declarado y predecible, selectividad en cobertura pero consistente. Transparencia editorial 88/100 — declaración explícita de valores progresistas, financiación por donantes pública, independencia editorial verificable. Cobertura 60/100 — cobertura centrada en Estados Unidos con algo de internacional, limitada en Sur Global profundo. Accesibilidad 90/100 — accesible globalmente. Puntuación combinada: (82x0.40)+(60x0.25)+(88x0.20)+(60x0.10)+(90x0.05)=32.8+15+17.6+6+4.5=75.9 — NIVEL B Complementaria.
+**Democracy Now** — Reportaje factual riguroso con correcciones visibles y clara distinción hecho-opinión. Sesgo progresista declarado y predecible. Transparencia alta: declaración explícita de valores, financiación por donantes pública, independencia editorial verificable. Cobertura centrada en Estados Unidos con limitaciones en Sur Global profundo. → B
 
-**Africa News**: Honestidad periodística 76/100 — reporta hechos verificables del continente, errores ocasionales con corrección, buena distinción hecho-opinión. Sesgos 65/100 — sesgo panafricano declarado y predecible, enfoca lo que otros ignoran. Transparencia editorial 80/100 — transparente sobre su enfoque panafricano, propiedad y financiación conocidas. Cobertura 75/100 — cobertura continental amplia, voces diversas. Accesibilidad 80/100 — accesible globalmente. Puntuación combinada: (76x0.40)+(65x0.25)+(80x0.20)+(75x0.10)+(80x0.05)=30.4+16.25+16+7.5+4=74.15 — NIVEL B Complementaria.
+**Africa News** — Reporta hechos verificables del continente de forma consistente. Sesgo panafricano declarado y predecible. Transparencia editorial buena: enfoque panafricano explícito, propiedad y financiación conocidas. Cobertura continental amplia con voces diversas. → B
+
+**Press TV** — Medio iraní con línea editorial pro-iraní clara y declarada. Reporta hechos verificables con sesgo consistente y predecible. Transparencia editorial alta sobre su posición. Cobertura centrada en Medio Oriente. → B
+
+**TeleSUR** — Canal público multinacional con línea editorial pro-integración latinoamericana declarada. Reporta hechos verificables con sesgo progresista consistente. Cobertura de América Latina con voces diversas. → B
+
+**CGTN** — Medio estatal chino con sesgo pro-PCCh predecible y declarado. Reporta hechos verificables sobre China y su política exterior. Transparencia editorial completa sobre su posición. Cobertura centrada en la perspectiva china con alcance internacional. → B
+
+**Xinhua** — Agencia de noticias estatal china. Sesgo pro-PCCh predecible, consistente y declarado. Funciona como fuente primaria de información oficial del gobierno chino. Alta verificabilidad en hechos fácticos, selectividad en temas internos. → B
+
+---
 
 ## 9. Revisión y Actualización
 
-Las clasificaciones se revisan trimestralmente mediante evaluación automatizada de los indicadores observables y auditoría humana de muestras. Cualquier fuente puede ser recalificada ante: un incidente de desinformación verificable (recalificación inmediata), solicitud fundamentada de usuario Premium o superior (evaluación en 30 días), cambio documentado en la línea editorial o propiedad de la fuente (evaluación en 15 días), o acumulación de errores factuales sin corrección (evaluación en 7 días). Las recalificaciones siempre se documentan públicamente con la justificación y evidencia.
+Las clasificaciones se revisan trimestralmente mediante evaluación cualitativa de muestras recientes. Cualquier fuente puede ser reclasificada ante: un incidente de desinformación verificable (reclasificación inmediata), solicitud fundamentada de usuario Premium o superior (evaluación en 30 días), cambio documentado en la línea editorial o propiedad (evaluación en 15 días), o acumulación de errores factuales sin corrección (evaluación en 7 días). Las reclasificaciones siempre se documentan con la justificación y evidencia.
+
+---
 
 ## 10. Nota Metodológica
 
-Este sistema reconoce explícitamente que no existe la neutralidad periodística. Todo medio tiene una posición, y la honestidad no está en no tenerla sino en declararla y en no fabricar hechos para sostenerla. Un medio que dice "somos la voz de la resistencia" y reporta hechos verificables es más honesto que un medio que dice "somos neutrales" y omite sistemáticamente los crímenes de sus aliados. La clasificación no pretende ser definitiva ni universal: es una herramienta del Monitor, construida desde la Óptica Sur Global, para ayudar al usuario a navegar un paisaje mediático donde la supuesta neutralidad es a menudo la forma más sofisticada de propaganda.
+Este sistema reconoce explícitamente que no existe la neutralidad periodística. Todo medio tiene una posición, y la honestidad no está en no tenerla sino en declararla y en no fabricar hechos para sostenerla. Un medio que dice "somos la voz de la resistencia" y reporta hechos verificables es más honesto que un medio que dice "somos neutrales" y omite sistemáticamente los crímenes de sus aliados.
+
+La clasificación es una herramienta del Monitor, construida desde la Óptica Sur Global, para ayudar al usuario a navegar un paisaje mediático donde la supuesta neutralidad es a menudo la forma más sofisticada de propaganda. Es cualitativa y contextual: no produce rankings ni establece verdades absolutas sobre las fuentes. Produce perfiles que permiten al usuario calibrar la información que consume.
