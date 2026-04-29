@@ -1,5 +1,5 @@
 'use client';
-
+// AnalysisOverlay v3 — close via backdrop click or Escape (B5/B6 eliminated)
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import ReactMarkdown from 'react-markdown';
