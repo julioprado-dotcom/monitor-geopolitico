@@ -154,7 +154,7 @@ Principales gaps en Historial de Desarrollo: Subsistema TV completo no registrad
 package.json: 0.9.0-meridian
 Historial_Desarrollo.pdf: referencia 0.8.0 DESACTUALIZADO (pendiente actualización)
 Marco Conceptual: v0.9.0
-Tags Git: v0.9.0-meridian, v0.9.1-meridian
+Tags Git: v0.9.0-meridian, v0.9.1-meridian, v0.9.2-meridian
 
 ## 11. PREFERENCIAS DEL USUARIO
 
@@ -173,6 +173,7 @@ Git: Trabajar con protocolo claro, no actualizar el repo hasta estar listos
 5. Health check cacheado → Si una sesión tiene merge conflict, aunque se resuelva externamente, la sesión queda bloqueada. Hay que continuar en nuevo chat.
 6. Hydration mismatch (overflow-hidden) → Si page.tsx tiene overflow-hidden en el grid y se quita, el servidor cachea el HTML viejo y el cliente renderiza distinto. Solución: mantener overflow-hidden consistente entre servidor y cliente.
 7. AnalysisOverlay → Creado clonando patrón de SignalOverlay con fuente de datos en analysisContent.ts. Tarjetas de análisis ahora muestran artículo completo correctamente.
+8. AnalysisOverlay verificado funcional (sesión 2026-04-29) → Flujo completo AnalysisCard → AnalysisOverlay → Análisis IA probado con browser automation. 6 tarjetas visibles, contenido completo (1564px scroll), análisis IA generado (~11,000 caracteres), cierre por backdrop click, 0 errores en consola.
 
 ## 13. PROTOCOLO GIT
 
