@@ -66,9 +66,11 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // Permitir cross-origin requests desde el panel de preview
+  // Permitir cross-origin requests desde cualquier preview
   allowedDevOrigins: [
     "https://preview-web-f51e802b-ca59-4d1f-84fc-1989cb1896c4.space.chatglm.site",
+    /.+\.space-z\.ai$/,
+    /.+\.space\.chatglm\.site$/,
   ],
 };
 
