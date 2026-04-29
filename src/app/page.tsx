@@ -13,6 +13,8 @@ import AnalysisCard from '@/components/AnalysisCard';
 import SearchBar from '@/components/SearchBar';
 import ThreadCard from '@/components/Explorer/ThreadCard';
 import ThreadDetail from '@/components/Explorer/ThreadDetail';
+import KpiDashboard from '@/components/KpiDashboard';
+import PatternList from '@/components/PatternList';
 
 // Lazy imports: componentes secundarios no críticos para carga inicial
 const MGSidebar = dynamic(() => import('@/components/MGSidebar'), { loading: () => <MGSidebarFallback /> });
@@ -230,6 +232,13 @@ export default function Home() {
 
                 {/* Center column */}
                 <div className={`flex flex-col gap-3 sm:gap-4 min-w-0 ${mobileTab === 'tv' ? 'hidden lg:flex' : 'flex'}`}>
+            {/* 0. Inteligencia Visual: KPIs + Patrones */}
+            <KpiDashboard signals={filteredSignals} />
+            <div className="border-l-2 border-[#00E5A0] pl-4 glass p-4 rounded-lg">
+              <h3 className="text-[9px] sm:text-[10px] font-bold text-[#00E5A0] mb-2 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">Patrones Detectados (24h)</h3>
+              <PatternList />
+            </div>
+
             {/* 1. Barras de señales (MetricsBar) */}
             <MetricsBar allSignals={demoSignals} filteredCount={filteredSignals.length} selectedRelevances={selectedRelevances} onToggleRelevance={toggleRelevance} onClearRelevance={() => setSelectedRelevances(new Set())} />
 
