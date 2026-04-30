@@ -1,0 +1,165 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ── Enums ──
+
+enum TipoCombo {
+  TERMOMETRO_SOLO
+  TERMO_SALDO
+  PAQUETE_COMPLETO
+}
+
+enum EstadoContrato {
+  ACTIVO
+  VENCIDO
+  CANCELADO
+  SUSPENDIDO
+}
+
+// ── Etiquetas dinámicas ──
+
+model Etiqueta {
+  id        Int       @id @default(autoincrement())
+  nombre    String    @unique // ej: "YPFB", "Daroca", "Litio"
+  color     String    @default("#00E5A0") // color hex para la UI
+  clienteId Int?      // null = uso global, != null = privada del cliente
+  cliente   Cliente?  @relation(fields: [clienteId], references: [id])
+
+  // Relaciones muchos a muchos
+  tematicas       TematicaEtiqueta[]
+  ejesMonitoreo   EjeMonitoreoEtiqueta[]
+  menciones       MencionEtiqueta[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ── Temáticas (agrupadores lógicos) ──
+
+model Tematica {
+  id        Int      @id @default(autoincrement())
+  nombre    String   @unique // ej: "Crisis YPFB", "Cadena del Litio"
+  clienteId Int
+  cliente   Cliente @relation(fields: [clienteId], references: [id])
+
+  // Relaciones muchos a muchos con etiquetas
+  etiquetas TematicaEtiqueta[]
+
+  // Relación con ejes de monitoreo
+  ejesMonitoreo EjeMonitoreo[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ── Tabla pivote: Temática ↔ Etiqueta ──
+
+model TematicaEtiqueta {
+  tematicaId Int
+  etiquetaId Int
+
+  tematica Tematica @relation(fields: [tematicaId], references: [id], onDelete: Cascade)
+  etiqueta Etiqueta @relation(fields: [etiquetaId], references: [id], onDelete: Cascade)
+
+  @@id([tematicaId, etiquetaId])
+}
+
+// ── Tabla pivote: EjeMonitoreo ↔ Etiqueta ──
+
+model EjeMonitoreoEtiqueta {
+  ejeMonitoreoId Int
+  etiquetaId     Int
+
+  ejeMonitoreo EjeMonitoreo @relation(fields: [ejeMonitoreoId], references: [id], onDelete: Cascade)
+  etiqueta     Etiqueta     @relation(fields: [etiquetaId], references: [id], onDelete: Cascade)
+
+  @@id([ejeMonitoreoId, etiquetaId])
+}
+
+// ── Tabla pivote: Mencion ↔ Etiqueta ──
+
+model MencionEtiqueta {
+  mencionId Int
+  etiquetaId Int
+
+  mencion Mencion @relation(fields: [mencionId], references: [id], onDelete: Cascade)
+  etiqueta Etiqueta @relation(fields: [etiquetaId], references: [id], onDelete: Cascade)
+
+  @@id([mencionId, etiquetaId])
+}
+
+// ── Clientes Institucionales ──
+
+model Cliente {
+  id            Int             @id @default(autoincrement())
+  razonSocial   String          // ej: "ABEN - Agencia Boliviana de Energía Nuclear"
+  sigla         String          @unique // ej: "ABEN"
+  contacto      String          // ej: "Director General"
+  whatsapp      String          // ej: "59170000001"
+  activo        Boolean         @default(true)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  contratos     Contrato[]
+  tematicas     Tematica[]
+  etiquetas     Etiqueta[]
+}
+
+// ── Contratos ──
+
+model Contrato {
+  id            Int             @id @default(autoincrement())
+  clienteId     Int
+  cliente       Cliente         @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  tipoCombo     TipoCombo
+  estado        EstadoContrato  @default(ACTIVO)
+  instalacion   String          // ej: "ENERGÍA CONNECT"
+  fechaInicio   DateTime        @default(now())
+  fechaFin      DateTime        // 6 meses desde creación
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  ejesMonitoreo EjeMonitoreo[]
+}
+
+// ── Ejes de Monitoreo ──
+
+model EjeMonitoreo {
+  id          Int      @id @default(autoincrement())
+  nombre      String   // ej: "Monitoreo Energético Integral"
+  contratoId  Int
+  contrato    Contrato @relation(fields: [contratoId], references: [id], onDelete: Cascade)
+  tematicaId  Int?
+  tematica    Tematica? @relation(fields: [tematicaId], references: [id])
+
+  etiquetas   EjeMonitoreoEtiqueta[]
+  menciones   Mencion[]
+
+  activo      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ── Menciones (señales vinculadas a un eje) ──
+
+model Mencion {
+  id             Int      @id @default(autoincrement())
+  ejeMonitoreoId Int
+  ejeMonitoreo   EjeMonitoreo @relation(fields: [ejeMonitoreoId], references: [id], onDelete: Cascade)
+  titulo         String
+  resumen        String?
+  fuente         String?
+  url            String?
+  relevancia     Int?     // score numérico 1-100
+  fechaMencion   DateTime @default(now())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  etiquetas      MencionEtiqueta[]
+}
