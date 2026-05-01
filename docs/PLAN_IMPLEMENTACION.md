@@ -41,7 +41,7 @@ Antes de cualquier implementación funcional, se deben corregir las 23 inconsist
 
 ### 0.6 Correcciones en código fuente
 - `src/data/signals.ts`: Actualizar etiquetas de sourceLevel de "Fuente oficial primaria/B/C/D" a "Referencial/Complementaria/Contrastiva/Vigilada" para consistencia con CLASIFICACION_FUENTES.md
-- `src/data/signals.ts`: Verificar si regiones usan "LATAM" vs "LATINOAMÉRICA" y "ASIA" vs "ASIA-PACÍFICO" y alinear con documentación
+- ~~`src/data/signals.ts`: Verificar si regiones usan "LATAM" vs "LATINOAMÉRICA" y "ASIA" vs "ASIA-PACÍFICO" y alinear con documentación~~ ✅ COMPLETADO (commit b1ca829) — Valor técnico `LATINOAMÉRICA`, sin abreviaturas
 
 ### 0.7 Corrección de dependencias
 - CONTEXTO.md §8: Eliminar `prisma` de la lista de dependencias no utilizadas (está activamente usada en `src/lib/db.ts`)

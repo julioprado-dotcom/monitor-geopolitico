@@ -72,10 +72,10 @@ El proyecto tiene una estructura mixta heredada de múltiples sesiones de desarr
   - `EPSTEMOLOGICAL_TERMS`: Array de 18 términos que nunca se traducen
 - Impacto: content-proxy, compare route, analyze route, y todos los componentes que usen estos valores deben importar desde config.
 
-**MIG-03 — Normalizar nombres de regiones**
-- Estado actual: El código usa `LATAM` y `ASIA`. La documentación usa `LATINOAMÉRICA` y `ASIA-PACÍFICO`.
-- Decisión: Normalizar a códigos cortos en el código (`LATAM`, `ASIA`) con display names en el config (`{ code: 'LATAM', display: 'LATINOAMÉRICA' }`).
-- Impacto: signals.ts, channels.ts, y todos los componentes que referencian regiones.
+**MIG-03 — Normalizar nombres de regiones** ✅ COMPLETADO (commit b1ca829)
+- Estado actual: Resuelto. El valor técnico del tipo Region ahora es `LATINOAMÉRICA` (no abreviaturas). `regionLabels` mapea a nombres legibles.
+- Decisión final: Usar nombres completos como valor técnico (`LATINOAMÉRICA`, no `LATAM`). Sin capa de abreviaturas.
+- Impacto: signals.ts, channels.ts, analysis.ts, threads.ts, MGSidebar.tsx, KpiDashboard.tsx — 6 archivos, 26 inserciones.
 
 **MIG-04 — Añadir metadatos de fuente a canales**
 - Extender la interfaz TVChannel en `src/types/index.ts` con campos de CLASIFICACION_FUENTES.md:

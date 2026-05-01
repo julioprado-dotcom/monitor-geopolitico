@@ -40,7 +40,7 @@ sleep 10 && curl -s -o /dev/null -w "%{http_code}" http://localhost:3000
 Nombre: Monitor Geopolítico — News Connect
 Versión: 0.9.0-meridian
 Repositorio: https://github.com/julioprado-dotcom/monitor-geopolitico
-Último commit: 865a6c7 — feat: Monitor Geopolítico — News Connect v0.9.0-meridian
+Último commit: b1ca829 — refactor: renombrar valor técnico de región 'LATAM' → 'LATINOAMÉRICA'
 Tags: v0.9.0-meridian, v0.9.1-meridian
 Descripción: Plataforma de monitoreo geopolítico con óptica del Sur Global que recopila, clasifica y analiza señales de múltiples fuentes mediante IA. Combina un sistema de TV en vivo con análisis automatizado para ofrecer una perspectiva crítica y no hegemónica de la realidad internacional.
 
@@ -104,7 +104,7 @@ AVISO CRÍTICO: Estos paradigmas NO son decoración teórica — son el ADN filo
 8 Clasificadores: Conflicto, Economía, Diplomacia, Seguridad, Tecnología, Ecosistema, Energía, Derechos Humanos
 Multi-clasificación: classifiers es string[] (una señal puede tener múltiples clasificadores)
 
-6 Regiones: NORTEAMÉRICA, LATINOAMÉRICA, EUROPA, ASIA-PACÍFICO, MEDIO ORIENTE, ÁFRICA
+6 Regiones: NORTEAMÉRICA, LATINOAMÉRICA, EUROPA, ASIA, MEDIO ORIENTE, ÁFRICA (valor técnico del tipo Region = 'LATINOAMÉRICA', no abreviaturas)
 
 5 Filtros Analíticos: Congruencia Inversa, Coherencia Histórica, Integridad Epistémica, Confiabilidad Asimétrica, Flexibilidad Pragmática
 
