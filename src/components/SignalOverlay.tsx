@@ -115,6 +115,55 @@ export default function SignalOverlay({ signal, onClose }: SignalOverlayProps) {
     return () => abortRef.current?.abort();
   }, []);
 
+  // NewsArticle JSON-LD — structured data para SEO (injectado client-side)
+  useEffect(() => {
+    const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://monitor-geopolitico.vercel.app';
+    const articleSchema = {
+      '@context': 'https://schema.org',
+      '@type': 'NewsArticle',
+      headline: signal.title,
+      description: signal.summary,
+      datePublished: signal.timestamp,
+      dateModified: signal.timestamp,
+      author: {
+        '@type': 'Organization',
+        name: signal.source,
+      },
+      publisher: {
+        '@type': 'Organization',
+        name: 'News Connect',
+        url: SITE_URL,
+      },
+      image: signal.image ? `${SITE_URL}${signal.image}` : undefined,
+      mainEntityOfPage: {
+        '@type': 'WebPage',
+        '@id': `${SITE_URL}/?signal=${encodeURIComponent(signal.id)}`,
+      },
+      about: [
+        { '@type': 'Thing', name: signal.region },
+        ...signal.classifiers.map((c) => ({ '@type': 'Thing', name: c })),
+      ],
+      isAccessibleForFree: signal.accessLevel === 'ABIERTO',
+    };
+
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.id = `newsarticle-${signal.id}`;
+    script.textContent = JSON.stringify(articleSchema);
+    document.head.appendChild(script);
+
+    return () => {
+      document.getElementById(`newsarticle-${signal.id}`)?.remove();
+    };
+  }, [signal.id, signal.title, signal.summary, signal.timestamp, signal.source, signal.image, signal.region, signal.classifiers, signal.accessLevel]);
+
+  // Update document.title for signal view (mejora SEO en social/analítica)
+  useEffect(() => {
+    const prev = document.title;
+    document.title = `${signal.title} — Monitor Geopolítico`;
+    return () => { document.title = prev; };
+  }, [signal.title]);
+
   return (
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 animate-fade-in"

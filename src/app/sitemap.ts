@@ -1,16 +1,112 @@
 import type { MetadataRoute } from 'next';
+import { demoSignals } from '@/data/signals';
+import { demoAnalysis } from '@/data/analysis';
+import { demoThreads } from '@/data/threads';
+import { regionLabels, type Region } from '@/data/signals';
+import { type ThreadType, typeLabels } from '@/data/threads';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://monitor-geopolitico.vercel.app';
 
+/** 8 clasificadores temáticos del modelo analítico */
+const CLASSIFIERS = [
+  'Conflicto', 'Economía', 'Diplomacia', 'Seguridad',
+  'Tecnología', 'Ecosistema', 'Energía', 'Derechos Humanos',
+] as const;
+
 export default function sitemap(): MetadataRoute.Sitemap {
-  const staticPages: MetadataRoute.Sitemap = [
+  const now = new Date();
+
+  // 1. Página principal — prioridad máxima, actualización horaria
+  const home: MetadataRoute.Sitemap = [
     {
       url: SITE_URL,
-      lastModified: new Date(),
+      lastModified: now,
       changeFrequency: 'hourly',
       priority: 1.0,
     },
   ];
 
-  return staticPages;
+  // 2. Secciones principales (navegación por hash)
+  const sections: MetadataRoute.Sitemap = [
+    {
+      url: `${SITE_URL}/#signals`,
+      lastModified: now,
+      changeFrequency: 'hourly',
+      priority: 0.9,
+    },
+    {
+      url: `${SITE_URL}/#analysis`,
+      lastModified: now,
+      changeFrequency: 'daily',
+      priority: 0.8,
+    },
+    {
+      url: `${SITE_URL}/#explorer`,
+      lastModified: now,
+      changeFrequency: 'hourly',
+      priority: 0.8,
+    },
+  ];
+
+  // 3. Páginas por región — indexables como facets de búsqueda
+  const regions = Object.keys(regionLabels) as Region[];
+  const regionPages: MetadataRoute.Sitemap = regions.map((r) => ({
+    url: `${SITE_URL}/?region=${encodeURIComponent(r)}`,
+    lastModified: now,
+    changeFrequency: 'daily' as const,
+    priority: 0.7,
+  }));
+
+  // 4. Páginas por clasificador — organizan contenido temático para carousels
+  const classifierPages: MetadataRoute.Sitemap = CLASSIFIERS.map((c) => ({
+    url: `${SITE_URL}/?classifier=${encodeURIComponent(c)}`,
+    lastModified: now,
+    changeFrequency: 'daily' as const,
+    priority: 0.7,
+  }));
+
+  // 5. Tipos de hilo en el explorador
+  const threadTypes = Object.keys(typeLabels) as ThreadType[];
+  const threadTypePages: MetadataRoute.Sitemap = threadTypes.map((t) => ({
+    url: `${SITE_URL}/?threadType=${encodeURIComponent(t)}`,
+    lastModified: now,
+    changeFrequency: 'weekly' as const,
+    priority: 0.5,
+  }));
+
+  // 6. Señales individuales — señaladas para indexación profunda
+  //    (cada señal tiene overlay con contenido único y análisis IA)
+  const signalPages: MetadataRoute.Sitemap = demoSignals.map((s) => ({
+    url: `${SITE_URL}/?signal=${encodeURIComponent(s.id)}`,
+    lastModified: new Date(s.timestamp),
+    changeFrequency: 'weekly' as const,
+    priority: s.relevance === 'CRÍTICA' ? 0.7 : 0.5,
+  }));
+
+  // 7. Análisis individuales
+  const analysisPages: MetadataRoute.Sitemap = demoAnalysis.map((a) => ({
+    url: `${SITE_URL}/?analysis=${encodeURIComponent(a.id)}`,
+    lastModified: new Date(a.timestamp),
+    changeFrequency: 'monthly' as const,
+    priority: 0.6,
+  }));
+
+  // 8. Hilos geopolíticos
+  const threadPages: MetadataRoute.Sitemap = demoThreads.map((t) => ({
+    url: `${SITE_URL}/?thread=${encodeURIComponent(t.id)}`,
+    lastModified: new Date(t.lastActivityAt),
+    changeFrequency: t.status === 'EN_VIVO' ? ('hourly' as const) : ('weekly' as const),
+    priority: t.status === 'EN_VIVO' ? 0.7 : 0.5,
+  }));
+
+  return [
+    ...home,
+    ...sections,
+    ...regionPages,
+    ...classifierPages,
+    ...threadTypePages,
+    ...signalPages,
+    ...analysisPages,
+    ...threadPages,
+  ];
 }

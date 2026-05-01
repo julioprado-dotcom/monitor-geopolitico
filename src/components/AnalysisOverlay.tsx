@@ -119,6 +119,55 @@ export default function AnalysisOverlay({ analysis: analysisData, onClose }: Ana
     return () => abortRef.current?.abort();
   }, []);
 
+  // Article JSON-LD — structured data para análisis editorial
+  useEffect(() => {
+    const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://monitor-geopolitico.vercel.app';
+    const articleSchema = {
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: analysisData.title,
+      description: analysisData.summary,
+      datePublished: analysisData.timestamp,
+      author: {
+        '@type': 'Organization',
+        name: analysisData.author,
+        jobTitle: analysisData.authorRole,
+      },
+      publisher: {
+        '@type': 'Organization',
+        name: 'News Connect',
+        url: SITE_URL,
+      },
+      image: analysisData.image ? `${SITE_URL}${analysisData.image}` : undefined,
+      mainEntityOfPage: {
+        '@type': 'WebPage',
+        '@id': `${SITE_URL}/?analysis=${encodeURIComponent(analysisData.id)}`,
+      },
+      about: [
+        { '@type': 'Thing', name: analysisData.region },
+        ...analysisData.tags.map((tag) => ({ '@type': 'Thing', name: tag })),
+      ],
+      isAccessibleForFree: analysisData.accessLevel === 'ABIERTO',
+    };
+
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.id = `article-${analysisData.id}`;
+    script.textContent = JSON.stringify(articleSchema);
+    document.head.appendChild(script);
+
+    return () => {
+      document.getElementById(`article-${analysisData.id}`)?.remove();
+    };
+  }, [analysisData]);
+
+  // Update document.title for analysis view
+  useEffect(() => {
+    const prev = document.title;
+    document.title = `${analysisData.title} — Monitor Geopolítico`;
+    return () => { document.title = prev; };
+  }, [analysisData.title]);
+
   return (
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 animate-fade-in"
