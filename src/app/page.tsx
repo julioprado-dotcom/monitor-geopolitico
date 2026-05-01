@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useMemo, useCallback, useRef } from 'react';
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { Radar, Menu, Tv, Radio, Brain, GitBranch, Loader2 } from 'lucide-react';
+import { Radar, Menu, Tv, Radio, Brain, GitBranch, Loader2, BookOpen, User } from 'lucide-react';
 import { demoSignals, type Relevance, type Region, type Signal, relevanceColors } from '@/data/signals';
 import { demoAnalysis, type Analysis } from '@/data/analysis';
 import { demoThreads, type Thread, type ThreadStatus } from '@/data/threads';
@@ -15,6 +15,7 @@ import ThreadCard from '@/components/Explorer/ThreadCard';
 import ThreadDetail from '@/components/Explorer/ThreadDetail';
 import KpiDashboard from '@/components/KpiDashboard';
 import PatternList from '@/components/PatternList';
+import { useMounted } from '@/hooks/useMounted';
 
 // Lazy: react-markdown solo se carga cuando se genera análisis IA
 const ReactMarkdown = dynamic(() => import('react-markdown'), { ssr: false });
@@ -87,6 +88,14 @@ export default function Home() {
   const [expandedThread, setExpandedThread] = useState<Thread | null>(null);
   const [followedThreads, setFollowedThreads] = useState<Set<string>>(new Set());
   const [threadFilter, setThreadFilter] = useState<ThreadStatus | 'SEGUIDOS' | null>(null);
+  const mounted = useMounted();
+
+  // ── Estados para Análisis en Panel de Foco ──
+  const [analysisFullContent, setAnalysisFullContent] = useState<string | null>(null);
+  const [analysisAiResult, setAnalysisAiResult] = useState<string | null>(null);
+  const [analysisAiLoading, setAnalysisAiLoading] = useState(false);
+  const [analysisAiError, setAnalysisAiError] = useState<string | null>(null);
+  const analysisAbortRef = useRef<AbortController | null>(null);
 
   const filteredSignals = useMemo(() => {
     return demoSignals.filter((s) => {
@@ -242,6 +251,7 @@ export default function Home() {
   // ── Sistema de Foco Dinámico: navegación por deslizamiento horizontal ──
   const handleSelectSignal = (signal: Signal) => {
     setSelectedSignal(signal);
+    setSelectedAnalysis(null);
     setAnalysis(null);
     setAnalysisError(null);
     abortRef.current?.abort();
@@ -250,6 +260,109 @@ export default function Home() {
       focoPanel.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
     }
   };
+
+  const handleSelectAnalysis = (analysisItem: Analysis) => {
+    setSelectedAnalysis(analysisItem);
+    setSelectedSignal(null);
+    setAnalysisFullContent(null);
+    setAnalysisAiResult(null);
+    setAnalysisAiError(null);
+    analysisAbortRef.current?.abort();
+    const focoPanel = document.getElementById('foco-panel');
+    if (focoPanel) {
+      focoPanel.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+    }
+  };
+
+  // ── Señales relacionadas al análisis seleccionado ──
+  const relatedAnalysisSignals = useMemo(() => {
+    if (!selectedAnalysis) return [];
+    return demoSignals
+      .map((signal) => {
+        let score = 0;
+        if (signal.region === selectedAnalysis.region) score += 2;
+        const sharedTags = signal.classifiers.filter((c) =>
+          selectedAnalysis.tags.some((t) => t.toLowerCase() === c.toLowerCase())
+        );
+        score += sharedTags.length * 3;
+        return { signal, score };
+      })
+      .filter((item) => item.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 5);
+  }, [selectedAnalysis]);
+
+  // ── Lazy load fullContent del análisis ──
+  useEffect(() => {
+    if (!selectedAnalysis) return;
+    setAnalysisFullContent(null);
+    import('@/data/analysisContent').then(({ analysisFullContent: contents }) => {
+      const content = contents[selectedAnalysis.id];
+      setAnalysisFullContent(content || selectedAnalysis.summary);
+    });
+  }, [selectedAnalysis]);
+
+  // ── document.title dinámico para análisis ──
+  useEffect(() => {
+    if (!selectedAnalysis) return;
+    const prev = document.title;
+    document.title = `${selectedAnalysis.title} — Monitor Geopolítico`;
+    return () => { document.title = prev; };
+  }, [selectedAnalysis?.title]);
+
+  // ── Fetch AI analysis para artículos de análisis ──
+  const fetchAnalysisAi = useCallback(async () => {
+    if (!selectedAnalysis) return;
+    analysisAbortRef.current?.abort();
+    const controller = new AbortController();
+    analysisAbortRef.current = controller;
+
+    setAnalysisAiLoading(true);
+    setAnalysisAiError(null);
+    setAnalysisAiResult(null);
+
+    try {
+      const payload = {
+        id: selectedAnalysis.id,
+        title: selectedAnalysis.title,
+        summary: selectedAnalysis.summary,
+        fullContent: analysisFullContent || selectedAnalysis.summary,
+        region: selectedAnalysis.region,
+        classifiers: selectedAnalysis.tags,
+        source: selectedAnalysis.author,
+        sourceUrl: '',
+        language: 'es',
+        timestamp: selectedAnalysis.timestamp,
+        relevance: 'MEDIA',
+        verified: true,
+        sourceLevel: 'A',
+        accessLevel: 'ABIERTO',
+      };
+      const res = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: controller.signal,
+      });
+
+      if (!res.ok) {
+        if (res.status === 429) throw new Error('Límite diario de análisis alcanzado. Intenta más tarde.');
+        const data = await res.json();
+        throw new Error(data.error || 'Error al generar el análisis');
+      }
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      if (!data.analysis) throw new Error('El análisis no se generó correctamente.');
+      setAnalysisAiResult(data.analysis);
+    } catch (err: any) {
+      if (err.name !== 'AbortError') setAnalysisAiError(err.message || 'Error de conexión');
+    } finally {
+      setAnalysisAiLoading(false);
+    }
+  }, [selectedAnalysis, analysisFullContent]);
+
+  // Cleanup abort refs
+  useEffect(() => { return () => { abortRef.current?.abort(); analysisAbortRef.current?.abort(); }; }, []);
 
   return (
     <div className="h-screen flex flex-col bg-[#0A0F1C] text-[#F1F5F9] overflow-hidden">
@@ -405,7 +518,7 @@ export default function Home() {
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 content-auto">
                   {filteredAnalysis.map((analysis) => (
-                    <AnalysisCard key={analysis.id} analysis={analysis} onClick={setSelectedAnalysis} />
+                    <AnalysisCard key={analysis.id} analysis={analysis} onClick={handleSelectAnalysis} />
                   ))}
                 </div>
                 {filteredAnalysis.length === 0 && (
@@ -507,9 +620,9 @@ export default function Home() {
 
           {/* Panel 2: Foco */}
           <section id="foco-panel" className="min-w-full snap-start overflow-y-auto bg-[#0A0F1C]" style={{ padding: '2rem' }}>
-            {!selectedSignal ? (
-              <p className="text-slate-500">Selecciona una señal para ver el análisis detallado.</p>
-            ) : (
+            {!selectedSignal && !selectedAnalysis ? (
+              <p className="text-slate-500">Selecciona una señal o análisis para ver el contenido detallado.</p>
+            ) : selectedSignal ? (
               <div className="max-w-3xl mx-auto">
                 {/* Botón de Volver */}
                 <button
@@ -624,7 +737,171 @@ export default function Home() {
                   )}
                 </div>
               </div>
-            )}
+            ) : selectedAnalysis ? (
+              <div className="max-w-3xl mx-auto">
+                {/* ← Volver */}
+                <button
+                  onClick={() => {
+                    document.getElementById('panel-contexto')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="text-slate-400 hover:text-white mb-6 flex items-center gap-2 text-sm"
+                >
+                  ← Volver al panel
+                </button>
+
+                {/* Badge + readTime + date */}
+                <div className="flex items-center flex-wrap gap-2 mb-3">
+                  <span
+                    className="px-2 py-0.5 rounded text-[10px] font-bold uppercase font-[family-name:var(--font-jetbrains-mono)]"
+                    style={{ backgroundColor: '#D4A01720', color: '#D4A017', border: '1px solid #D4A01730' }}
+                  >
+                    Análisis
+                  </span>
+                  <span className="flex items-center gap-1 text-[10px] text-white/35 font-[family-name:var(--font-jetbrains-mono)]">
+                    <BookOpen className="w-3.5 h-3.5" />
+                    {selectedAnalysis.readTime} min lectura
+                  </span>
+                  <span className="text-[10px] text-white/25 ml-auto font-[family-name:var(--font-jetbrains-mono)]">
+                    {mounted ? new Date(selectedAnalysis.timestamp).toLocaleDateString('es', { year: 'numeric', month: 'long', day: 'numeric' }) : selectedAnalysis.id}
+                  </span>
+                </div>
+
+                {/* Hero image */}
+                {selectedAnalysis.image && (
+                  <div className="relative w-full h-48 overflow-hidden rounded-xl mb-3">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={selectedAnalysis.image} alt={selectedAnalysis.title} className="w-full h-full object-cover" loading="lazy" decoding="async" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0A0F1C] to-transparent" />
+                  </div>
+                )}
+
+                {/* Title */}
+                <h2 className="text-lg sm:text-xl font-bold text-white mb-3 font-[family-name:var(--font-space-grotesk)]">
+                  {selectedAnalysis.title}
+                </h2>
+
+                {/* Author + region */}
+                <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl mb-4 flex-wrap" style={{ backgroundColor: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <User className="w-3.5 h-3.5 text-white/30" />
+                    <span className="text-xs font-bold text-white/70 font-[family-name:var(--font-space-grotesk)]">{selectedAnalysis.author}</span>
+                    {selectedAnalysis.authorRole && (<>
+                      <span className="text-white/10 text-xs">·</span>
+                      <span className="text-[10px] text-white/35 font-[family-name:var(--font-jetbrains-mono)]">{selectedAnalysis.authorRole}</span>
+                    </>)}
+                  </div>
+                  <span className="text-white/10 text-xs">·</span>
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]" style={{ backgroundColor: '#D4A01712', color: '#D4A01770' }}>{selectedAnalysis.region}</span>
+                </div>
+
+                {/* Full content — lazy loaded */}
+                <div className="mb-4">
+                  {!analysisFullContent ? (
+                    <div className="flex items-center gap-2 py-4">
+                      <div className="w-4 h-4 border-2 border-white/10 border-t-white/30 rounded-full animate-spin" />
+                      <span className="text-xs text-white/30 font-[family-name:var(--font-jetbrains-mono)]">Cargando contenido...</span>
+                    </div>
+                  ) : (
+                    analysisFullContent.split('\n\n').map((paragraph, i) => (
+                      <p key={i} className="text-sm text-white/70 leading-relaxed mb-3 last:mb-0 font-[family-name:var(--font-space-grotesk)]">{paragraph}</p>
+                    ))
+                  )}
+                </div>
+
+                {/* Tags */}
+                <div className="flex items-center flex-wrap gap-2 mb-3">
+                  {selectedAnalysis.tags.map((tag) => (
+                    <span key={tag} className="px-2 py-0.5 rounded text-[10px] font-bold font-[family-name:var(--font-jetbrains-mono)]" style={{ backgroundColor: '#D4A01712', color: '#D4A01770' }}>{tag}</span>
+                  ))}
+                </div>
+
+                {/* Related signals */}
+                {relatedAnalysisSignals.length > 0 && (
+                  <div className="mb-4">
+                    <div className="flex items-center gap-2 mb-2.5">
+                      <Radio className="w-3.5 h-3.5 text-[#00E5A0]/60" />
+                      <span className="text-[10px] font-bold text-white/40 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">Señales relacionadas ({relatedAnalysisSignals.length})</span>
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                      {relatedAnalysisSignals.map(({ signal }) => (
+                        <button
+                          key={signal.id}
+                          onClick={() => handleSelectSignal(signal)}
+                          className="text-left flex items-start gap-2.5 px-3 py-2 rounded-lg bg-white/[0.02] border border-white/[0.04] hover:bg-white/[0.05] hover:border-white/[0.1] transition-colors"
+                        >
+                          <div className="min-w-0 flex-1">
+                            <p className="text-[11px] font-bold text-white/60 leading-snug font-[family-name:var(--font-space-grotesk)] line-clamp-2">{signal.title}</p>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className="text-[9px] text-white/25 font-[family-name:var(--font-jetbrains-mono)]">{signal.source}</span>
+                              <span className="text-white/10 text-[9px]">·</span>
+                              <span className="text-[9px] text-white/20 font-[family-name:var(--font-jetbrains-mono)]">{signal.region}</span>
+                            </div>
+                          </div>
+                          <span className="shrink-0 px-1.5 py-0.5 rounded text-[9px] font-bold font-[family-name:var(--font-jetbrains-mono)]" style={{ backgroundColor: `${relevanceColors[signal.relevance]}18`, color: relevanceColors[signal.relevance] }}>{signal.relevance}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Divider */}
+                <div className="w-full h-px bg-white/[0.06] mb-6" />
+
+                {/* AI Analysis */}
+                <div className="mb-8" aria-live="polite" aria-atomic="true">
+                  {!analysisAiResult && !analysisAiLoading && !analysisAiError && (
+                    <button
+                      onClick={fetchAnalysisAi}
+                      disabled={!analysisFullContent}
+                      className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl transition-colors duration-150 font-[family-name:var(--font-space-grotesk)] ${analysisFullContent ? 'bg-[#D4A017]/10 border border-[#D4A017]/20 text-[#D4A017] hover:bg-[#D4A017]/20' : 'bg-white/[0.03] border border-white/[0.06] text-white/20 cursor-not-allowed'}`}
+                    >
+                      <Brain className={`w-4 h-4 ${!analysisFullContent ? 'animate-pulse' : ''}`} />
+                      <span className="text-sm font-bold">{analysisFullContent ? 'Análisis IA — Perspectiva Sur Global' : 'Cargando contenido...'}</span>
+                    </button>
+                  )}
+                  {analysisAiLoading && (
+                    <div className="flex flex-col items-center gap-3 py-8" role="status">
+                      <Loader2 className="w-6 h-6 text-[#D4A017] animate-spin" />
+                      <span className="text-sm text-white/50 font-[family-name:var(--font-space-grotesk)]">Generando análisis...</span>
+                    </div>
+                  )}
+                  {analysisAiError && (
+                    <div className="glass rounded-xl p-4 flex flex-col items-center gap-3" role="alert">
+                      <p className="text-sm text-red-400 font-[family-name:var(--font-space-grotesk)]">{analysisAiError}</p>
+                      <button onClick={fetchAnalysisAi} className="px-4 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold hover:bg-red-500/20 transition-colors font-[family-name:var(--font-jetbrains-mono)]">Reintentar</button>
+                    </div>
+                  )}
+                  {analysisAiResult && (
+                    <div className="flex flex-col gap-3">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Brain className="w-4 h-4 text-[#D4A017]" />
+                        <span className="text-sm font-bold text-[#D4A017]/80 font-[family-name:var(--font-space-grotesk)]">Análisis IA — Perspectiva Sur Global</span>
+                      </div>
+                      <div className="glass rounded-xl p-4 prose-invert">
+                        <ReactMarkdown
+                          components={{
+                            h3: ({ children }) => <h3 className="text-xs font-bold text-[#D4A017]/70 uppercase tracking-wider mb-2 mt-4 first:mt-0 font-[family-name:var(--font-jetbrains-mono)]">{children}</h3>,
+                            h2: ({ children }) => <h2 className="text-xs font-bold text-[#D4A017]/70 uppercase tracking-wider mb-2 mt-4 first:mt-0 font-[family-name:var(--font-jetbrains-mono)]">{children}</h2>,
+                            strong: ({ children }) => <strong className="text-white/90 font-bold">{children}</strong>,
+                            p: ({ children }) => <p className="text-sm text-white/65 leading-relaxed mb-3 last:mb-0 font-[family-name:var(--font-space-grotesk)]">{children}</p>,
+                            ul: ({ children }) => <ul className="text-sm text-white/65 leading-relaxed mb-3 pl-4 list-disc font-[family-name:var(--font-space-grotesk)]">{children}</ul>,
+                            ol: ({ children }) => <ol className="text-sm text-white/65 leading-relaxed mb-3 pl-4 list-decimal font-[family-name:var(--font-space-grotesk)]">{children}</ol>,
+                            li: ({ children }) => <li className="mb-1">{children}</li>,
+                          }}
+                        >{analysisAiResult}</ReactMarkdown>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Disclaimer */}
+                <div className="border-t border-white/[0.06] pt-3">
+                  <p className="text-[9px] text-white/20 leading-relaxed font-[family-name:var(--font-jetbrains-mono)]">
+                    Los análisis publicados en esta sección reflejan la perspectiva editorial de Óptica Sur Global. Las fuentes citadas son verificables y públicas.
+                  </p>
+                </div>
+              </div>
+            ) : null}
           </section>
         </div>
       </div>
@@ -640,10 +917,7 @@ export default function Home() {
 
       {/* SIGNAL OVERLAY — desactivado: el Panel de Foco reemplaza esta funcionalidad */}
 
-      {/* ANALYSIS OVERLAY */}
-      {selectedAnalysis && (
-        <AnalysisOverlay analysis={selectedAnalysis} onClose={() => setSelectedAnalysis(null)} />
-      )}
+      {/* ANALYSIS OVERLAY — desactivado: el Panel de Foco reemplaza esta funcionalidad */}
 
       {/* SOURCE COMPARISON VIEW */}
       {comparisonSignal && (
