@@ -158,7 +158,8 @@ export default function Home() {
         t.title.toLowerCase().includes(q) ||
         t.description.toLowerCase().includes(q) ||
         t.tags.some((tag) => tag.toLowerCase().includes(q)) ||
-        t.signals.some((s) => s.title.toLowerCase().includes(q) || s.source.toLowerCase().includes(q))
+        t.signals.some((s) => s.title.toLowerCase().includes(q) || s.source.toLowerCase().includes(q)) ||
+        t.fullContent.toLowerCase().includes(q)
       );
     }
     return threads;

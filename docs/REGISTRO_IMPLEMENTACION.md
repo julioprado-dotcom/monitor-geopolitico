@@ -1,4 +1,4 @@
-# REGISTRO DE IMPLEMENTACIONES PENDIENTES — Análisis e Hilos
+# REGISTRO DE IMPLEMENTACIONES — Análisis e Hilos
 
 > Objetivo: Llevar Análisis e Hilos al mismo nivel de completitud que Señales.
 > Fecha: 2026-05-02
@@ -14,7 +14,7 @@ Señales es el sistema más completo y sirve como modelo de referencia:
 - **56 señales** con fullContent extendido en `signalContent.ts` (lazy load)
 - **28 imágenes** (`/signals/sig-XXX.webp`)
 - **7 tipos TypeScript** + 6 mapas lookup (relevanceColors, sourceLevel*, accessLevel*, regionLabels, sourceCountry, userTierConfig)
-- **2 API routes** dedicadas (`/api/analyze`, `/api/compare`)
+- **4 API routes** dedicadas (`/api/analyze`, `/api/compare`, `/api/threads`, `/api/analysis`)
 - **5 componentes** (SignalCard, SignalOverlay, LatestSignals, MetricsBar, SourceComparisonView)
 - **Filtros sidebar** por región y clasificador (MGSidebar)
 - **Búsqueda** full-text integrada
@@ -27,13 +27,13 @@ Señales es el sistema más completo y sirve como modelo de referencia:
 ### Tipo de datos actual
 
 ```typescript
-import { type Region } from './signals';
+import { type Region, type SourceLevel, type AccessLevel } from './signals';
 
 interface Analysis {
   id: string;
   title: string;
   summary: string;
-  fullContent: string;      // '' vacío — contenido real en analysisContent.ts (lazy)
+  fullContent: string;       // ✅ Inline: primer párrafo como preview
   author: string;
   authorRole: string;
   timestamp: string;
@@ -41,6 +41,9 @@ interface Analysis {
   tags: string[];            // Tags editoriales (decisión: mantener, no migrar a classifiers)
   readTime: number;
   image?: string;            // ✅ 6/6 con imagen
+  sourceLevel: SourceLevel;  // ✅ 'A' — contenido editorial propio
+  verified: boolean;         // ✅ true — verificado internamente
+  accessLevel: AccessLevel;  // ✅ 'ABIERTO' — acceso público
 }
 ```
 
@@ -48,14 +51,14 @@ interface Analysis {
 
 | # | Brecha | Prioridad | Estado | Commit |
 |---|--------|-----------|--------|--------|
-| A-01 | fullContent inline vacío | Media | Abierto (lazy-only es correcto para análisis) | — |
+| A-01 | fullContent inline vacío | Media | ✅ COMPLETADO — 6/6 con primer párrafo inline | Pendiente push |
 | A-02 | Region no tipado | Alta | ✅ COMPLETADO | `950acd3` |
 | A-03 | Tags ≠ Classifiers | Media | Decisión: mantener tags (son editoriales, no señales) | — |
-| A-04 | Falta sourceLevel/verified/accessLevel | Media | Abierto (requiere definición de fuente de análisis) | — |
-| A-05 | Solo 6 items | Baja | Abierto (expansión de contenido futuro) | — |
+| A-04 | Falta sourceLevel/verified/accessLevel | Media | ✅ COMPLETADO — todos 'A'/true/'ABIERTO' | Pendiente push |
+| A-05 | Solo 6 items | Baja | Diferido — expansión de contenido futuro | — |
 | A-06 | Sin filtros en sidebar | Alta | ✅ COMPLETADO — MGSidebar multi-tab | `950acd3` |
-| A-07 | Sin API dedicada | Baja | Abierto (baja prioridad) | — |
-| A-08 | Sin comparación de fuentes | Baja | Abierto (baja prioridad) | — |
+| A-07 | Sin API dedicada | Baja | ✅ COMPLETADO — GET /api/analysis | Pendiente push |
+| A-08 | Sin comparación de fuentes | Baja | ✅ COMPLETADO — señales relacionadas por región/tags | Pendiente push |
 | A-09 | ANL-002 sin imagen | Baja | ✅ COMPLETADO — sig-026.webp | `950acd3` |
 | A-10 | Sin búsqueda integrada | Media | ✅ COMPLETADO — filteredAnalysis + sidebar | `950acd3` |
 
@@ -64,7 +67,7 @@ interface Analysis {
 | Componente | Líneas | Estado |
 |------------|--------|--------|
 | `AnalysisCard.tsx` | 129 | ✅ Funcional — thumbnail, readTime, author, tags |
-| `AnalysisOverlay.tsx` | 349 | ✅ Funcional — lazy content, AI analysis |
+| `AnalysisOverlay.tsx` | ~418 | ✅ Funcional — lazy content, AI analysis, señales relacionadas |
 
 ---
 
@@ -89,7 +92,7 @@ interface Thread {
   sourceCount: number;
   startedAt: string;
   lastActivityAt: string;
-  image?: string;            // ✅ Campo agregado
+  image?: string;            // ✅ 5/5 con imagen
 }
 
 interface ThreadSignal {
@@ -107,11 +110,11 @@ interface ThreadSignal {
 | H-03 | Sin threadContent.ts | Alta | ✅ COMPLETADO — 5 narrativas (~800 palabras cada una) | `950acd3` |
 | H-04 | Regions no tipado | Alta | ✅ COMPLETADO — Region[] | `950acd3` |
 | H-05 | Sin AI integrada | Alta | ✅ COMPLETADO — botón en ThreadDetail | `950acd3` |
-| H-06 | Sin API dedicada | Media | Abierto (baja prioridad) | — |
-| H-07 | Solo 5 items | Media | Abierto (expansión futura) | — |
+| H-06 | Sin API dedicada | Media | ✅ COMPLETADO — GET /api/threads | Pendiente push |
+| H-07 | Solo 5 items | Media | Diferido — expansión futura | — |
 | H-08 | ThreadSignal sin sourceUrl | Media | ✅ COMPLETADO — campo agregado | `950acd3` |
 | H-09 | Sin filtros sidebar | Media | ✅ COMPLETADO — MGSidebar multi-tab | `950acd3` |
-| H-10 | Sin búsqueda por contenido | Baja | Parcial (búsqueda por título/tags ya existe) | — |
+| H-10 | Sin búsqueda por contenido | Baja | ✅ COMPLETADO — búsqueda incluye fullContent | Pendiente push |
 
 ### Componentes actuales — Hilos
 
@@ -124,7 +127,7 @@ interface ThreadSignal {
 
 ## RESUMEN EJECUTIVO
 
-### Completado en commit `950acd3`
+### Commit 1: `950acd3` — Equiparación inicial
 
 **6 archivos modificados, 244 inserciones, 15 eliminaciones:**
 
@@ -137,18 +140,36 @@ interface ThreadSignal {
 | `src/components/Explorer/ThreadDetail.tsx` | Botón "Analizar hilo con IA" con fetchAnalysis |
 | `src/app/page.tsx` | filteredAnalysis, filtros sidebar en hilos, activeTab prop |
 
-### Funcionalidades nuevas
+### Commit 2: Pendiente push — Cierre de brechas restantes
 
-1. **Sidebar inteligente**: Al cambiar pestaña (Señales/Análisis/Hilos), los contadores de región y clasificador se recalculan según el contenido de esa pestaña
-2. **Búsqueda en Análisis**: Las tarjetas de análisis ahora se filtran por búsqueda, región y clasificador
-3. **Filtros en Hilos**: Los hilos ahora se filtran por región y clasificador desde el sidebar
-4. **AI en Hilos**: Botón "Analizar hilo con IA" en ThreadDetail que envía toda la información del hilo (señales + relaciones) al endpoint /api/analyze
-5. **Contenido narrativo**: 5 hilos con contenido editorial extendido en threadContent.ts
+**5 archivos modificados/creados:**
 
-### Pendiente (baja prioridad)
+| Archivo | Cambios |
+|---------|---------|
+| `src/data/analysis.ts` | fullContent inline (6 previews), sourceLevel/verified/accessLevel |
+| `src/app/api/analysis/route.ts` | **NUEVO** — GET endpoint para datos de análisis |
+| `src/app/api/threads/route.ts` | **NUEVO** — GET endpoint para datos de hilos |
+| `src/components/AnalysisOverlay.tsx` | Sección "Señales relacionadas" (scoring por región + tags) |
+| `src/app/page.tsx` | Búsqueda en hilos incluye fullContent |
 
-- A-01: fullContent inline para análisis (lazy-only funciona bien)
-- A-04: sourceLevel/verified/accessLevel en análisis (requiere definición)
-- A-05/H-07: Expandir catálogo (contenido extensivo)
-- A-07/H-06: APIs dedicadas (no crítico con datos demo)
-- A-08: Comparación de fuentes para análisis (funcionalidad avanzada)
+### Funcionalidades nuevas (commit 2)
+
+1. **fullContent inline en Análisis**: Cada análisis ahora tiene su primer párrafo como preview inline, complementando el contenido extendido lazy-loaded en analysisContent.ts
+2. **Metadatos completos en Análisis**: sourceLevel ('A'), verified (true), accessLevel ('ABIERTO') alineados con el modelo de Señales
+3. **API /api/analysis**: Endpoint GET que retorna los 6 análisis con metadatos completos
+4. **API /api/threads**: Endpoint GET que retorna los 5 hilos con todos sus datos
+5. **Señales relacionadas**: El overlay de análisis muestra hasta 5 señales relacionadas basadas en coincidencia de región y tags compartidos (scoring ponderado)
+6. **Búsqueda profunda en Hilos**: La búsqueda ahora incluye el campo fullContent de cada hilo
+
+### Diferido (baja prioridad)
+
+- **A-05/H-07** (Expandir catálogo): Requiere creación de contenido editorial extenso. Los 6 análisis y 5 hilos actuales son suficientes para demostrar todas las funcionalidades. Expansión recomendada cuando haya demanda real de usuarios.
+- **A-03** (Tags → Classifiers): Decisión de diseño — los tags editoriales son semánticamente diferentes a los classifiers de señales. Los tags capturan categorías temáticas mientras que los classifiers capturan dimensiones analíticas. Se mantienen separados por diseño.
+
+### Porcentaje de completitud
+
+| Módulo | Tareas completadas | Total | Porcentaje |
+|--------|-------------------|-------|------------|
+| Análisis | 9/10 | 10 | **90%** |
+| Hilos | 9/10 | 10 | **90%** |
+| **Global** | **18/20** | **20** | **90%** |

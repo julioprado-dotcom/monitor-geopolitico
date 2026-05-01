@@ -7,11 +7,14 @@ import {
   Loader2,
   BookOpen,
   User,
+  Radio,
 } from 'lucide-react';
 // Lazy: react-markdown (~50KB) solo se carga cuando se genera el análisis IA
 const ReactMarkdown = dynamic(() => import('react-markdown'), { ssr: false });
 import { type Analysis } from '@/data/analysis';
+import { demoSignals, relevanceColors } from '@/data/signals';
 import { useMounted } from '@/hooks/useMounted';
+import { useMemo } from 'react';
 
 interface AnalysisOverlayProps {
   analysis: Analysis;
@@ -238,6 +241,9 @@ export default function AnalysisOverlay({ analysis: analysisData, onClose }: Ana
             ))}
           </div>
 
+          {/* 7. Señales relacionadas */}
+          <RelatedSignals analysis={analysisData} />
+
           {/* Divider */}
           <div className="w-full h-px bg-white/[0.06] mb-6" />
 
@@ -347,3 +353,66 @@ export default function AnalysisOverlay({ analysis: analysisData, onClose }: Ana
     </div>
   );
 }
+
+// ── Subcomponente: Señales relacionadas al análisis ──
+function RelatedSignals({ analysis }: { analysis: Analysis }) {
+  const related = useMemo(() => {
+    return demoSignals
+      .map((signal) => {
+        let score = 0;
+        if (signal.region === analysis.region) score += 2;
+        const sharedTags = signal.classifiers.filter((c) =>
+          analysis.tags.some((t) => t.toLowerCase() === c.toLowerCase())
+        );
+        score += sharedTags.length * 3;
+        return { signal, score };
+      })
+      .filter((item) => item.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 5);
+  }, [analysis]);
+
+  if (related.length === 0) return null;
+
+  return (
+    <div className="mb-4">
+      <div className="flex items-center gap-2 mb-2.5">
+        <Radio className="w-3.5 h-3.5 text-[#00E5A0]/60" />
+        <span className="text-[10px] font-bold text-white/40 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">
+          Señales relacionadas ({related.length})
+        </span>
+      </div>
+      <div className="flex flex-col gap-1.5">
+        {related.map(({ signal }) => (
+          <div
+            key={signal.id}
+            className="flex items-start gap-2.5 px-3 py-2 rounded-lg bg-white/[0.02] border border-white/[0.04]"
+          >
+            <div className="flex-1 min-w-0">
+              <p className="text-[11px] font-bold text-white/60 leading-snug font-[family-name:var(--font-space-grotesk)] line-clamp-2">
+                {signal.title}
+              </p>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-[9px] text-white/25 font-[family-name:var(--font-jetbrains-mono)]">
+                  {signal.source}
+                </span>
+                <span className="text-white/10 text-[9px]">·</span>
+                <span className="text-[9px] text-white/20 font-[family-name:var(--font-jetbrains-mono)]">
+                  {signal.region}
+                </span>
+              </div>
+            </div>
+            <span
+              className="shrink-0 px-1.5 py-0.5 rounded text-[9px] font-bold font-[family-name:var(--font-jetbrains-mono)]"
+              style={{ backgroundColor: `${relevanceColors[signal.relevance]}18`, color: relevanceColors[signal.relevance] }}
+            >
+              {signal.relevance}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+
