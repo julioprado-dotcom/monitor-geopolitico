@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import type { Signal } from '@/types';
 import { relevanceColors, regionLabels } from '@/data/signals';
 import { mapRegions, continentPaths, jitterPosition } from '@/data/mapRegions';
@@ -28,6 +28,15 @@ for (const r of mapRegions) {
 export default function GeoMap({ signals, onSelectSignal }: GeoMapProps) {
   const [hoveredSignal, setHoveredSignal] = useState<Signal | null>(null);
   const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
 
   const signalMarkers = useMemo(() => {
     return signals.map((s) => {
@@ -186,7 +195,7 @@ export default function GeoMap({ signals, onSelectSignal }: GeoMapProps) {
             return (
               <g key={signal.id}>
                 {/* Pulse ring for CRÍTICA */}
-                {isCritical && (
+                {isCritical && !prefersReducedMotion && (
                   <>
                     <circle cx={cx} cy={cy} r="18" fill="none" stroke={color} strokeWidth="1" opacity="0.4">
                       <animate attributeName="r" values="6;22" dur="2s" repeatCount="indefinite" />

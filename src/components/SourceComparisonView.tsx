@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 // Lazy: react-markdown (~50KB) solo se carga cuando se muestra el meta-análisis
 const ReactMarkdown = dynamic(() => import('react-markdown'), { ssr: false });
@@ -54,6 +55,7 @@ export default function SourceComparisonView({ seedSignal, onClose }: SourceComp
   const [data, setData] = useState<ComparisonData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const containerRef = useFocusTrap(true, onClose);
 
   const fetchComparison = async (signal?: AbortSignal) => {
     setLoading(true);
@@ -88,17 +90,22 @@ export default function SourceComparisonView({ seedSignal, onClose }: SourceComp
     return () => controller.abort();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const closeOnEscape = (e: React.KeyboardEvent) => {
+  const closeOnEscape = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Escape') onClose();
-  };
+  }, [onClose]);
 
   return (
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 animate-fade-in"
       style={{ backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)', backgroundColor: 'rgba(0,0,0,0.8)' }}
       onKeyDown={closeOnEscape}
+      aria-hidden="true"
     >
       <div
+        ref={containerRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Comparación de fuentes geopolíticas"
         className="relative glass-strong rounded-2xl w-full max-w-5xl max-h-[92vh] overflow-y-auto animate-slide-in"
         onClick={(e) => e.stopPropagation()}
       >
@@ -127,9 +134,10 @@ export default function SourceComparisonView({ seedSignal, onClose }: SourceComp
             </div>
           </div>
 
-          {/* Loading state */}
+          {/* Loading state — aria-live para lectores de pantalla */}
+          <div aria-live="polite" aria-atomic="true">
           {loading && (
-            <div className="flex flex-col items-center gap-3 py-16">
+            <div className="flex flex-col items-center gap-3 py-16" role="status">
               <Loader2 className="w-8 h-8 text-[#00E5A0] animate-spin" />
               <span className="text-sm text-white/50 font-[family-name:var(--font-space-grotesk)]">
                 Buscando fuentes relacionadas y generando análisis comparativo...
@@ -140,9 +148,8 @@ export default function SourceComparisonView({ seedSignal, onClose }: SourceComp
             </div>
           )}
 
-          {/* Error state */}
           {error && !loading && (
-            <div className="glass rounded-xl p-4 flex flex-col items-center gap-3 py-12">
+            <div className="glass rounded-xl p-4 flex flex-col items-center gap-3 py-12" role="alert">
               <p className="text-sm text-red-400 font-[family-name:var(--font-space-grotesk)]">{error}</p>
               <button
                 onClick={() => fetchComparison()}
@@ -153,6 +160,7 @@ export default function SourceComparisonView({ seedSignal, onClose }: SourceComp
             </div>
           )}
 
+          </div>
           {/* Comparison result */}
           {data && !loading && (
             <div className="flex flex-col gap-5">

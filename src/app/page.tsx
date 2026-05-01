@@ -542,8 +542,20 @@ export default function Home() {
                   {selectedSignal.fullContent || selectedSignal.summary}
                 </div>
 
+                {/* Botón de comparar fuentes desde el Panel de Foco */}
+                <div className="mb-6">
+                  <button
+                    onClick={() => setComparisonSignal(selectedSignal)}
+                    aria-label={`Comparar cobertura de ${selectedSignal.title} con otras fuentes`}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-white/[0.03] border border-white/[0.06] text-white/50 hover:text-white/70 hover:bg-white/[0.06] rounded-xl transition-colors text-xs font-bold font-[family-name:var(--font-space-grotesk)]"
+                  >
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M11 18H8a2 2 0 0 1-2-2V9"/></svg>
+                    Comparar fuentes de esta señal
+                  </button>
+                </div>
+
                 {/* Botón de IA + Análisis */}
-                <div className="mb-8">
+                <div className="mb-8" aria-live="polite" aria-atomic="true">
                   {!analysis && !analyzing && !analysisError && (
                     <button
                       onClick={() => selectedSignal && fetchAnalysis(selectedSignal)}
@@ -555,14 +567,14 @@ export default function Home() {
                   )}
 
                   {analyzing && (
-                    <div className="flex flex-col items-center gap-3 py-8">
+                    <div className="flex flex-col items-center gap-3 py-8" role="status">
                       <Loader2 className="w-6 h-6 text-[#00E5A0] animate-spin" />
                       <span className="text-sm text-white/50 font-[family-name:var(--font-space-grotesk)]">Generando análisis...</span>
                     </div>
                   )}
 
                   {analysisError && (
-                    <div className="glass rounded-xl p-4 flex flex-col items-center gap-3">
+                    <div className="glass rounded-xl p-4 flex flex-col items-center gap-3" role="alert">
                       <p className="text-sm text-red-400 font-[family-name:var(--font-space-grotesk)]">{analysisError}</p>
                       <button
                         onClick={() => selectedSignal && fetchAnalysis(selectedSignal)}

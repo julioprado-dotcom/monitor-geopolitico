@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { ArrowLeft, Bookmark, BookmarkCheck, Link2, Clock, Globe, Brain, Loader2 } from 'lucide-react';
 import { type Thread, type ThreadSignal, statusConfig, typeLabels } from '@/data/threads';
 import { relevanceColors } from '@/data/signals';
@@ -98,13 +98,23 @@ export default function ThreadDetail({ thread, isFollowed, onToggleFollow, onClo
     }
   }, [thread]);
 
+  // Close on Escape
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   return (
-    <div className="glass rounded-xl overflow-hidden border border-white/[0.06]">
+    <div className="glass rounded-xl overflow-hidden border border-white/[0.06]" role="article" aria-label={`Hilo geopolítico: ${thread.title}`}>
       {/* Header */}
       <div className="px-4 py-3 border-b border-white/[0.06]">
         <div className="flex items-center justify-between gap-3 mb-3">
           <button
             onClick={onClose}
+            aria-label="Volver a la lista de hilos"
             className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-white/35 hover:text-white/60 font-[family-name:var(--font-jetbrains-mono)] transition-colors"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
@@ -112,6 +122,7 @@ export default function ThreadDetail({ thread, isFollowed, onToggleFollow, onClo
           </button>
           <button
             onClick={() => onToggleFollow(thread.id)}
+            aria-label={isFollowed ? `Dejar de seguir: ${thread.title}` : `Seguir: ${thread.title}`}
             className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] transition-colors"
             style={isFollowed
               ? { backgroundColor: '#00E5A015', color: '#00E5A0', border: '1px solid #00E5A025' }
@@ -252,6 +263,7 @@ export default function ThreadDetail({ thread, isFollowed, onToggleFollow, onClo
               <button
                 key={rel.threadId}
                 onClick={() => onNavigateRelation(rel.threadId)}
+                aria-label={`Ir a hilo relacionado: ${rel.title} (${relType.label})`}
                 className="w-full text-left flex items-start gap-2.5 p-2.5 rounded-lg bg-white/[0.02] border border-white/[0.05] hover:bg-white/[0.05] hover:border-white/[0.1] transition-colors group mb-2 last:mb-0"
               >
                 <Link2 className="w-3.5 h-3.5 mt-0.5 shrink-0" style={{ color: relType.color }} />
@@ -289,7 +301,7 @@ export default function ThreadDetail({ thread, isFollowed, onToggleFollow, onClo
       </div>
 
       {/* Análisis IA del Hilo */}
-      <div className="px-4 py-3 border-t border-white/[0.06]">
+      <div className="px-4 py-3 border-t border-white/[0.06]" aria-live="polite" aria-atomic="true">
         {!analysis && !analyzing && !analysisError && (
           <button
             onClick={fetchAnalysis}
@@ -301,14 +313,14 @@ export default function ThreadDetail({ thread, isFollowed, onToggleFollow, onClo
         )}
 
         {analyzing && (
-          <div className="flex flex-col items-center gap-2 py-6">
+          <div className="flex flex-col items-center gap-2 py-6" role="status">
             <Loader2 className="w-5 h-5 text-[#38BDF8] animate-spin" />
             <span className="text-[11px] text-white/40 font-[family-name:var(--font-space-grotesk)]">Analizando {thread.signals.length} señales del hilo...</span>
           </div>
         )}
 
         {analysisError && (
-          <div className="glass rounded-xl p-3 flex flex-col items-center gap-2">
+          <div className="glass rounded-xl p-3 flex flex-col items-center gap-2" role="alert">
             <p className="text-[11px] text-red-400 font-[family-name:var(--font-space-grotesk)]">{analysisError}</p>
             <button
               onClick={fetchAnalysis}

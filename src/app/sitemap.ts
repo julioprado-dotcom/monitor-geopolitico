@@ -4,7 +4,7 @@ import { demoAnalysis } from '@/data/analysis';
 import { demoThreads } from '@/data/threads';
 import { regionLabels, type Region } from '@/data/signals';
 import { type ThreadType, typeLabels } from '@/data/threads';
-import { SITE_URL, CLASSIFIERS } from '@/config';
+import { SITE_URL, CLASSIFIERS, ANALYSIS_FILTERS } from '@/config';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
@@ -58,7 +58,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  // 5. Tipos de hilo en el explorador
+  // 5. Páginas por filtro analítico — Óptica Sur Global
+  const filterPages: MetadataRoute.Sitemap = ANALYSIS_FILTERS.map((f) => ({
+    url: `${SITE_URL}/?filter=${encodeURIComponent(f)}`,
+    lastModified: now,
+    changeFrequency: 'monthly' as const,
+    priority: 0.5,
+  }));
+
+  // 6. Tipos de hilo en el explorador
   const threadTypes = Object.keys(typeLabels) as ThreadType[];
   const threadTypePages: MetadataRoute.Sitemap = threadTypes.map((t) => ({
     url: `${SITE_URL}/?threadType=${encodeURIComponent(t)}`,
@@ -67,7 +75,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.5,
   }));
 
-  // 6. Señales individuales — señaladas para indexación profunda
+  // 7. Señales individuales — señaladas para indexación profunda
   //    (cada señal tiene overlay con contenido único y análisis IA)
   const signalPages: MetadataRoute.Sitemap = demoSignals.map((s) => ({
     url: `${SITE_URL}/?signal=${encodeURIComponent(s.id)}`,
@@ -76,7 +84,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: s.relevance === 'CRÍTICA' ? 0.7 : 0.5,
   }));
 
-  // 7. Análisis individuales
+  // 8. Análisis individuales
   const analysisPages: MetadataRoute.Sitemap = demoAnalysis.map((a) => ({
     url: `${SITE_URL}/?analysis=${encodeURIComponent(a.id)}`,
     lastModified: new Date(a.timestamp),
@@ -84,7 +92,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }));
 
-  // 8. Hilos geopolíticos
+  // 9. Hilos geopolíticos
   const threadPages: MetadataRoute.Sitemap = demoThreads.map((t) => ({
     url: `${SITE_URL}/?thread=${encodeURIComponent(t.id)}`,
     lastModified: new Date(t.lastActivityAt),
@@ -97,6 +105,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...sections,
     ...regionPages,
     ...classifierPages,
+    ...filterPages,
     ...threadTypePages,
     ...signalPages,
     ...analysisPages,

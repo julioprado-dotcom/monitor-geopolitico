@@ -100,9 +100,7 @@ export const regionLabels: Record<Region, string> = {
   'NORTEAMÉRICA': 'Norteamérica',
 };
 
-// ── Disclaimer legal ──
-
-export const DISCLAIMER = 'Monitor Geopolítico es una plataforma de análisis e investigación geopolítica. Los artículos y contenido original pertenecen a sus fuentes. El análisis geopolítico generado por el Monitor — Óptica Sur Global, con filtros analíticos y bidireccionalidad de relevancia — es contenido original del Monitor Geopolítico - Newsconnect';
+// ── Disclaimer legal (centralizado en src/config/index.ts) ──
 
 export const SHARE_FOOTER_FREE = '\n\nAnálisis por Monitor Geopolítico — monitor-geopolitico.com';
 

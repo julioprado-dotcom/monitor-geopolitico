@@ -2,6 +2,7 @@
 // AnalysisOverlay v3 — close via backdrop click or Escape (B5/B6 eliminated)
 import { useState, useEffect, useCallback, useRef } from 'react';
 import dynamic from 'next/dynamic';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 import {
   Brain,
   Loader2,
@@ -32,6 +33,7 @@ export default function AnalysisOverlay({ analysis: analysisData, onClose }: Ana
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const mounted = useMounted();
+  const containerRef = useFocusTrap(true, onClose);
 
   // Lazy load fullContent desde analysisContent.ts — MISMO PATRÓN que SignalOverlay con signalContent.ts
   const [fullContent, setFullContent] = useState<string | null>(null);
@@ -180,6 +182,10 @@ export default function AnalysisOverlay({ analysis: analysisData, onClose }: Ana
         <div className="rounded-2xl overflow-hidden flex flex-col max-h-[90vh] glass-strong">
         {/* Scroll container */}
         <div
+          ref={containerRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Análisis editorial: ${analysisData.title}`}
           className="flex-1 min-h-0 overflow-y-auto overlay-scroll"
           onClick={(e) => e.stopPropagation()}
         >
@@ -316,7 +322,7 @@ export default function AnalysisOverlay({ analysis: analysisData, onClose }: Ana
             )}
 
             {loading && (
-              <div className="flex flex-col items-center gap-3 py-8">
+              <div className="flex flex-col items-center gap-3 py-8" role="status">
                 <Loader2 className="w-6 h-6 text-[#D4A017] animate-spin" />
                 <span className="text-sm text-white/50 font-[family-name:var(--font-space-grotesk)]">
                   Generando análisis...
@@ -325,7 +331,7 @@ export default function AnalysisOverlay({ analysis: analysisData, onClose }: Ana
             )}
 
             {error && (
-              <div className="glass rounded-xl p-4 flex flex-col items-center gap-3">
+              <div className="glass rounded-xl p-4 flex flex-col items-center gap-3" role="alert">
                 <p className="text-sm text-red-400 font-[family-name:var(--font-space-grotesk)]">
                   {error}
                 </p>

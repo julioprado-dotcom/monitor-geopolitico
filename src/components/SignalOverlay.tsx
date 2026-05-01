@@ -22,8 +22,8 @@ import {
   sourceLevelColors,
   sourceCountry,
   accessLevelLabels,
-  DISCLAIMER,
 } from '@/data/signals';
+import { DISCLAIMER } from '@/config';
 import { useMounted } from '@/hooks/useMounted';
 
 interface SignalOverlayProps {
