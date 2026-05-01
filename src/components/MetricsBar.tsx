@@ -36,7 +36,7 @@ export default function MetricsBar({ allSignals, filteredCount, selectedRelevanc
       </div>
 
       {/* Barras sólidas verticales compactas */}
-      <div className="flex items-end gap-2.5">
+      <div className="flex items-end gap-2.5" role="group" aria-label="Filtros por nivel de severidad">
         {relevances.map((sev) => {
           const count = counts[sev];
           const color = relevanceColors[sev];
@@ -48,8 +48,10 @@ export default function MetricsBar({ allSignals, filteredCount, selectedRelevanc
               key={sev}
               role="button"
               tabIndex={0}
+              aria-label={`Filtrar por severidad ${sev}${isSelected ? ' (seleccionado)' : ''} — ${count} señales`}
+              aria-pressed={isSelected}
               onClick={() => onToggleRelevance(sev)}
-              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onToggleRelevance(sev); }}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggleRelevance(sev); } }}
               className="flex-1 flex flex-col items-center gap-1 transition-all duration-150 cursor-pointer"
             >
               {/* Botón limpiar encima de la barra seleccionada */}

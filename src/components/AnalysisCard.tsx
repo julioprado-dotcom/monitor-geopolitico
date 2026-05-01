@@ -37,10 +37,14 @@ export default function AnalysisCard({ analysis, onClick }: AnalysisCardProps) {
   }, [analysis.image]);
 
   return (
-    <div
+    <article
       className="glass rounded-xl overflow-hidden hover:bg-white/[0.04] cursor-pointer transition-colors duration-150 group flex flex-col"
       style={{ borderLeft: '3px solid #D4A017' }}
       onClick={() => onClick(analysis)}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(analysis); } }}
+      tabIndex={0}
+      role="article"
+      aria-label={`${analysis.title} — ${analysis.author}`}
     >
       {/* Imagen */}
       {analysis.image && (
@@ -124,6 +128,6 @@ export default function AnalysisCard({ analysis, onClick }: AnalysisCardProps) {
           </div>
         </div>
       </div>
-    </div>
+    </article>
   );
 }

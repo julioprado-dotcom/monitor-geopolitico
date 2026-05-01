@@ -45,10 +45,14 @@ export default function SignalCard({ signal, onRegionClick, onClassifierClick, o
   }, [signal.image]);
 
   return (
-    <div
+    <article
       className="glass rounded-xl overflow-hidden hover:bg-white/[0.04] cursor-pointer transition-colors duration-150 group flex flex-col"
       style={{ borderLeft: `3px solid ${relevanceColor}` }}
       onClick={() => onSignalClick(signal)}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSignalClick(signal); } }}
+      tabIndex={0}
+      role="article"
+      aria-label={`${signal.title} — ${signal.source}`}
     >
       {/* Thumbnail — arriba de todo, solo si hay imagen */}
       {signal.image && (
@@ -178,6 +182,6 @@ export default function SignalCard({ signal, onRegionClick, onClassifierClick, o
           </div>
         </div>
       </div>
-    </div>
+    </article>
   );
 }

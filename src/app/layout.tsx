@@ -282,7 +282,12 @@ export default function RootLayout({
         className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} antialiased bg-background text-foreground`}
       >
         <JsonLd />
-        {children}
+        <a href="#main-content" className="skip-to-content">
+          Saltar al contenido principal
+        </a>
+        <div id="main-content" role="main">
+          {children}
+        </div>
       </body>
     </html>
   );
