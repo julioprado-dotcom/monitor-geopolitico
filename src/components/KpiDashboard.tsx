@@ -26,7 +26,7 @@ export default function KpiDashboard({ signals }: KpiDashboardProps) {
       return acc;
     }, {});
 
-    let topRegion: Region = 'LATAM';
+    let topRegion: Region = 'LATINOAMÉRICA';
     let topCount = 0;
     for (const [region, count] of Object.entries(regionCount)) {
       if (count > topCount) {

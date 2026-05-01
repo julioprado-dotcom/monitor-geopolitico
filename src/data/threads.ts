@@ -221,7 +221,7 @@ export const demoThreads: Thread[] = [
     description: 'La expansión del BRICS y los avances hacia un sistema de pago alternativo al dominante generan reestructuración en el orden económico global.',
     status: 'EVOLUCION',
     type: 'economia',
-    regions: ['ASIA', 'LATAM', 'ÁFRICA', 'MEDIO ORIENTE'],
+    regions: ['ASIA', 'LATINOAMÉRICA', 'ÁFRICA', 'MEDIO ORIENTE'],
     signals: [
       {
         id: 'ts-010',
@@ -280,7 +280,7 @@ export const demoThreads: Thread[] = [
     description: 'Incremento sostenido de migrantes en el Darién con respuesta humanitaria insuficiente y tensión diplomática entre países de tránsito.',
     status: 'DORMANTE',
     type: 'derechos_humanos',
-    regions: ['LATAM'],
+    regions: ['LATINOAMÉRICA'],
     signals: [
       {
         id: 'ts-014',

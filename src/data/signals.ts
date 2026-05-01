@@ -1,6 +1,6 @@
 export type Relevance = 'CRÍTICA' | 'ALTA' | 'MEDIA' | 'BAJA' | 'INFORMATIVA';
 
-export type Region = 'LATAM' | 'EUROPA' | 'ASIA' | 'ÁFRICA' | 'MEDIO ORIENTE' | 'NORTEAMÉRICA';
+export type Region = 'LATINOAMÉRICA' | 'EUROPA' | 'ASIA' | 'ÁFRICA' | 'MEDIO ORIENTE' | 'NORTEAMÉRICA';
 
 export type SourceLevel = 'A' | 'B' | 'C' | 'D';
 
@@ -115,7 +115,7 @@ export const userTierConfig: Record<UserTier, {
 // ── Etiquetas de región para UI (mapea el valor técnico al nombre visible) ──
 
 export const regionLabels: Record<Region, string> = {
-  'LATAM': 'Latinoamérica',
+  'LATINOAMÉRICA': 'Latinoamérica',
   'EUROPA': 'Europa',
   'ASIA': 'Asia-Pacífico',
   'ÁFRICA': 'África',
@@ -176,7 +176,7 @@ export const demoSignals: Signal[] = [
 El sistema busca eliminar la dependencia del dólar estadounidense en el comercio bilateral entre los países del bloque, que representa el 35% del PIB mundial y el 45% de la población global. Según el Banco Central de Brasil, el volumen de comercio intra-BRICS alcanzó los 4.8 billones de dólares en 2024, con una proyección de crecimiento del 18% anual.
 
 La Reserva Federal de EE.UU. expresó su preocupación por el impacto potencial en la hegemonía del dólar como moneda de reserva global. Los países del Sur Global ven en esta iniciativa una herramienta de soberanía financiera y una alternativa al sistema de pagos dominado por occidente, que ha utilizado el control del SWIFT como instrumento de presión geopolítica.`,
-    region: 'LATAM',
+    region: 'LATINOAMÉRICA',
     classifiers: ['Economía', 'Diplomacia'],
     relevance: 'ALTA',
     source: 'Agencia BRICS de Noticias',
@@ -259,7 +259,7 @@ Los tres países forman ahora una franja de gobiernos militares que controla el 
 El acuerdo elimina aranceles al 90% de los productos europeos exportados al Mercosur y al 82% de los productos sudamericanos exportados a la UE. Se estima que el acuerdo podría incrementar el comercio bilateral en 40.000 millones de dólares anuales.
 
 Sin embargo, el acuerdo enfrenta oposición significativa. En Europa, productores agrícolas de Francia, Polonia e Irlanda temen una invasión de productos baratos. En América Latina, organizaciones ambientalistas advierten que el acuerdo profundizará la deforestación amazónica y precarizará las condiciones laborales.`,
-    region: 'LATAM',
+    region: 'LATINOAMÉRICA',
     classifiers: ['Diplomacia', 'Economía'],
     relevance: 'MEDIA',
     source: 'EFE',
@@ -360,7 +360,7 @@ Amnistía Internacional documentó condiciones laborales inaceptables, incluyend
 La ley establece multas de hasta el 10% de la facturación global para empresas que incumplan. Crea un Ente Regulador de Datos con poder para auditar algoritmos y exigir transparencia en moderación de contenido.
 
 Las empresas tecnológicas estadounidenses calificaron la ley de discriminatoria. La Unión Europea e India expresaron interés en adoptar modelos similares, señalando un cambio de paradigma global en la gobernanza de datos tecnológicos.`,
-    region: 'LATAM',
+    region: 'LATINOAMÉRICA',
     classifiers: ['Tecnología', 'Economía', 'Diplomacia'],
     relevance: 'ALTA',
     source: 'Folha de São Paulo',
@@ -442,7 +442,7 @@ Startups francesas y alemanas temen que la regulación asfixie la innovación. S
 La medida generó fricciones con corporaciones canadienses, chinas y surcoreanas. Bolivia y Argentina, los otros dos países del triángulo del litio, han mostrado interés en coordinar políticas de soberanía sobre el mineral.
 
 China, principal consumidor mundial de litio, expresó preocupación por la medida. Estados Unidos evalúa recurrir a mecanismos de disputa del USMCA para proteger las inversiones de sus empresas en el sector.`,
-    region: 'LATAM',
+    region: 'LATINOAMÉRICA',
     classifiers: ['Economía', 'Energía', 'Derechos Humanos'],
     relevance: 'ALTA',
     source: 'La Jornada',
@@ -522,7 +522,7 @@ China rechazó el informe, calificándolo de falso y manipulado por fuerzas anti
 Maduro convocó un referéndum donde, según resultados oficiales cuestionados, el 95% votó a favor de reclamar la soberanía. CARICOM respaldó la posición guyanesa de resolver la disputa mediante la CIJ.
 
 Brasil reforzó su presencia militar en la frontera norte. EE.UU. aumentó ejercicios militares con Guyana, mientras Rusia expresó apoyo al derecho venezolano de defender su soberanía territorial.`,
-    region: 'LATAM',
+    region: 'LATINOAMÉRICA',
     classifiers: ['Conflicto', 'Energía', 'Diplomacia'],
     relevance: 'ALTA',
     source: 'Telesur',
@@ -583,7 +583,7 @@ China se declaró Estado cercano al Ártico y desplegó rompehielos de investiga
 El ministro de Economía anunció que Argentina dejará de usar el dólar como moneda de referencia y adoptará una canasta con yuan, real y peso. Se acelerará la adhesión formal al bloque BRICS+.
 
 Brasil, China y Sudáfrica expresaron su apoyo. El FMI advirtió sobre consecuencias para el acceso a crédito internacional. El caso argentino podría sentar precedente para otros países del Sur Global endeudados.`,
-    region: 'LATAM',
+    region: 'LATINOAMÉRICA',
     classifiers: ['Economía', 'Diplomacia', 'Derechos Humanos'],
     relevance: 'CRÍTICA',
     source: 'Página/12',
@@ -624,7 +624,7 @@ China adoptó postura ambivalente. La crisis generó 2,5 millones de desplazados
 El corredor almacena 2.800 millones de toneladas de CO2, valorado en el mercado internacional de carbono. El financiamiento inicial de 350 millones proviene del CAF, Fondo Verde para el Clima y fondos soberanos de Noruega y Alemania.
 
 Las comunidades indígenas y afrocolombianas participarán en la gobernanza del corredor con representación directa en el consejo administrativo.`,
-    region: 'LATAM',
+    region: 'LATINOAMÉRICA',
     classifiers: ['Ecosistema', 'Derechos Humanos'],
     relevance: 'BAJA',
     source: 'Mongabay Latam',
@@ -737,7 +737,7 @@ Israel rechazó la decisión. EE.UU. bloqueó resolución del Consejo de Segurid
     fullContent: `Colombia creó el Banco de Desarrollo Andino con capital de 7.000 millones de dólares (Ecuador: 2.500M, Perú: 2.000M, Bolivia: 500M). El banco financia proyectos sin condicionamientos del FMI ni Banco Mundial.
 
 La gobernanza se basa en un país, un voto. Las tasas de interés serán 30-50% inferiores a las del mercado internacional. China expresó interés en cooperar. EE.UU. advirtió sobre riesgos de sostenibilidad.`,
-    region: 'LATAM',
+    region: 'LATINOAMÉRICA',
     classifiers: ['Economía', 'Diplomacia'],
     relevance: 'ALTA',
     source: 'Telesur',
@@ -755,7 +755,7 @@ La gobernanza se basa en un país, un voto. Las tasas de interés serán 30-50% 
     fullContent: `Manifestações massivas irromperam no Paraguai após o governo autorizar despejos de 5.000 famílias camponesas em favor de extensões de monocultura de soja de corporações multinacionais como Cargill e Monsanto.
 
 Os camponeses denunciam violência policial excessiva, incluindo gases lacrimogêneos e prisões arbitrárias. A ONU pediu a suspensão imediata dos despejos. O caso revela a tensão entre o agronegócio transnacional e comunidades camponesas no Cone Sul.`,
-    region: 'LATAM',
+    region: 'LATINOAMÉRICA',
     classifiers: ['Conflicto', 'Derechos Humanos'],
     relevance: 'ALTA',
     source: 'Folha de São Paulo',
@@ -774,7 +774,7 @@ Os camponeses denunciam violência policial excessiva, incluindo gases lacrimog�
     fullContent: `Cuba inaugurou sua rede 5G desenvolvida com Huawei e Rostelecom, cobrindo Havana, Varadero, Santiago de Cuba e Santa Clara. O projeto de 800 milhões de dólares usa tecnologia openRAN.
 
 EE.UU. incluiu engenheiros cubanos e empresas russas em sua lista de sanções OFAC. Venezuela e Nicarágua expressaram interesse em tecnologia similar. O governo cubano declarou que nenhuma sanção deterá seu direito à conectividade.`,
-    region: 'LATAM',
+    region: 'LATINOAMÉRICA',
     classifiers: ['Tecnología', 'Diplomacia'],
     relevance: 'ALTA',
     source: 'Prensa Latina',
@@ -792,7 +792,7 @@ EE.UU. incluiu engenheiros cubanos e empresas russas em sua lista de sanções O
     fullContent: `Incêndios florestais na Amazônia boliviana atingiram 34.000 focos de calor em abril, destruindo 800.000 hectares. Pior abril desde 1998, superando a média histórica em 300%.
 
 Fumaça tóxica afetou 15 milhões de pessoas no Brasil, Peru e Paraguai. Níveis de PM2.5 chegaram a 12 vezes o limite da OMS. O governo culpou o El Niño e queimadas ilegais, mas ambientalistas apontam a desregulação de 2024 como causa principal.`,
-    region: 'LATAM',
+    region: 'LATINOAMÉRICA',
     classifiers: ['Ecosistema', 'Seguridad'],
     relevance: 'MEDIA',
     source: 'Telesur',
@@ -811,7 +811,7 @@ Fumaça tóxica afetou 15 milhões de pessoas no Brasil, Peru e Paraguai. Nívei
     fullContent: `A CELAC e a ASEAN firmaram o Mecanismo de Diálogo Estratégico Permanente em Jacarta. O acordo estabelece reuniões ministeriais anuais, grupos de trabalho e um fundo de cooperação de 500 milhões de dólares.
 
 Espera-se que o comércio bilateral, atualmente em 280 bilhões de dólares, cresça 25% em cinco anos. Analistas veem o acordo como reflexo da autonomia crescente do Sul Global na configuração de sua própria arquitetura de cooperação.`,
-    region: 'LATAM',
+    region: 'LATINOAMÉRICA',
     classifiers: ['Diplomacia', 'Economía'],
     relevance: 'INFORMATIVA',
     source: 'RT',

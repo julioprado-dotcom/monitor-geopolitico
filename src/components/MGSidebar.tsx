@@ -11,7 +11,7 @@ interface MGSidebarProps {
   onClassifierSelect: (c: string | null) => void;
 }
 
-const regions: Region[] = ['LATAM', 'EUROPA', 'ASIA', 'ÁFRICA', 'MEDIO ORIENTE', 'NORTEAMÉRICA'];
+const regions: Region[] = ['LATINOAMÉRICA', 'EUROPA', 'ASIA', 'ÁFRICA', 'MEDIO ORIENTE', 'NORTEAMÉRICA'];
 
 const classifiers = [
   'Diplomacia',
@@ -25,7 +25,7 @@ const classifiers = [
 ];
 
 const regionIcons: Record<string, string> = {
-  LATAM: '🌎',
+  'LATINOAMÉRICA': '🌎',
   EUROPA: '🌍',
   ASIA: '🌏',
   'ÁFRICA': '🌍',
