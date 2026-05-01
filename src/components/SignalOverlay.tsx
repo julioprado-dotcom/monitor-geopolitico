@@ -29,9 +29,10 @@ import { useMounted } from '@/hooks/useMounted';
 interface SignalOverlayProps {
   signal: Signal;
   onClose: () => void;
+  onCompare?: (signal: Signal) => void;
 }
 
-export default function SignalOverlay({ signal, onClose }: SignalOverlayProps) {
+export default function SignalOverlay({ signal, onClose, onCompare }: SignalOverlayProps) {
   const [analysis, setAnalysis] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -290,6 +291,26 @@ export default function SignalOverlay({ signal, onClose }: SignalOverlayProps) {
               <ExternalLink className="w-3 h-3" />
               Ir al artículo
             </a>
+
+            {/* Botón comparar fuentes */}
+            {onCompare && (
+              <>
+                <span className="text-white/10 text-xs">·</span>
+                <button
+                  onClick={(e) => { e.stopPropagation(); onCompare(signal); onClose(); }}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold font-[family-name:var(--font-jetbrains-mono)] transition-colors duration-150"
+                  style={{
+                    backgroundColor: 'rgba(59,130,246,0.15)',
+                    color: '#60A5FA',
+                    border: '1px solid rgba(59,130,246,0.3)',
+                  }}
+                  aria-label={`Comparar cobertura de ${signal.title} con otras fuentes`}
+                >
+                  <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M11 18H8a2 2 0 0 1-2-2V9"/></svg>
+                  Comparar fuentes
+                </button>
+              </>
+            )}
           </div>
 
           {/* 5. Full content — lazy loaded */}
