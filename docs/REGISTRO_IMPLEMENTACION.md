@@ -2,7 +2,7 @@
 
 > Objetivo: Llevar Análisis e Hilos al mismo nivel de completitud que Señales.
 > Fecha: 2026-05-02
-> Última actualización: 2026-05-02
+> Última actualización: 2026-05-02 (Fase 2: SEO + MIG + a11y + Mapa + Comparación)
 
 ---
 
@@ -173,3 +173,67 @@ interface ThreadSignal {
 | Análisis | 9/10 | 10 | **90%** |
 | Hilos | 9/10 | 10 | **90%** |
 | **Global** | **18/20** | **20** | **90%** |
+
+---
+
+## FASE 2 — MEJORAS TRANSVERSALES (2026-05-02)
+
+### Commits adicionales
+
+| Commit | Descripción |
+|--------|-------------|
+| `371cf0e` | SEO Fase 1 — sitemap.xml, robots.txt, BreadcrumbList JSON-LD |
+| `741d5f6` | SEO Fase 2 — JSON-LD ampliado (FAQPage, Organization, Dataset), sitemap dinámico (77+ URLs), document.title en overlays |
+| `85202a1` | MIG-01 + MIG-02 — Tipos centralizados en `src/types/index.ts`, config en `src/config/index.ts` |
+| `33f4ce6` | Accesibilidad (a11y) Fase 1 — skip-to-content, ARIA labels, focus-visible, reduced-motion CSS |
+| `e23da48` | Mapa geopolítico interactivo — GeoMap.tsx (SVG puro), 6 regiones, marcadores por señal |
+| `6414260` | Comparación de fuentes — API + UI (SourceComparisonView), botón en SignalOverlay |
+| `df39ba9` | Pulir MIG-02 + a11y completa + comparar fuentes en Panel de Foco |
+
+### Mejoras de Accesibilidad (a11y) — Completado 95%
+
+| Mejora | Componentes afectados |
+|--------|----------------------|
+| `useFocusTrap` hook | SourceComparisonView, AnalysisOverlay |
+| `aria-modal="true"` + `role="dialog"` | SourceComparisonView, AnalysisOverlay |
+| `aria-live="polite"` para estados dinámicos | SourceComparisonView, AnalysisOverlay, ThreadDetail, Panel de Foco (page.tsx) |
+| `role="alert"` para errores | Todos los modales y paneles con AI |
+| `role="status"` para spinners de carga | Todos los estados de loading |
+| `role="article"` + `aria-label` | ThreadDetail |
+| `aria-label` descriptivos | Botones volver, seguir, relaciones en ThreadDetail |
+| Cierre con Escape | ThreadDetail (ya existía en AnalysisOverlay y SourceComparisonView) |
+| SVG SMIL respeta `prefers-reduced-motion` | GeoMap (pulse rings en CRÍTICA deshabilitados) |
+| Skip-to-content link | layout.tsx (ya existía) |
+| Focus-visible ring global | globals.css (ya existía) |
+
+### Comparación de Fuentes — Completado
+
+| Feature | Estado |
+|---------|--------|
+| API `/api/compare` | ✅ Funcional — clustering por región + classifiers + source diferente |
+| SourceComparisonView | ✅ Funcional — grid de fuentes, meta-análisis IA |
+| Botón bulk "Comparar fuentes" | ✅ Funcional — debajo del grid de señales |
+| Botón por señal en Panel de Foco | ✅ NUEVO — debajo del contenido completo de la señal seleccionada |
+| Botón por señal en SignalOverlay | ✅ Code exists (SignalOverlay no está activo en UI actual) |
+
+### Mapa Geopolítico — Completado
+
+| Feature | Estado |
+|---------|--------|
+| GeoMap.tsx (SVG puro, sin dependencias externas) | ✅ Integrado en page.tsx |
+| 6 regiones con centroides + jitter | ✅ |
+| Marcadores por relevancia (5 niveles) | ✅ |
+| Pulse animation en CRÍTICA (respeta reduced-motion) | ✅ |
+| Tooltip hover + click para seleccionar señal | ✅ |
+| Keyboard navigation (Enter/Space) | ✅ |
+| ARIA attributes en SVG y marcadores | ✅ |
+
+### MIG-01/MIG-02 — Completado 100%
+
+| Item | Estado |
+|------|--------|
+| `src/types/index.ts` — fuente única de tipos | ✅ 5 union types + 7 interfaces |
+| `src/config/index.ts` — fuente única de config | ✅ 6 constantes exportadas |
+| DISCLAIMER centralizado (sin duplicados) | ✅ Eliminado de signals.ts, importado desde config |
+| ANALYSIS_FILTERS utilizado | ✅ 5 URLs en sitemap |
+| Types importados desde @/types en componentes nuevos | ✅ GeoMap, mapRegions |
