@@ -112,6 +112,19 @@ export const userTierConfig: Record<UserTier, {
 
 // ── Disclaimer legal ──
 
+// ── Etiquetas de región para UI (mapea el valor técnico al nombre visible) ──
+
+export const regionLabels: Record<Region, string> = {
+  'LATAM': 'Latinoamérica',
+  'EUROPA': 'Europa',
+  'ASIA': 'Asia-Pacífico',
+  'ÁFRICA': 'África',
+  'MEDIO ORIENTE': 'Medio Oriente',
+  'NORTEAMÉRICA': 'Norteamérica',
+};
+
+// ── Disclaimer legal ──
+
 export const DISCLAIMER = 'Monitor Geopolítico es una plataforma de análisis e investigación geopolítica. Los artículos y contenido original pertenecen a sus fuentes. El análisis geopolítico generado por el Monitor — Óptica Sur Global, con filtros analíticos y bidireccionalidad de relevancia — es contenido original del Monitor Geopolítico - Newsconnect';
 
 export const SHARE_FOOTER_FREE = '\n\nAnálisis por Monitor Geopolítico — monitor-geopolitico.com';

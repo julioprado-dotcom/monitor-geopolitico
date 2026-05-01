@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { type Signal, type Region, type Relevance } from '@/data/signals';
+import { type Signal, type Region, type Relevance, regionLabels } from '@/data/signals';
 import { Activity, ShieldAlert, Globe } from 'lucide-react';
 
 interface KpiDashboardProps {
@@ -10,15 +10,6 @@ interface KpiDashboardProps {
 
 const RELEVANCE_THREATS: Relevance[] = ['CRÍTICA', 'ALTA'];
 const RELEVANCE_STABLE: Relevance[] = ['INFORMATIVA', 'BAJA'];
-
-const regionLabels: Record<Region, string> = {
-  LATAM: 'Latinoamérica',
-  EUROPA: 'Europa',
-  ASIA: 'Asia-Pacífico',
-  'ÁFRICA': 'África',
-  'MEDIO ORIENTE': 'Medio Oriente',
-  NORTEAMÉRICA: 'Norteamérica',
-};
 
 export default function KpiDashboard({ signals }: KpiDashboardProps) {
   const kpis = useMemo(() => {

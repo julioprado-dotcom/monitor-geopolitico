@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { type Region, demoSignals } from '@/data/signals';
+import { type Region, demoSignals, regionLabels } from '@/data/signals';
 import { ChevronRight, Globe, Info, Filter, Radio } from 'lucide-react';
 
 interface MGSidebarProps {
@@ -101,7 +101,7 @@ export default function MGSidebar({
                 >
                   <span className="flex items-center gap-1.5">
                     <span className="text-xs">{regionIcons[region]}</span>
-                    {region}
+                    {regionLabels[region]}
                   </span>
                   <span className="text-[10px] text-white/25">{regionCounts[region]}</span>
                 </button>
