@@ -25,6 +25,7 @@ const LatestSignals = dynamic(() => import('@/components/LatestSignals'));
 const SourceClassifier = dynamic(() => import('@/components/SourceClassifier'));
 
 // ── Dynamic imports: solo se cargan cuando se necesitan (cero impacto en carga inicial) ──
+const GeoMap = dynamic(() => import('@/components/GeoMap'), { ssr: false });
 const AnalysisOverlay = dynamic(() => import('@/components/AnalysisOverlay'), { ssr: false });
 const FloatingProjector = dynamic(() => import('@/components/FloatingProjector'), { ssr: false });
 const SourceComparisonView = dynamic(() => import('@/components/SourceComparisonView'), { ssr: false });
@@ -337,6 +338,9 @@ export default function Home() {
               <h3 className="text-[9px] sm:text-[10px] font-bold text-[#00E5A0] mb-2 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">Patrones Detectados (24h)</h3>
               <PatternList />
             </div>
+
+            {/* 0.5 Mapa Geopolítico */}
+            <GeoMap signals={filteredSignals} onSelectSignal={handleSelectSignal} />
 
             {/* 1. Barras de señales (MetricsBar) */}
             <MetricsBar allSignals={demoSignals} filteredCount={filteredSignals.length} selectedRelevances={selectedRelevances} onToggleRelevance={toggleRelevance} onClearRelevance={() => setSelectedRelevances(new Set())} />
