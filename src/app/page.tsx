@@ -127,12 +127,30 @@ export default function Home() {
     });
   };
 
+  const filteredAnalysis = useMemo(() => {
+    return demoAnalysis.filter((a) => {
+      if (selectedRegion && a.region !== selectedRegion) return false;
+      if (selectedClassifier && !a.tags.includes(selectedClassifier)) return false;
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        return a.title.toLowerCase().includes(q) || a.summary.toLowerCase().includes(q) || a.tags.some((t) => t.toLowerCase().includes(q));
+      }
+      return true;
+    });
+  }, [selectedRegion, selectedClassifier, searchQuery]);
+
   const filteredThreads = useMemo(() => {
     let threads = demoThreads;
     if (threadFilter === 'SEGUIDOS') {
       threads = threads.filter((t) => followedThreads.has(t.id));
     } else if (threadFilter) {
       threads = threads.filter((t) => t.status === threadFilter);
+    }
+    if (selectedRegion) {
+      threads = threads.filter((t) => t.regions.includes(selectedRegion));
+    }
+    if (selectedClassifier) {
+      threads = threads.filter((t) => t.tags.some((tag) => tag.toLowerCase().includes(selectedClassifier.toLowerCase())));
     }
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
@@ -144,7 +162,7 @@ export default function Home() {
       );
     }
     return threads;
-  }, [threadFilter, followedThreads, searchQuery]);
+  }, [threadFilter, followedThreads, selectedRegion, selectedClassifier, searchQuery]);
 
   // ── Análisis IA en Panel de Foco ──
   const [analysis, setAnalysis] = useState<string | null>(null);
@@ -291,6 +309,7 @@ export default function Home() {
             selectedClassifier={selectedClassifier}
             onRegionSelect={handleRegionSelect}
             onClassifierSelect={handleClassifierSelect}
+            activeTab={contentTab}
           />
         </div>
       </aside>
@@ -299,7 +318,7 @@ export default function Home() {
       <div className="flex-1 flex overflow-hidden">
         {/* Sidebar — desktop only (mobile usa offcanvas) */}
         <div className="hidden lg:block w-[200px] shrink-0 overflow-y-auto border-r border-white/[0.06] p-2">
-          <MGSidebar selectedRegion={selectedRegion} selectedClassifier={selectedClassifier} onRegionSelect={setSelectedRegion} onClassifierSelect={setSelectedClassifier} />
+          <MGSidebar selectedRegion={selectedRegion} selectedClassifier={selectedClassifier} onRegionSelect={setSelectedRegion} onClassifierSelect={setSelectedClassifier} activeTab={contentTab} />
         </div>
 
         {/* Horizontal scroll container */}
@@ -378,11 +397,21 @@ export default function Home() {
 
             {/* 4. Tarjetas — Análisis */}
             {contentTab === 'analysis' && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 content-auto">
-                {demoAnalysis.map((analysis) => (
-                  <AnalysisCard key={analysis.id} analysis={analysis} onClick={setSelectedAnalysis} />
-                ))}
-              </div>
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 content-auto">
+                  {filteredAnalysis.map((analysis) => (
+                    <AnalysisCard key={analysis.id} analysis={analysis} onClick={setSelectedAnalysis} />
+                  ))}
+                </div>
+                {filteredAnalysis.length === 0 && (
+                  <div className="text-center py-16">
+                    <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-4">
+                      <Brain className="w-8 h-8 text-[#D4A017]/20" />
+                    </div>
+                    <p className="text-sm text-white/25 font-[family-name:var(--font-space-grotesk)]">No se encontraron análisis con los filtros actuales</p>
+                  </div>
+                )}
+              </>
             )}
 
             {/* 4. Explorador Geopolítico */}

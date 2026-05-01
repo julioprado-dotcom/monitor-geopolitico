@@ -1,6 +1,7 @@
 'use client';
 
-import { ArrowLeft, Bookmark, BookmarkCheck, Link2, Clock, Globe } from 'lucide-react';
+import { useState, useRef, useCallback } from 'react';
+import { ArrowLeft, Bookmark, BookmarkCheck, Link2, Clock, Globe, Brain, Loader2 } from 'lucide-react';
 import { type Thread, type ThreadSignal, statusConfig, typeLabels } from '@/data/threads';
 import { relevanceColors } from '@/data/signals';
 
@@ -37,6 +38,65 @@ const relationTypeLabels: Record<string, { label: string; color: string }> = {
 
 export default function ThreadDetail({ thread, isFollowed, onToggleFollow, onClose, onNavigateRelation }: ThreadDetailProps) {
   const status = statusConfig[thread.status];
+  const [analysis, setAnalysis] = useState<string | null>(null);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
+
+  const fetchAnalysis = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    setAnalyzing(true);
+    setAnalysisError(null);
+    setAnalysis(null);
+
+    try {
+      // Construir payload con toda la información del hilo
+      const allSignalTitles = thread.signals.map((s) => `[${s.source}] ${s.title}`).join('\n');
+      const payload = {
+        id: thread.id,
+        title: thread.title,
+        summary: thread.description,
+        fullContent: `${thread.description}\n\nSeñales del hilo:\n${allSignalTitles}\n\nRelaciones: ${thread.relations.map((r) => `${r.title} (${r.type})`).join(', ')}`,
+        region: thread.regions[0],
+        classifiers: [typeLabels[thread.type]],
+        relevance: 'ALTA',
+        language: 'es',
+        source: 'Monitor Geopolítico — Hilos',
+      };
+
+      const res = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: controller.signal,
+      });
+
+      if (!res.ok) {
+        if (res.status === 429) throw new Error('Límite diario de análisis alcanzado. Intenta más tarde.');
+        const text = await res.text();
+        throw new Error(`Error ${res.status}: ${text.slice(0, 120)}`);
+      }
+
+      const raw = await res.text();
+      let data: { analysis?: string; error?: string };
+      try {
+        data = JSON.parse(raw);
+      } catch {
+        throw new Error('La respuesta del servidor no es válida. Intenta de nuevo.');
+      }
+
+      if (data.error) throw new Error(data.error);
+      if (!data.analysis) throw new Error('El análisis no se generó correctamente.');
+      setAnalysis(data.analysis);
+    } catch (err: any) {
+      if (err.name !== 'AbortError') setAnalysisError(err.message || 'Error de conexión');
+    } finally {
+      setAnalyzing(false);
+    }
+  }, [thread]);
 
   return (
     <div className="glass rounded-xl overflow-hidden border border-white/[0.06]">
@@ -226,6 +286,48 @@ export default function ThreadDetail({ thread, isFollowed, onToggleFollow, onClo
             </span>
           ))}
         </div>
+      </div>
+
+      {/* Análisis IA del Hilo */}
+      <div className="px-4 py-3 border-t border-white/[0.06]">
+        {!analysis && !analyzing && !analysisError && (
+          <button
+            onClick={fetchAnalysis}
+            className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-[#38BDF8]/8 border border-[#38BDF8]/15 text-[#38BDF8]/70 rounded-xl hover:bg-[#38BDF8]/15 hover:text-[#38BDF8] transition-colors font-bold font-[family-name:var(--font-space-grotesk)] text-[11px]"
+          >
+            <Brain className="w-3.5 h-3.5" />
+            Analizar hilo con IA — Perspectiva Sur Global
+          </button>
+        )}
+
+        {analyzing && (
+          <div className="flex flex-col items-center gap-2 py-6">
+            <Loader2 className="w-5 h-5 text-[#38BDF8] animate-spin" />
+            <span className="text-[11px] text-white/40 font-[family-name:var(--font-space-grotesk)]">Analizando {thread.signals.length} señales del hilo...</span>
+          </div>
+        )}
+
+        {analysisError && (
+          <div className="glass rounded-xl p-3 flex flex-col items-center gap-2">
+            <p className="text-[11px] text-red-400 font-[family-name:var(--font-space-grotesk)]">{analysisError}</p>
+            <button
+              onClick={fetchAnalysis}
+              className="px-3 py-1 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-bold hover:bg-red-500/20 transition-colors font-[family-name:var(--font-jetbrains-mono)]"
+            >
+              Reintentar
+            </button>
+          </div>
+        )}
+
+        {analysis && (
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-1.5 mb-1">
+              <Brain className="w-3.5 h-3.5 text-[#38BDF8]" />
+              <span className="text-[10px] font-bold text-[#38BDF8]/70 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">Análisis IA — Hilo</span>
+            </div>
+            <div className="text-[11px] text-white/55 leading-relaxed font-[family-name:var(--font-space-grotesk)] whitespace-pre-line">{analysis}</div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -2,13 +2,18 @@
 
 import { useMemo } from 'react';
 import { type Region, demoSignals, regionLabels } from '@/data/signals';
+import { demoAnalysis } from '@/data/analysis';
+import { demoThreads } from '@/data/threads';
 import { ChevronRight, Globe, Info, Filter, Radio } from 'lucide-react';
+
+type ContentTab = 'signals' | 'analysis' | 'explorer';
 
 interface MGSidebarProps {
   selectedRegion: Region | null;
   selectedClassifier: string | null;
   onRegionSelect: (r: Region | null) => void;
   onClassifierSelect: (c: string | null) => void;
+  activeTab: ContentTab;
 }
 
 const regions: Region[] = ['LATINOAMÉRICA', 'EUROPA', 'ASIA', 'ÁFRICA', 'MEDIO ORIENTE', 'NORTEAMÉRICA'];
@@ -33,23 +38,54 @@ const regionIcons: Record<string, string> = {
   NORTEAMÉRICA: '🌎',
 };
 
+const tabLabels: Record<ContentTab, string> = {
+  signals: 'Señales Geopolíticas',
+  analysis: 'Análisis',
+  explorer: 'Hilos Geopolíticos',
+};
+
 export default function MGSidebar({
   selectedRegion,
   selectedClassifier,
   onRegionSelect,
   onClassifierSelect,
+  activeTab,
 }: MGSidebarProps) {
   const regionCounts = useMemo(() => {
     const c: Record<string, number> = {};
-    regions.forEach((r) => { c[r] = demoSignals.filter((s) => s.region === r).length; });
+    regions.forEach((r) => {
+      switch (activeTab) {
+        case 'signals':
+          c[r] = demoSignals.filter((s) => s.region === r).length;
+          break;
+        case 'analysis':
+          c[r] = demoAnalysis.filter((a) => a.region === r).length;
+          break;
+        case 'explorer':
+          c[r] = demoThreads.filter((t) => t.regions.includes(r)).length;
+          break;
+      }
+    });
     return c;
-  }, []);
+  }, [activeTab]);
 
   const classifierCounts = useMemo(() => {
     const c: Record<string, number> = {};
-    classifiers.forEach((cls) => { c[cls] = demoSignals.filter((s) => s.classifiers.includes(cls)).length; });
+    classifiers.forEach((cls) => {
+      switch (activeTab) {
+        case 'signals':
+          c[cls] = demoSignals.filter((s) => s.classifiers.includes(cls)).length;
+          break;
+        case 'analysis':
+          c[cls] = demoAnalysis.filter((a) => a.tags.includes(cls)).length;
+          break;
+        case 'explorer':
+          c[cls] = demoThreads.filter((t) => t.tags.some((tag) => tag.toLowerCase().includes(cls.toLowerCase()))).length;
+          break;
+      }
+    });
     return c;
-  }, []);
+  }, [activeTab]);
 
   return (
     <div className="flex flex-col gap-3">
@@ -60,7 +96,7 @@ export default function MGSidebar({
             <Radio className="w-3.5 h-3.5 text-[#00E5A0]" />
           </div>
           <span className="text-[11px] font-bold text-white/60 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">
-            Señales Geopolíticas
+            {tabLabels[activeTab]}
           </span>
         </div>
       </div>

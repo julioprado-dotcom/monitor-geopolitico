@@ -1,3 +1,5 @@
+import { type Region } from './signals';
+
 export interface Analysis {
   id: string;
   title: string;
@@ -6,7 +8,7 @@ export interface Analysis {
   author: string;
   authorRole: string;
   timestamp: string;
-  region: string;
+  region: Region;
   tags: string[];
   readTime: number; // minutos
   image?: string;
@@ -37,6 +39,7 @@ export const demoAnalysis: Analysis[] = [
     region: 'LATINOAMÉRICA',
     tags: ['Diplomacia', 'Economía', 'Tecnología'],
     readTime: 12,
+    image: '/signals/sig-026.webp',
   },
   {
     id: 'ANL-003',

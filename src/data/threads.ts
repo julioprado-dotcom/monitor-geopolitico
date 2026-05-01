@@ -1,5 +1,7 @@
 // ── Modelo de Hilos de Eventos para el Explorador ──
 
+import { type Region } from './signals';
+
 export type ThreadStatus = 'EN_VIVO' | 'EVOLUCION' | 'RESUELTO' | 'DORMANTE';
 export type ThreadType = 'conflicto' | 'diplomacia' | 'economia' | 'tecnologia' | 'seguridad' | 'derechos_humanos' | 'energia' | 'desastre';
 
@@ -13,6 +15,7 @@ export interface ThreadSignal {
   relevance: 'CRÍTICA' | 'ALTA' | 'MEDIA' | 'BAJA';
   tags: string[];
   sourceLevel: 'A' | 'B' | 'C';
+  sourceUrl?: string;
 }
 
 export interface ThreadRelation {
@@ -26,15 +29,17 @@ export interface Thread {
   id: string;
   title: string;
   description: string;
+  fullContent: string;
   status: ThreadStatus;
   type: ThreadType;
-  regions: string[];
+  regions: Region[];
   signals: ThreadSignal[];
   relations: ThreadRelation[];
   tags: string[];
   sourceCount: number;
   startedAt: string; // ISO
   lastActivityAt: string; // ISO
+  image?: string;
 }
 
 // ── Helpers ──
@@ -64,6 +69,7 @@ export const demoThreads: Thread[] = [
     id: 'thread-001',
     title: 'Escalación en el Mar Rojo',
     description: 'Serie de ataques a shipping comercial y respuesta militar multinacional que amenaza rutas globales de comercio.',
+    fullContent: '',
     status: 'EN_VIVO',
     type: 'conflicto',
     regions: ['MEDIO ORIENTE', 'EUROPA', 'ASIA'],
@@ -142,11 +148,13 @@ export const demoThreads: Thread[] = [
     sourceCount: 5,
     startedAt: '2026-04-28T10:00:00Z',
     lastActivityAt: '2026-04-28T18:45:00Z',
+    image: '/signals/sig-045.webp',
   },
   {
     id: 'thread-002',
     title: 'Tensión EE.UU.-Irán por programa nuclear',
     description: 'Escalada diplomática y sanciones en torno al programa nuclear iraní, con impacto en mercados energéticos globales.',
+    fullContent: '',
     status: 'EVOLUCION',
     type: 'diplomacia',
     regions: ['NORTEAMÉRICA', 'MEDIO ORIENTE', 'ASIA'],
@@ -214,11 +222,13 @@ export const demoThreads: Thread[] = [
     sourceCount: 4,
     startedAt: '2026-04-27T08:00:00Z',
     lastActivityAt: '2026-04-28T09:00:00Z',
+    image: '/signals/sig-042.webp',
   },
   {
     id: 'thread-003',
     title: 'Cumbre del BRICS: nueva arquitectura financiera',
     description: 'La expansión del BRICS y los avances hacia un sistema de pago alternativo al dominante generan reestructuración en el orden económico global.',
+    fullContent: '',
     status: 'EVOLUCION',
     type: 'economia',
     regions: ['ASIA', 'LATINOAMÉRICA', 'ÁFRICA', 'MEDIO ORIENTE'],
@@ -273,11 +283,13 @@ export const demoThreads: Thread[] = [
     sourceCount: 4,
     startedAt: '2026-04-25T14:00:00Z',
     lastActivityAt: '2026-04-27T08:00:00Z',
+    image: '/signals/sig-026.webp',
   },
   {
     id: 'thread-004',
     title: 'Crisis migratoria en la frontera Colombia-Panamá',
     description: 'Incremento sostenido de migrantes en el Darién con respuesta humanitaria insuficiente y tensión diplomática entre países de tránsito.',
+    fullContent: '',
     status: 'DORMANTE',
     type: 'derechos_humanos',
     regions: ['LATINOAMÉRICA'],
@@ -321,11 +333,13 @@ export const demoThreads: Thread[] = [
     sourceCount: 3,
     startedAt: '2026-04-20T09:00:00Z',
     lastActivityAt: '2026-04-22T14:00:00Z',
+    image: '/signals/sig-044.webp',
   },
   {
     id: 'thread-005',
     title: 'Guerra de agresión EE.UU.-Israel contra Irán',
     description: 'Ofensiva militar conjunta de Estados Unidos, Israel y aliados contra instalaciones estratégicas de Irán. El Eje de Resistencia (Hezbolá, Hamás, Houthis, milicias iraquíes) activa respuestas coordinadas. Conflicto armado directo con riesgo de conflagración regional y crisis energética global.',
+    fullContent: '',
     status: 'EN_VIVO',
     type: 'conflicto',
     regions: ['MEDIO ORIENTE', 'NORTEAMÉRICA', 'EUROPA', 'ASIA'],
@@ -487,5 +501,6 @@ export const demoThreads: Thread[] = [
     sourceCount: 12,
     startedAt: '2026-04-27T02:15:00Z',
     lastActivityAt: '2026-04-28T06:00:00Z',
+    image: '/signals/sig-046.webp',
   },
 ];
