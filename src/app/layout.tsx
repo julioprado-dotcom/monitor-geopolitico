@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
+import { SITE_URL, DISCLAIMER } from '@/config';
 import "./globals.css";
 
 
@@ -15,7 +16,6 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://monitor-geopolitico.vercel.app";
 
 export const metadata: Metadata = {
   title: "Monitor Geopolítico — News Connect",

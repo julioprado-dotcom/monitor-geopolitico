@@ -1,14 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-const ALLOWED_DOMAINS = [
-  'rt.com', 'rtd.rt.com',
-  'aljazeera.com', 'telesurtv.net',
-  'cctv.com', 'france24.com',
-  'dw.com', 'presstv.ir',
-  'trtworld.com', 'cgtn.com',
-];
-
-const DISCLAIMER = 'Contenido original de su fuente. El Monitor Geopolítico no se atribuye la propiedad del contenido. Análisis independiente con Óptica Sur Global.';
+import { ALLOWED_PROXY_DOMAINS, DISCLAIMER } from '@/config';
 
 /**
  * Sanitización XSS: elimina scripts, event handlers, javascript: URLs, y elementos peligrosos.

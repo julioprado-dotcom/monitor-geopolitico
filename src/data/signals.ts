@@ -1,30 +1,7 @@
-export type Relevance = 'CRÍTICA' | 'ALTA' | 'MEDIA' | 'BAJA' | 'INFORMATIVA';
+// Tipos importados desde src/types/index.ts (MIG-01 — fuente única de verdad)
+export type { Relevance, Region, SourceLevel, AccessLevel, UserTier, Signal } from '@/types';
 
-export type Region = 'LATINOAMÉRICA' | 'EUROPA' | 'ASIA' | 'ÁFRICA' | 'MEDIO ORIENTE' | 'NORTEAMÉRICA';
-
-export type SourceLevel = 'A' | 'B' | 'C' | 'D';
-
-export type AccessLevel = 'ABIERTO' | 'RESTRINGIDO' | 'CLASIFICADO';
-
-export type UserTier = 'gratuito' | 'premium' | 'profesional' | 'institucional';
-
-export interface Signal {
-  id: string;
-  title: string;
-  summary: string;
-  fullContent: string;
-  region: Region;
-  classifiers: string[];
-  relevance: Relevance;
-  source: string;
-  sourceUrl: string;
-  language: string;
-  timestamp: string;
-  verified: boolean;
-  sourceLevel: SourceLevel;
-  accessLevel: AccessLevel;
-  image?: string;
-}
+import type { Relevance, Region, SourceLevel, AccessLevel, UserTier, Signal } from '@/types';
 
 export const relevanceColors: Record<Relevance, string> = {
   'CRÍTICA': '#EF4444',

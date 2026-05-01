@@ -4,14 +4,7 @@ import { demoAnalysis } from '@/data/analysis';
 import { demoThreads } from '@/data/threads';
 import { regionLabels, type Region } from '@/data/signals';
 import { type ThreadType, typeLabels } from '@/data/threads';
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://monitor-geopolitico.vercel.app';
-
-/** 8 clasificadores temáticos del modelo analítico */
-const CLASSIFIERS = [
-  'Conflicto', 'Economía', 'Diplomacia', 'Seguridad',
-  'Tecnología', 'Ecosistema', 'Energía', 'Derechos Humanos',
-] as const;
+import { SITE_URL, CLASSIFIERS } from '@/config';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();

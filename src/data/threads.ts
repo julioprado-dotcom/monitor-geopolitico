@@ -1,46 +1,8 @@
 // ── Modelo de Hilos de Eventos para el Explorador ──
 
-import { type Region } from './signals';
-
-export type ThreadStatus = 'EN_VIVO' | 'EVOLUCION' | 'RESUELTO' | 'DORMANTE';
-export type ThreadType = 'conflicto' | 'diplomacia' | 'economia' | 'tecnologia' | 'seguridad' | 'derechos_humanos' | 'energia' | 'desastre';
-
-export interface ThreadSignal {
-  id: string;
-  source: string;
-  sourceCountry: string;
-  title: string;
-  summary: string;
-  timestamp: string; // ISO
-  relevance: 'CRÍTICA' | 'ALTA' | 'MEDIA' | 'BAJA';
-  tags: string[];
-  sourceLevel: 'A' | 'B' | 'C';
-  sourceUrl?: string;
-}
-
-export interface ThreadRelation {
-  threadId: string;
-  title: string;
-  reason: string;
-  type: 'causa' | 'efecto' | 'correlacion';
-}
-
-export interface Thread {
-  id: string;
-  title: string;
-  description: string;
-  fullContent: string;
-  status: ThreadStatus;
-  type: ThreadType;
-  regions: Region[];
-  signals: ThreadSignal[];
-  relations: ThreadRelation[];
-  tags: string[];
-  sourceCount: number;
-  startedAt: string; // ISO
-  lastActivityAt: string; // ISO
-  image?: string;
-}
+// Tipos importados desde src/types/index.ts (MIG-01)
+export type { ThreadStatus, ThreadType, ThreadSignal, ThreadRelation, Thread } from '@/types';
+import type { ThreadStatus, ThreadType, ThreadSignal, ThreadRelation, Thread } from '@/types';
 
 // ── Helpers ──
 

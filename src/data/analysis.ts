@@ -1,21 +1,6 @@
-import { type Region, type SourceLevel, type AccessLevel } from './signals';
-
-export interface Analysis {
-  id: string;
-  title: string;
-  summary: string;
-  fullContent: string;
-  author: string;
-  authorRole: string;
-  timestamp: string;
-  region: Region;
-  tags: string[];
-  readTime: number; // minutos
-  image?: string;
-  sourceLevel: SourceLevel;
-  verified: boolean;
-  accessLevel: AccessLevel;
-}
+// Tipos importados desde src/types/index.ts (MIG-01)
+export type { Analysis } from '@/types';
+import type { Analysis } from '@/types';
 
 export const demoAnalysis: Analysis[] = [
   {
