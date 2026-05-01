@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { type Signal, type Region, relevanceColors, sourceLevelLabels, sourceLevelColors, sourceCountry } from '@/data/signals';
-import { ShieldCheck, ShieldAlert, Clock, Eye } from 'lucide-react';
+import { ShieldCheck, ShieldAlert, Clock, ChevronDown, ChevronUp } from 'lucide-react';
 import { useMounted } from '@/hooks/useMounted';
 import { timeAgo, isRecent } from '@/lib/utils-time';
 
@@ -10,10 +10,12 @@ interface SignalCardProps {
   signal: Signal;
   onRegionClick: (r: Region) => void;
   onClassifierClick: (c: string) => void;
-  onSignalClick: (s: Signal) => void;
+  isExpanded: boolean;
+  onToggleExpand: (signal: Signal) => void;
+  onReadFull: (signal: Signal) => void;
 }
 
-export default function SignalCard({ signal, onRegionClick, onClassifierClick, onSignalClick }: SignalCardProps) {
+export default function SignalCard({ signal, onRegionClick, onClassifierClick, isExpanded, onToggleExpand, onReadFull }: SignalCardProps) {
   const relevanceColor = relevanceColors[signal.relevance];
   const mounted = useMounted();
   // isRecent solo en cliente para evitar hydration mismatch (Date.now() difiere server vs client)
@@ -46,11 +48,8 @@ export default function SignalCard({ signal, onRegionClick, onClassifierClick, o
 
   return (
     <article
-      className="glass rounded-xl overflow-hidden hover:bg-white/[0.04] cursor-pointer transition-colors duration-150 group flex flex-col"
+      className="glass rounded-xl overflow-hidden hover:bg-white/[0.04] transition-colors duration-150 group flex flex-col"
       style={{ borderLeft: `3px solid ${relevanceColor}` }}
-      onClick={() => onSignalClick(signal)}
-      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSignalClick(signal); } }}
-      tabIndex={0}
       role="article"
       aria-label={`${signal.title} — ${signal.source}`}
     >
@@ -113,13 +112,21 @@ export default function SignalCard({ signal, onRegionClick, onClassifierClick, o
           </div>
         </div>
 
-        {/* Título */}
-        <h3 className="text-[13px] sm:text-sm font-bold text-white leading-snug line-clamp-2 mb-2 font-[family-name:var(--font-space-grotesk)] group-hover:text-[#00E5A0]/90 transition-colors duration-150">
-          {signal.title}
-        </h3>
+        {/* Título — clickable to toggle expand */}
+        <button
+          type="button"
+          onClick={() => onToggleExpand(signal)}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggleExpand(signal); } }}
+          className="text-left w-full"
+          aria-expanded={isExpanded}
+        >
+          <h3 className="text-[13px] sm:text-sm font-bold text-white leading-snug mb-2 font-[family-name:var(--font-space-grotesk)] group-hover:text-[#00E5A0]/90 transition-colors duration-150">
+            {signal.title}
+          </h3>
+        </button>
 
         {/* Contenido — empuja el botón hacia abajo con flex-1 */}
-        <p className="text-[11px] sm:text-xs text-white/55 leading-relaxed mb-3 font-[family-name:var(--font-space-grotesk)] line-clamp-4">
+        <p className={`text-[11px] sm:text-xs text-white/55 leading-relaxed mb-3 font-[family-name:var(--font-space-grotesk)] transition-all duration-300 ease-in-out overflow-hidden ${isExpanded ? '' : 'line-clamp-4'}`}>
           {displayText}
         </p>
 
@@ -172,14 +179,41 @@ export default function SignalCard({ signal, onRegionClick, onClassifierClick, o
           </div>
 
           {/* Señalizador de fuente — al fondo */}
-          <div className="flex items-center">
-            <span
-              className="px-1.5 py-0.5 rounded text-[8px] font-bold font-[family-name:var(--font-jetbrains-mono)]"
-              style={{ backgroundColor: levelColors.bg, color: levelColors.text, border: `1px solid ${levelColors.border}` }}
-            >
-              {signal.sourceLevel} · {sourceLevelLabels[signal.sourceLevel]}
-            </span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <span
+                className="px-1.5 py-0.5 rounded text-[8px] font-bold font-[family-name:var(--font-jetbrains-mono)]"
+                style={{ backgroundColor: levelColors.bg, color: levelColors.text, border: `1px solid ${levelColors.border}` }}
+              >
+                {signal.sourceLevel} · {sourceLevelLabels[signal.sourceLevel]}
+              </span>
+            </div>
+
+            {/* Expand/collapse indicator */}
+            <div className="flex items-center gap-1 text-white/20">
+              {isExpanded ? (
+                <ChevronUp className="w-3.5 h-3.5 text-[#00E5A0]/50" />
+              ) : (
+                <ChevronDown className="w-3.5 h-3.5" />
+              )}
+            </div>
           </div>
+        </div>
+
+        {/* Expanded section — "Leer artículo completo" button */}
+        <div
+          className={`overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-20 opacity-100 mt-3' : 'max-h-0 opacity-0 mt-0'}`}
+        >
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onReadFull(signal);
+            }}
+            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-[#00E5A0]/10 border border-[#00E5A0]/20 text-[#00E5A0] rounded-xl hover:bg-[#00E5A0]/20 transition-colors text-[11px] font-bold font-[family-name:var(--font-space-grotesk)]"
+          >
+            Leer artículo completo
+          </button>
         </div>
       </div>
     </article>

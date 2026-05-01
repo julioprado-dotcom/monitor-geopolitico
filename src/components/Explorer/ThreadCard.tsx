@@ -9,7 +9,7 @@ interface ThreadCardProps {
   thread: Thread;
   isFollowed: boolean;
   onToggleFollow: (id: string) => void;
-  onExpand: (thread: Thread) => void;
+  onSelectThread: (thread: Thread) => void;
   onSignalClick?: (signal: ThreadSignal, region: Region) => void;
 }
 
@@ -31,7 +31,7 @@ function sourceInitials(source: string): string {
   return source.slice(0, 2).toUpperCase();
 }
 
-export default function ThreadCard({ thread, isFollowed, onToggleFollow, onExpand, onSignalClick }: ThreadCardProps) {
+export default function ThreadCard({ thread, isFollowed, onToggleFollow, onSelectThread, onSignalClick }: ThreadCardProps) {
   const status = statusConfig[thread.status];
   const latestSignals = thread.signals.slice(-3);
 
@@ -119,7 +119,7 @@ export default function ThreadCard({ thread, isFollowed, onToggleFollow, onExpan
         )}
       </div>
 
-      {/* Footer: tags + cronología */}
+      {/* Footer: tags + cronología — clicking "Cronología" goes to Foco */}
       <div className="px-3 py-2 border-t border-white/[0.04] flex items-center justify-between">
         <div className="flex items-center gap-1.5 overflow-hidden">
           {thread.tags.slice(0, 3).map((tag) => (
@@ -132,7 +132,7 @@ export default function ThreadCard({ thread, isFollowed, onToggleFollow, onExpan
           ))}
         </div>
         <button
-          onClick={() => onExpand(thread)}
+          onClick={() => onSelectThread(thread)}
           className="shrink-0 flex items-center gap-1 px-2 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] text-white/30 hover:text-white/55 hover:bg-white/[0.04] transition-colors"
         >
           <Clock className="w-3 h-3" />

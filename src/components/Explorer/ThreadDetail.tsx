@@ -100,14 +100,8 @@ export default function ThreadDetail({ thread, isFollowed, onToggleFollow, onClo
     }
   }, [thread]);
 
-  // Close on Escape
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
+  // Cleanup abort on unmount
+  useEffect(() => { return () => { abortRef.current?.abort(); }; }, []);
 
   return (
     <div className="glass rounded-xl overflow-hidden border border-white/[0.06]" role="article" aria-label={`Hilo geopolítico: ${thread.title}`}>

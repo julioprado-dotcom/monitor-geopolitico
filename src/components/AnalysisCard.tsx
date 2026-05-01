@@ -2,16 +2,18 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { type Analysis } from '@/data/analysis';
-import { Clock, BookOpen } from 'lucide-react';
+import { Clock, BookOpen, ChevronDown, ChevronUp } from 'lucide-react';
 import { useMounted } from '@/hooks/useMounted';
 import { timeAgo } from '@/lib/utils-time';
 
 interface AnalysisCardProps {
   analysis: Analysis;
-  onClick: (a: Analysis) => void;
+  isExpanded: boolean;
+  onToggleExpand: (a: Analysis) => void;
+  onReadFull: (a: Analysis) => void;
 }
 
-export default function AnalysisCard({ analysis, onClick }: AnalysisCardProps) {
+export default function AnalysisCard({ analysis, isExpanded, onToggleExpand, onReadFull }: AnalysisCardProps) {
   const mounted = useMounted();
   const [imgVisible, setImgVisible] = useState(false);
   const imgRef = useRef<HTMLDivElement>(null);
@@ -38,11 +40,8 @@ export default function AnalysisCard({ analysis, onClick }: AnalysisCardProps) {
 
   return (
     <article
-      className="glass rounded-xl overflow-hidden hover:bg-white/[0.04] cursor-pointer transition-colors duration-150 group flex flex-col"
+      className="glass rounded-xl overflow-hidden hover:bg-white/[0.04] transition-colors duration-150 group flex flex-col"
       style={{ borderLeft: '3px solid #D4A017' }}
-      onClick={() => onClick(analysis)}
-      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(analysis); } }}
-      tabIndex={0}
       role="article"
       aria-label={`${analysis.title} — ${analysis.author}`}
     >
@@ -92,13 +91,21 @@ export default function AnalysisCard({ analysis, onClick }: AnalysisCardProps) {
           </div>
         </div>
 
-        {/* Título */}
-        <h3 className="text-[13px] sm:text-sm font-bold text-white leading-snug line-clamp-3 mb-2 font-[family-name:var(--font-space-grotesk)] group-hover:text-[#D4A017]/90 transition-colors duration-150">
-          {analysis.title}
-        </h3>
+        {/* Título — clickable to toggle expand */}
+        <button
+          type="button"
+          onClick={() => onToggleExpand(analysis)}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggleExpand(analysis); } }}
+          className="text-left w-full"
+          aria-expanded={isExpanded}
+        >
+          <h3 className="text-[13px] sm:text-sm font-bold text-white leading-snug mb-2 font-[family-name:var(--font-space-grotesk)] group-hover:text-[#D4A017]/90 transition-colors duration-150">
+            {analysis.title}
+          </h3>
+        </button>
 
         {/* Resumen */}
-        <p className="text-[11px] sm:text-xs text-white/55 leading-relaxed mb-3 font-[family-name:var(--font-space-grotesk)] line-clamp-4 flex-1">
+        <p className={`text-[11px] sm:text-xs text-white/55 leading-relaxed mb-3 font-[family-name:var(--font-space-grotesk)] transition-all duration-300 ease-in-out overflow-hidden flex-1 ${isExpanded ? '' : 'line-clamp-4'}`}>
           {analysis.summary}
         </p>
 
@@ -122,10 +129,33 @@ export default function AnalysisCard({ analysis, onClick }: AnalysisCardProps) {
                 {analysis.author}
               </span>
             </div>
-            <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-[#D4A017]/10 text-[#D4A017]/60 font-[family-name:var(--font-jetbrains-mono)]">
-              {analysis.region}
-            </span>
+            <div className="flex items-center gap-1.5">
+              <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-[#D4A017]/10 text-[#D4A017]/60 font-[family-name:var(--font-jetbrains-mono)]">
+                {analysis.region}
+              </span>
+              {isExpanded ? (
+                <ChevronUp className="w-3.5 h-3.5 text-[#D4A017]/50" />
+              ) : (
+                <ChevronDown className="w-3.5 h-3.5 text-white/20" />
+              )}
+            </div>
           </div>
+        </div>
+
+        {/* Expanded section — "Leer análisis completo" button */}
+        <div
+          className={`overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-20 opacity-100 mt-3' : 'max-h-0 opacity-0 mt-0'}`}
+        >
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onReadFull(analysis);
+            }}
+            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-[#D4A017]/10 border border-[#D4A017]/20 text-[#D4A017] rounded-xl hover:bg-[#D4A017]/20 transition-colors text-[11px] font-bold font-[family-name:var(--font-space-grotesk)]"
+          >
+            Leer análisis completo
+          </button>
         </div>
       </div>
     </article>
