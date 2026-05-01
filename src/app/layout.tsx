@@ -88,7 +88,7 @@ export const metadata: Metadata = {
 
 /** JSON-LD structured data for the platform */
 function JsonLd() {
-  const schema = {
+  const webSiteSchema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": "Monitor Geopolítico",
@@ -109,11 +109,49 @@ function JsonLd() {
       "query-input": "required name=search_term_string",
     },
   };
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Inicio",
+        "item": SITE_URL,
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Señales Geopolíticas",
+        "item": `${SITE_URL}/#signals`,
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Análisis",
+        "item": `${SITE_URL}/#analysis`,
+      },
+      {
+        "@type": "ListItem",
+        "position": 4,
+        "name": "Hilos Geopolíticos",
+        "item": `${SITE_URL}/#explorer`,
+      },
+    ],
+  };
+
   return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(webSiteSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+    </>
   );
 }
 
