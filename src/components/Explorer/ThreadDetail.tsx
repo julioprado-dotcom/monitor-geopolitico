@@ -245,12 +245,26 @@ export default function ThreadDetail({ thread, isFollowed, onToggleFollow, onClo
                       ))}
                     </div>
 
-                    {/* Indicador "Leer más" */}
-                    <div className="flex items-center gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <ExternalLink className="w-3 h-3 text-[#38BDF8]/50" />
-                      <span className="text-[8px] font-bold text-[#38BDF8]/50 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">
-                        Leer artículo completo
-                      </span>
+                    {/* Indicadores de acción */}
+                    <div className="flex items-center gap-3 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center gap-1">
+                        <ExternalLink className="w-3 h-3 text-[#38BDF8]/50" />
+                        <span className="text-[8px] font-bold text-[#38BDF8]/50 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">
+                          Leer artículo completo
+                        </span>
+                      </div>
+                      {signal.sourceUrl && (
+                        <a
+                          href={signal.sourceUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="flex items-center gap-1 text-[8px] font-bold text-white/30 hover:text-white/50 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] transition-colors"
+                        >
+                          <Link2 className="w-2.5 h-2.5" />
+                          Original
+                        </a>
+                      )}
                     </div>
                   </button>
                 </div>

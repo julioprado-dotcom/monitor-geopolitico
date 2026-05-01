@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { Radar, Menu, Tv, Radio, Brain, GitBranch, Loader2, BookOpen, User, ChevronRight } from 'lucide-react';
+import { Radar, Menu, Tv, Radio, Brain, GitBranch, Loader2, BookOpen, User, ChevronRight, ExternalLink } from 'lucide-react';
 import { demoSignals, type Relevance, type Region, type Signal, relevanceColors } from '@/data/signals';
 import { demoAnalysis, type Analysis } from '@/data/analysis';
 import { demoThreads, type Thread, type ThreadStatus, type ThreadSignal } from '@/data/threads';
@@ -809,9 +809,22 @@ export default function Home() {
                     </div>
 
                     {/* Contenido Completo */}
-                    <div className="mb-8 text-slate-300 leading-relaxed whitespace-pre-line border-l-2 border-slate-700 pl-4">
+                    <div className="mb-4 text-slate-300 leading-relaxed whitespace-pre-line border-l-2 border-slate-700 pl-4">
                       {selectedSignal.fullContent || selectedSignal.summary}
                     </div>
+
+                    {/* Enlace al artículo original */}
+                    {selectedSignal.sourceUrl && (
+                      <a
+                        href={selectedSignal.sourceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 mb-6 px-4 py-2 bg-white/[0.03] border border-white/[0.08] text-white/40 hover:text-white/60 hover:bg-white/[0.06] rounded-xl transition-colors text-xs font-bold font-[family-name:var(--font-space-grotesk)]"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        Ir al artículo original
+                      </a>
+                    )}
 
                     {/* Botón de comparar fuentes */}
                     <div className="mb-6">

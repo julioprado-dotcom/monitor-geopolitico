@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { type Signal, type Region, relevanceColors, sourceLevelLabels, sourceLevelColors, sourceCountry } from '@/data/signals';
-import { ShieldCheck, ShieldAlert, Clock, ChevronDown, ChevronUp } from 'lucide-react';
+import { ShieldCheck, ShieldAlert, Clock, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
 import { useMounted } from '@/hooks/useMounted';
 import { timeAgo, isRecent } from '@/lib/utils-time';
 
@@ -200,20 +200,34 @@ export default function SignalCard({ signal, onRegionClick, onClassifierClick, i
           </div>
         </div>
 
-        {/* Expanded section — "Leer artículo completo" button */}
+        {/* Expanded section — botones de acción */}
         <div
-          className={`overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-20 opacity-100 mt-3' : 'max-h-0 opacity-0 mt-0'}`}
+          className={`overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-28 opacity-100 mt-3' : 'max-h-0 opacity-0 mt-0'}`}
         >
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onReadFull(signal);
-            }}
-            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-[#00E5A0]/10 border border-[#00E5A0]/20 text-[#00E5A0] rounded-xl hover:bg-[#00E5A0]/20 transition-colors text-[11px] font-bold font-[family-name:var(--font-space-grotesk)]"
-          >
-            Leer artículo completo
-          </button>
+          <div className="flex flex-col gap-2">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onReadFull(signal);
+              }}
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-[#00E5A0]/10 border border-[#00E5A0]/20 text-[#00E5A0] rounded-xl hover:bg-[#00E5A0]/20 transition-colors text-[11px] font-bold font-[family-name:var(--font-space-grotesk)]"
+            >
+              Leer artículo completo
+            </button>
+            {signal.sourceUrl && (
+              <a
+                href={signal.sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="w-full flex items-center justify-center gap-2 py-2 px-4 bg-white/[0.03] border border-white/[0.08] text-white/40 hover:text-white/60 hover:bg-white/[0.06] rounded-xl transition-colors text-[10px] font-bold font-[family-name:var(--font-space-grotesk)]"
+              >
+                <ExternalLink className="w-3 h-3" />
+                Ir al artículo original
+              </a>
+            )}
+          </div>
         </div>
       </div>
     </article>
