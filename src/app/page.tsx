@@ -267,6 +267,30 @@ export default function Home() {
     setExpandedAnalysisId((prev) => (prev === analysis.id ? null : analysis.id));
   }, []);
 
+  // ── Helper: scroll horizontal container to Foco panel ──
+  const scrollToFoco = useCallback((sectionId?: string) => {
+    const container = scrollContainerRef.current;
+    const focoPanel = document.getElementById('foco-panel');
+    if (!container || !focoPanel) return;
+    // Scroll horizontal container to show foco panel
+    const targetScrollLeft = focoPanel.offsetLeft;
+    container.scrollTo({ left: targetScrollLeft, behavior: 'smooth' });
+    // After horizontal scroll, scroll vertically to the specific section
+    if (sectionId) {
+      setTimeout(() => {
+        document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 350);
+    }
+  }, []);
+
+  // ── Helper: scroll horizontal container back to Contexto ──
+  const scrollToContexto = useCallback(() => {
+    const container = scrollContainerRef.current;
+    const contextoPanel = document.getElementById('panel-contexto');
+    if (!container || !contextoPanel) return;
+    container.scrollTo({ left: 0, behavior: 'smooth' });
+  }, []);
+
   // ── READ FULL: Signal → Foco panel ──
   const handleReadFullSignal = useCallback((signal: Signal) => {
     setSelectedSignal(signal);
@@ -275,10 +299,8 @@ export default function Home() {
     setAnalysisError(null);
     abortRef.current?.abort();
     // Smart scroll: scroll to the signal section in foco
-    setTimeout(() => {
-      document.getElementById('foco-signal')?.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'start' });
-    }, 50);
-  }, []);
+    setTimeout(() => scrollToFoco('foco-signal'), 50);
+  }, [scrollToFoco]);
 
   // ── READ FULL: Analysis → Foco panel ──
   const handleReadFullAnalysis = useCallback((analysisItem: Analysis) => {
@@ -336,14 +358,14 @@ export default function Home() {
     if (t) {
       setSelectedThread(t);
       setTimeout(() => {
-        document.getElementById('foco-thread')?.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'start' });
-      }, 50);
+        document.getElementById('foco-thread')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
     }
   }, []);
 
   // ── "← Volver" from Foco sections ──
   const handleBackToContexto = useCallback(() => {
-    document.getElementById('panel-contexto')?.scrollIntoView({ behavior: 'smooth' });
+    scrollToContexto();
   }, []);
 
   // ── Close Foco Signal section ──
@@ -826,7 +848,8 @@ export default function Home() {
                       </a>
                     )}
 
-                    {/* Botón de comparar fuentes */}
+                    {/* Botón de comparar fuentes — solo si la señal existe en demoSignals */}
+                    {demoSignals.some((s) => s.id === selectedSignal.id) && (
                     <div className="mb-6">
                       <button
                         onClick={() => setComparisonSignal(selectedSignal)}
@@ -837,6 +860,7 @@ export default function Home() {
                         Comparar fuentes de esta señal
                       </button>
                     </div>
+                    )}
 
                     {/* Botón de IA + Análisis */}
                     <div className="mb-8" aria-live="polite" aria-atomic="true">
