@@ -2,6 +2,7 @@
 
 import { Clock, Bookmark, BookmarkCheck, ChevronRight } from 'lucide-react';
 import { type Thread, type ThreadSignal, statusConfig } from '@/data/threads';
+import type { Region } from '@/types';
 import { relevanceColors } from '@/data/signals';
 
 interface ThreadCardProps {
@@ -9,6 +10,7 @@ interface ThreadCardProps {
   isFollowed: boolean;
   onToggleFollow: (id: string) => void;
   onExpand: (thread: Thread) => void;
+  onSignalClick?: (signal: ThreadSignal, region: Region) => void;
 }
 
 function formatTime(iso: string): string {
@@ -29,7 +31,7 @@ function sourceInitials(source: string): string {
   return source.slice(0, 2).toUpperCase();
 }
 
-export default function ThreadCard({ thread, isFollowed, onToggleFollow, onExpand }: ThreadCardProps) {
+export default function ThreadCard({ thread, isFollowed, onToggleFollow, onExpand, onSignalClick }: ThreadCardProps) {
   const status = statusConfig[thread.status];
   const latestSignals = thread.signals.slice(-3);
 
@@ -82,26 +84,32 @@ export default function ThreadCard({ thread, isFollowed, onToggleFollow, onExpan
         </div>
       </div>
 
-      {/* Señales — título prominente, fuente secundaria */}
+      {/* Señales — título prominente, fuente secundaria — CLICKABLE */}
       <div className="px-3 py-2 border-t border-white/[0.04]">
         {latestSignals.map((signal) => {
           const color = relevanceColors[signal.relevance] || '#64748B';
           return (
-            <div key={signal.id} className="flex items-start gap-2 py-1.5">
+            <button
+              key={signal.id}
+              type="button"
+              onClick={() => onSignalClick?.(signal, thread.regions[0])}
+              className="w-full flex items-start gap-2 py-1.5 rounded-lg px-1 -mx-1 cursor-pointer transition-colors hover:bg-white/[0.04] group"
+              aria-label={`Leer: ${signal.title} — ${signal.source}`}
+            >
               {/* Indicador de relevancia */}
               <span
                 className="shrink-0 w-1 h-1 rounded-full mt-[7px]"
                 style={{ backgroundColor: color }}
               />
               {/* Título de la señal — prominente */}
-              <p className="min-w-0 flex-1 text-[11px] text-white/55 leading-snug font-[family-name:var(--font-space-grotesk)] truncate">
+              <p className="min-w-0 flex-1 text-[11px] text-white/55 leading-snug font-[family-name:var(--font-space-grotesk)] truncate group-hover:text-white/75 transition-colors">
                 {signal.title}
               </p>
               {/* Fuente — secundaria */}
-              <span className="shrink-0 text-[8px] font-bold font-[family-name:var(--font-jetbrains-mono)] text-white/20 bg-white/[0.03] px-1.5 py-0.5 rounded">
+              <span className="shrink-0 text-[8px] font-bold font-[family-name:var(--font-jetbrains-mono)] text-white/20 bg-white/[0.03] group-hover:bg-white/[0.06] px-1.5 py-0.5 rounded transition-colors">
                 {sourceInitials(signal.source)}
               </span>
-            </div>
+            </button>
           );
         })}
         {thread.signals.length > 3 && (

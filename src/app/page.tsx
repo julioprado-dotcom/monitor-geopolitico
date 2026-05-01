@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import { Radar, Menu, Tv, Radio, Brain, GitBranch, Loader2, BookOpen, User } from 'lucide-react';
 import { demoSignals, type Relevance, type Region, type Signal, relevanceColors } from '@/data/signals';
 import { demoAnalysis, type Analysis } from '@/data/analysis';
-import { demoThreads, type Thread, type ThreadStatus } from '@/data/threads';
+import { demoThreads, type Thread, type ThreadStatus, type ThreadSignal } from '@/data/threads';
 import { type TVChannel } from '@/data/channels';
 import MetricsBar from '@/components/MetricsBar';
 import SignalCard from '@/components/SignalCard';
@@ -260,6 +260,27 @@ export default function Home() {
       focoPanel.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
     }
   };
+
+  // ── Click en señal desde Hilos: convierte ThreadSignal → Signal y abre en Foco ──
+  const handleThreadSignalClick = useCallback((ts: ThreadSignal, region: Region) => {
+    const signal: Signal = {
+      id: ts.id,
+      title: ts.title,
+      summary: ts.summary,
+      fullContent: ts.summary,
+      region,
+      classifiers: ts.tags,
+      relevance: ts.relevance as Relevance,
+      source: ts.source,
+      sourceUrl: ts.sourceUrl || '',
+      language: 'es',
+      timestamp: ts.timestamp,
+      verified: ts.sourceLevel === 'A',
+      sourceLevel: ts.sourceLevel as Signal['sourceLevel'],
+      accessLevel: 'ABIERTO',
+    };
+    handleSelectSignal(signal);
+  }, []);
 
   const handleSelectAnalysis = (analysisItem: Analysis) => {
     setSelectedAnalysis(analysisItem);
@@ -579,6 +600,7 @@ export default function Home() {
                       const t = demoThreads.find((th) => th.id === threadId);
                       if (t) setExpandedThread(t);
                     }}
+                    onSignalClick={handleThreadSignalClick}
                   />
                 ) : (
                   <div className="flex flex-col gap-3">
@@ -589,6 +611,7 @@ export default function Home() {
                         isFollowed={followedThreads.has(thread.id)}
                         onToggleFollow={toggleFollowThread}
                         onExpand={setExpandedThread}
+                        onSignalClick={handleThreadSignalClick}
                       />
                     ))}
                     {filteredThreads.length === 0 && (

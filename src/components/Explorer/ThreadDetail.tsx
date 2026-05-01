@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { ArrowLeft, Bookmark, BookmarkCheck, Link2, Clock, Globe, Brain, Loader2 } from 'lucide-react';
+import { ArrowLeft, Bookmark, BookmarkCheck, Link2, Clock, Globe, Brain, Loader2, ExternalLink } from 'lucide-react';
 import { type Thread, type ThreadSignal, statusConfig, typeLabels } from '@/data/threads';
+import type { Region } from '@/types';
 import { relevanceColors } from '@/data/signals';
 
 interface ThreadDetailProps {
@@ -11,6 +12,7 @@ interface ThreadDetailProps {
   onToggleFollow: (id: string) => void;
   onClose: () => void;
   onNavigateRelation: (threadId: string) => void;
+  onSignalClick?: (signal: ThreadSignal, region: Region) => void;
 }
 
 function formatTimestamp(iso: string): string {
@@ -36,7 +38,7 @@ const relationTypeLabels: Record<string, { label: string; color: string }> = {
   correlacion: { label: 'Correlación', color: '#38BDF8' },
 };
 
-export default function ThreadDetail({ thread, isFollowed, onToggleFollow, onClose, onNavigateRelation }: ThreadDetailProps) {
+export default function ThreadDetail({ thread, isFollowed, onToggleFollow, onClose, onNavigateRelation, onSignalClick }: ThreadDetailProps) {
   const status = statusConfig[thread.status];
   const [analysis, setAnalysis] = useState<string | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
@@ -200,7 +202,12 @@ export default function ThreadDetail({ thread, isFollowed, onToggleFollow, onClo
                     }}
                   />
 
-                  <div className={`rounded-lg p-3 transition-colors ${isLatest ? 'bg-white/[0.04] border border-white/[0.08]' : ''}`}>
+                  <button
+                    type="button"
+                    onClick={() => onSignalClick?.(signal, thread.regions[0])}
+                    className={`w-full text-left rounded-lg p-3 transition-colors cursor-pointer group ${isLatest ? 'bg-white/[0.04] border border-white/[0.08]' : 'hover:bg-white/[0.03]'}`}
+                    aria-label={`Leer artículo completo: ${signal.title} — ${signal.source}`}
+                  >
                     {/* Fuente + timestamp */}
                     <div className="flex items-center justify-between mb-1.5">
                       <div className="flex items-center gap-2">
@@ -220,7 +227,7 @@ export default function ThreadDetail({ thread, isFollowed, onToggleFollow, onClo
                     </div>
 
                     {/* Título */}
-                    <h4 className="text-[12px] font-bold text-white/70 font-[family-name:var(--font-space-grotesk)] leading-snug mb-1">
+                    <h4 className="text-[12px] font-bold text-white/70 group-hover:text-white/90 font-[family-name:var(--font-space-grotesk)] leading-snug mb-1 transition-colors">
                       {signal.title}
                     </h4>
 
@@ -243,7 +250,15 @@ export default function ThreadDetail({ thread, isFollowed, onToggleFollow, onClo
                         </span>
                       ))}
                     </div>
-                  </div>
+
+                    {/* Indicador "Leer más" */}
+                    <div className="flex items-center gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <ExternalLink className="w-3 h-3 text-[#38BDF8]/50" />
+                      <span className="text-[8px] font-bold text-[#38BDF8]/50 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">
+                        Leer artículo completo
+                      </span>
+                    </div>
+                  </button>
                 </div>
               );
             })}
