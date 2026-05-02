@@ -9,10 +9,10 @@ const ReactMarkdown = dynamic(() => import('react-markdown'), { ssr: false });
 import {
   X as XIcon,
   GitCompareArrows,
-  Loader2,
   ExternalLink,
   Globe,
 } from 'lucide-react';
+import AnalysisPipeline from '@/components/AnalysisPipeline';
 import {
   type Signal,
   sourceLevelLabels,
@@ -137,15 +137,7 @@ export default function SourceComparisonView({ seedSignal, onClose }: SourceComp
           {/* Loading state — aria-live para lectores de pantalla */}
           <div aria-live="polite" aria-atomic="true">
           {loading && (
-            <div className="flex flex-col items-center gap-3 py-16" role="status">
-              <Loader2 className="w-8 h-8 text-[#00E5A0] animate-spin" />
-              <span className="text-sm text-white/50 font-[family-name:var(--font-space-grotesk)]">
-                Buscando fuentes relacionadas y generando análisis comparativo...
-              </span>
-              <span className="text-[10px] text-white/25 font-[family-name:var(--font-jetbrains-mono)]">
-                Esto puede tomar unos segundos
-              </span>
-            </div>
+            <AnalysisPipeline variant="comparison" startTime={Date.now()} />
           )}
 
           {error && !loading && (
