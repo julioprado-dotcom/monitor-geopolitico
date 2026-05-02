@@ -1,10 +1,12 @@
 'use client';
 
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
+import { geoNaturalEarth1, geoPath, geoCentroid, type GeoPermissibleObjects } from 'd3-geo';
+import { feature } from 'topojson-client';
 import type { Signal } from '@/types';
 import { relevanceColors, regionLabels } from '@/data/signals';
-import { mapRegions, continentPaths, jitterPosition } from '@/data/mapRegions';
-import type { Relevance, Region } from '@/types';
+import { COUNTRY_REGION_MAP, regionChoroplethColors } from '@/data/countryRegionMap';
+import type { Region, Relevance } from '@/types';
 
 interface GeoMapProps {
   signals: Signal[];
@@ -19,16 +21,39 @@ const LEGEND_ITEMS: { relevance: Relevance; label: string }[] = [
   { relevance: 'INFORMATIVA', label: 'Informativa' },
 ];
 
-/** Build a region→centroid lookup */
-const regionCentroids: Record<Region, { cx: number; cy: number }> = {} as Record<Region, { cx: number; cy: number }>;
-for (const r of mapRegions) {
-  regionCentroids[r.region] = { cx: r.cx, cy: r.cy };
+const WORLD_TOPO_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
+
+interface CountryFeature {
+  type: string;
+  id: string;
+  properties: { name: string };
+  geometry: GeoPermissibleObjects;
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type TopoData = any;
+
+const DEFAULT_CENTROIDS: Record<Region, [number, number]> = {
+  'NORTEAMÉRICA': [250, 155],
+  'LATINOAMÉRICA': [280, 330],
+  'EUROPA': [500, 130],
+  'ÁFRICA': [500, 280],
+  'MEDIO ORIENTE': [580, 200],
+  'ASIA': [720, 190],
+};
 
 export default function GeoMap({ signals, onSelectSignal }: GeoMapProps) {
   const [hoveredSignal, setHoveredSignal] = useState<Signal | null>(null);
   const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [hoveredCountry, setHoveredCountry] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // State (not ref!) so useMemo and render re-trigger when data loads
+  const [countries, setCountries] = useState<CountryFeature[]>([]);
+  const [regionCentroids, setRegionCentroids] = useState<Record<Region, [number, number]>>(DEFAULT_CENTROIDS);
+  const [pathGenerator, setPathGenerator] = useState<ReturnType<typeof geoPath> | null>(null);
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -38,14 +63,95 @@ export default function GeoMap({ signals, onSelectSignal }: GeoMapProps) {
     return () => mq.removeEventListener('change', handler);
   }, []);
 
+  // Fetch and process TopoJSON — sets state which triggers re-render
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadWorld() {
+      try {
+        const res = await fetch(WORLD_TOPO_URL);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const topology = await res.json() as TopoData;
+
+        if (cancelled) return;
+
+        // Convert TopoJSON to GeoJSON features
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const countriesGeo = feature(topology, topology.objects.countries) as any;
+        const features: CountryFeature[] = countriesGeo.features || [];
+
+        setCountries(features);
+
+        // Build projection fitted to the features
+        const fc = { type: 'FeatureCollection', features };
+        const proj = geoNaturalEarth1().fitSize([1000, 500], fc);
+        const path = geoPath().projection(proj);
+        setPathGenerator(() => path);
+
+        // Compute region centroids from actual country geometries
+        const regionCoords: Record<string, [number, number][]> = {
+          'NORTEAMÉRICA': [],
+          'LATINOAMÉRICA': [],
+          'EUROPA': [],
+          'ÁFRICA': [],
+          'MEDIO ORIENTE': [],
+          'ASIA': [],
+        };
+
+        for (const country of features) {
+          const region = COUNTRY_REGION_MAP[country.id];
+          if (region) {
+            try {
+              const centroid = geoCentroid(country as GeoPermissibleObjects);
+              const projected = proj(centroid);
+              if (projected && isFinite(projected[0]) && isFinite(projected[1])) {
+                regionCoords[region].push([projected[0], projected[1]]);
+              }
+            } catch {
+              // Skip malformed geometries
+            }
+          }
+        }
+
+        // Average centroids per region
+        const newCentroids = { ...DEFAULT_CENTROIDS };
+        for (const region of Object.keys(regionCoords) as Region[]) {
+          const coords = regionCoords[region];
+          if (coords.length > 0) {
+            const avgX = coords.reduce((sum, c) => sum + c[0], 0) / coords.length;
+            const avgY = coords.reduce((sum, c) => sum + c[1], 0) / coords.length;
+            newCentroids[region] = [avgX, avgY];
+          }
+        }
+        setRegionCentroids(newCentroids);
+        setLoading(false);
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : 'Error cargando mapa');
+          setLoading(false);
+        }
+      }
+    }
+
+    loadWorld();
+    return () => { cancelled = true; };
+  }, []);
+
+  // Signal markers with jitter — depends on signals + regionCentroids
   const signalMarkers = useMemo(() => {
     return signals.map((s) => {
       const base = regionCentroids[s.region];
       if (!base) return null;
-      const { cx, cy } = jitterPosition(s.id, base.cx, base.cy);
+      const { cx, cy } = jitterPosition(s.id, base[0], base[1]);
       return { signal: s, cx, cy };
     }).filter(Boolean) as { signal: Signal; cx: number; cy: number }[];
-  }, [signals]);
+  }, [signals, regionCentroids]);
+
+  // Find hovered country name
+  const hoveredCountryName = useMemo(() => {
+    if (!hoveredCountry) return '';
+    return countries.find(c => c.id === hoveredCountry)?.properties?.name || '';
+  }, [hoveredCountry, countries]);
 
   const handleMarkerEnter = useCallback((signal: Signal, e: React.MouseEvent<SVGCircleElement>) => {
     setHoveredSignal(signal);
@@ -77,6 +183,14 @@ export default function GeoMap({ signals, onSelectSignal }: GeoMapProps) {
     onSelectSignal(signal);
   }, [onSelectSignal]);
 
+  const handleCountryEnter = useCallback((countryId: string) => {
+    setHoveredCountry(countryId);
+  }, []);
+
+  const handleCountryLeave = useCallback(() => {
+    setHoveredCountry(null);
+  }, []);
+
   return (
     <div className="glass-strong rounded-xl overflow-hidden">
       {/* Title bar */}
@@ -94,7 +208,7 @@ export default function GeoMap({ signals, onSelectSignal }: GeoMapProps) {
             {signals.length} señales activas
           </span>
         </div>
-        {/* Legend */}
+        {/* Relevance legend */}
         <div className="hidden sm:flex items-center gap-2">
           {LEGEND_ITEMS.map((item) => (
             <div key={item.relevance} className="flex items-center gap-1">
@@ -113,8 +227,47 @@ export default function GeoMap({ signals, onSelectSignal }: GeoMapProps) {
       {/* Neon accent underline */}
       <div className="h-[1px] bg-gradient-to-r from-transparent via-[#00E5A0]/40 to-transparent" />
 
+      {/* Region color legend */}
+      <div className="px-4 py-1.5 border-b border-white/[0.04] flex items-center gap-3 overflow-x-auto">
+        {(Object.keys(regionChoroplethColors) as Region[]).map((region) => (
+          <div key={region} className="flex items-center gap-1.5 shrink-0">
+            <span
+              className="w-2.5 h-2.5 rounded-sm shrink-0 border"
+              style={{
+                backgroundColor: regionChoroplethColors[region].fill,
+                borderColor: regionChoroplethColors[region].stroke,
+              }}
+            />
+            <span className="text-[8px] text-white/35 font-[family-name:var(--font-jetbrains-mono)] uppercase tracking-wider">
+              {regionLabels[region]}
+            </span>
+          </div>
+        ))}
+      </div>
+
       {/* SVG Map */}
-      <div className="relative" style={{ height: 400 }}>
+      <div className="relative" style={{ height: 420 }}>
+        {loading && (
+          <div className="absolute inset-0 flex items-center justify-center z-10">
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-8 h-8 border-2 border-[#00E5A0]/30 border-t-[#00E5A0] rounded-full animate-spin" />
+              <span className="text-[10px] text-white/30 font-[family-name:var(--font-jetbrains-mono)]">
+                Cargando mapa mundial...
+              </span>
+            </div>
+          </div>
+        )}
+
+        {error && (
+          <div className="absolute inset-0 flex items-center justify-center z-10">
+            <div className="text-center">
+              <span className="text-[11px] text-red-400/70 font-[family-name:var(--font-jetbrains-mono)]">
+                Error: {error}
+              </span>
+            </div>
+          </div>
+        )}
+
         <svg
           viewBox="0 0 1000 500"
           className="w-full h-full"
@@ -125,12 +278,14 @@ export default function GeoMap({ signals, onSelectSignal }: GeoMapProps) {
           {/* Background */}
           <rect width="1000" height="500" fill="#070B15" />
 
-          {/* Grid lines */}
           <defs>
+            <radialGradient id="oceanGlow" cx="50%" cy="50%" r="70%">
+              <stop offset="0%" stopColor="rgba(0,229,160,0.02)" />
+              <stop offset="100%" stopColor="rgba(0,0,0,0)" />
+            </radialGradient>
             <pattern id="mapGrid" width="50" height="50" patternUnits="userSpaceOnUse">
-              <path d="M 50 0 L 0 0 0 50" fill="none" stroke="rgba(0,229,160,0.04)" strokeWidth="0.5" />
+              <path d="M 50 0 L 0 0 0 50" fill="none" stroke="rgba(0,229,160,0.03)" strokeWidth="0.3" />
             </pattern>
-            {/* Glow filter for markers */}
             <filter id="markerGlow" x="-50%" y="-50%" width="200%" height="200%">
               <feGaussianBlur stdDeviation="3" result="blur" />
               <feMerge>
@@ -138,7 +293,6 @@ export default function GeoMap({ signals, onSelectSignal }: GeoMapProps) {
                 <feMergeNode in="SourceGraphic" />
               </feMerge>
             </filter>
-            {/* Stronger glow for critical markers */}
             <filter id="criticalGlow" x="-100%" y="-100%" width="300%" height="300%">
               <feGaussianBlur stdDeviation="6" result="blur" />
               <feMerge>
@@ -148,43 +302,56 @@ export default function GeoMap({ signals, onSelectSignal }: GeoMapProps) {
             </filter>
           </defs>
 
+          {/* Ocean background */}
+          <rect width="1000" height="500" fill="url(#oceanGlow)" />
           <rect width="1000" height="500" fill="url(#mapGrid)" />
 
-          {/* Equator line */}
-          <line x1="0" y1="250" x2="1000" y2="250" stroke="rgba(0,229,160,0.06)" strokeWidth="0.5" strokeDasharray="8 4" />
-          {/* Prime meridian */}
-          <line x1="500" y1="0" x2="500" y2="500" stroke="rgba(0,229,160,0.06)" strokeWidth="0.5" strokeDasharray="8 4" />
+          {/* Equator & Prime Meridian */}
+          <line x1="0" y1="250" x2="1000" y2="250" stroke="rgba(0,229,160,0.05)" strokeWidth="0.4" strokeDasharray="8 4" />
+          <line x1="500" y1="0" x2="500" y2="500" stroke="rgba(0,229,160,0.05)" strokeWidth="0.4" strokeDasharray="8 4" />
 
-          {/* Continent shapes */}
-          {(Object.keys(continentPaths) as Region[]).map((region) => (
-            <path
-              key={region}
-              d={continentPaths[region]}
-              fill="rgba(0,229,160,0.04)"
-              stroke="rgba(0,229,160,0.12)"
-              strokeWidth="1"
-            />
-          ))}
+          {/* Country paths */}
+          {pathGenerator && countries.map((country) => {
+            const region = COUNTRY_REGION_MAP[country.id];
+            const isHovered = hoveredCountry === country.id;
+            const colors = region
+              ? regionChoroplethColors[region]
+              : { fill: 'rgba(255,255,255,0.03)', stroke: 'rgba(255,255,255,0.08)', hoverFill: 'rgba(255,255,255,0.1)' };
 
-          {/* Region labels */}
-          {mapRegions.map((mr) => (
-            <g key={mr.region}>
-              <text
-                x={mr.cx}
-                y={mr.cy}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                fill="rgba(255,255,255,0.12)"
-                fontSize="10"
-                fontFamily="var(--font-jetbrains-mono)"
-                fontWeight="700"
-                letterSpacing="0.08em"
-                style={{ pointerEvents: 'none' }}
-              >
-                {mr.label.toUpperCase()}
-              </text>
-            </g>
-          ))}
+            const d = pathGenerator(country);
+            if (!d) return null;
+
+            return (
+              <path
+                key={country.id}
+                d={d}
+                fill={isHovered ? colors.hoverFill : colors.fill}
+                stroke={isHovered ? colors.stroke : 'rgba(255,255,255,0.06)'}
+                strokeWidth={isHovered ? 1.2 : 0.4}
+                strokeLinejoin="round"
+                className="transition-all duration-300"
+                style={{ cursor: 'default' }}
+                onMouseEnter={() => handleCountryEnter(country.id)}
+                onMouseLeave={handleCountryLeave}
+              />
+            );
+          })}
+
+          {/* Hovered country info label */}
+          {hoveredCountryName && (
+            <text
+              x="20"
+              y="485"
+              fill="rgba(255,255,255,0.25)"
+              fontSize="9"
+              fontFamily="var(--font-jetbrains-mono)"
+              fontWeight="400"
+              letterSpacing="0.05em"
+              style={{ pointerEvents: 'none' }}
+            >
+              {hoveredCountryName}
+            </text>
+          )}
 
           {/* Signal markers */}
           {signalMarkers.map(({ signal, cx, cy }) => {
@@ -209,22 +376,13 @@ export default function GeoMap({ signals, onSelectSignal }: GeoMapProps) {
                 )}
 
                 {/* Outer glow */}
-                <circle
-                  cx={cx}
-                  cy={cy}
-                  r={isHovered ? 12 : 8}
-                  fill={color}
+                <circle cx={cx} cy={cy} r={isHovered ? 12 : 8} fill={color}
                   opacity={isHovered ? 0.15 : 0.08}
                   filter={isCritical ? 'url(#criticalGlow)' : 'url(#markerGlow)'}
-                  style={{ pointerEvents: 'none' }}
-                />
+                  style={{ pointerEvents: 'none' }} />
 
                 {/* Main dot */}
-                <circle
-                  cx={cx}
-                  cy={cy}
-                  r={isHovered ? 6 : 4.5}
-                  fill={color}
+                <circle cx={cx} cy={cy} r={isHovered ? 6 : 4.5} fill={color}
                   opacity={isHovered ? 1 : 0.85}
                   filter={isCritical ? 'url(#criticalGlow)' : 'url(#markerGlow)'}
                   className="cursor-pointer transition-all duration-200"
@@ -232,21 +390,14 @@ export default function GeoMap({ signals, onSelectSignal }: GeoMapProps) {
                   onMouseMove={handleMarkerMove}
                   onMouseLeave={handleMarkerLeave}
                   onClick={() => handleMarkerClick(signal)}
-                  role="button"
-                  tabIndex={0}
+                  role="button" tabIndex={0}
                   aria-label={`Señal: ${signal.title}. Relevancia: ${signal.relevance}. Fuente: ${signal.source}`}
-                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleMarkerClick(signal); }}
-                />
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleMarkerClick(signal); }} />
 
                 {/* Inner bright core */}
-                <circle
-                  cx={cx}
-                  cy={cy}
-                  r={isHovered ? 2.5 : 1.8}
-                  fill="white"
+                <circle cx={cx} cy={cy} r={isHovered ? 2.5 : 1.8} fill="white"
                   opacity={isHovered ? 0.9 : 0.5}
-                  style={{ pointerEvents: 'none' }}
-                />
+                  style={{ pointerEvents: 'none' }} />
               </g>
             );
           })}
@@ -254,55 +405,43 @@ export default function GeoMap({ signals, onSelectSignal }: GeoMapProps) {
 
         {/* Tooltip */}
         {hoveredSignal && tooltipPos && (
-          <div
-            className="absolute z-50 pointer-events-none animate-fade-in"
-            style={{
-              left: Math.min(tooltipPos.x + 14, 700),
-              top: tooltipPos.y - 10,
-              transform: 'translateY(-100%)',
-            }}
-          >
+          <div className="absolute z-50 pointer-events-none animate-fade-in"
+            style={{ left: Math.min(tooltipPos.x + 14, 700), top: tooltipPos.y - 10, transform: 'translateY(-100%)' }}>
             <div className="glass-strong rounded-lg px-3 py-2 shadow-xl max-w-[260px]">
               <div className="flex items-center gap-1.5 mb-1">
-                <span
-                  className="w-2 h-2 rounded-full shrink-0"
-                  style={{ backgroundColor: relevanceColors[hoveredSignal.relevance] }}
-                />
-                <span
-                  className="text-[8px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]"
-                  style={{ color: relevanceColors[hoveredSignal.relevance] }}
-                >
-                  {hoveredSignal.relevance}
-                </span>
-                <span className="text-[8px] text-white/30 font-[family-name:var(--font-jetbrains-mono)]">
-                  · {regionLabels[hoveredSignal.region]}
-                </span>
+                <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: relevanceColors[hoveredSignal.relevance] }} />
+                <span className="text-[8px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]"
+                  style={{ color: relevanceColors[hoveredSignal.relevance] }}>{hoveredSignal.relevance}</span>
+                <span className="text-[8px] text-white/30 font-[family-name:var(--font-jetbrains-mono)]">· {regionLabels[hoveredSignal.region]}</span>
               </div>
-              <p className="text-[11px] text-white/80 font-[family-name:var(--font-space-grotesk)] leading-snug line-clamp-2">
-                {hoveredSignal.title}
-              </p>
-              <p className="text-[9px] text-white/35 font-[family-name:var(--font-jetbrains-mono)] mt-1">
-                {hoveredSignal.source}
-              </p>
+              <p className="text-[11px] text-white/80 font-[family-name:var(--font-space-grotesk)] leading-snug line-clamp-2">{hoveredSignal.title}</p>
+              <p className="text-[9px] text-white/35 font-[family-name:var(--font-jetbrains-mono)] mt-1">{hoveredSignal.source}</p>
             </div>
           </div>
         )}
       </div>
 
-      {/* Mobile legend */}
+      {/* Mobile legends */}
       <div className="sm:hidden px-4 py-2 border-t border-white/[0.06] flex flex-wrap items-center gap-x-3 gap-y-1">
         {LEGEND_ITEMS.map((item) => (
           <div key={item.relevance} className="flex items-center gap-1">
-            <span
-              className="w-2 h-2 rounded-full shrink-0"
-              style={{ backgroundColor: relevanceColors[item.relevance] }}
-            />
-            <span className="text-[8px] text-white/40 font-[family-name:var(--font-jetbrains-mono)] uppercase tracking-wider">
-              {item.label}
-            </span>
+            <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: relevanceColors[item.relevance] }} />
+            <span className="text-[8px] text-white/40 font-[family-name:var(--font-jetbrains-mono)] uppercase tracking-wider">{item.label}</span>
           </div>
         ))}
       </div>
     </div>
   );
+}
+
+/** Slight deterministic jitter so multiple markers in the same region don't overlap */
+function jitterPosition(signalId: string, baseCx: number, baseCy: number): { cx: number; cy: number } {
+  let hash = 0;
+  for (let i = 0; i < signalId.length; i++) {
+    hash = ((hash << 5) - hash + signalId.charCodeAt(i)) | 0;
+  }
+  const range = 30;
+  const jitterX = ((hash & 0xFF) / 255) * range - range / 2;
+  const jitterY = (((hash >> 8) & 0xFF) / 255) * range - range / 2;
+  return { cx: baseCx + jitterX, cy: baseCy + jitterY };
 }
