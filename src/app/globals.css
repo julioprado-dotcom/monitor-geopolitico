@@ -368,6 +368,128 @@ details.mg-collapse > .collapse-content {
   outline-offset: 2px;
 }
 
+/* ============================================
+   Tab Transition Animations — GPU accelerated
+   (transform + opacity only)
+   ============================================ */
+
+/* Content slides in from the right — tab is to the right of previous */
+@keyframes tabSlideFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(16px) scale(0.995);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+/* Content slides in from the left — tab is to the left of previous */
+@keyframes tabSlideFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-16px) scale(0.995);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+/* Content fades with subtle scale — fallback (same tab type, unknown direction) */
+@keyframes tabFadeScale {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* New dynamic tab opens — slide up + fade + scale pop */
+@keyframes tabOpenPop {
+  0% {
+    opacity: 0;
+    transform: translateY(6px) scale(0.96);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-1px) scale(1.005);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Tab closing — collapse + fade out */
+@keyframes tabCloseCollapse {
+  from {
+    opacity: 1;
+    transform: scale(1);
+    max-width: 220px;
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.85) translateX(8px);
+    max-width: 0;
+    padding-left: 0;
+    padding-right: 0;
+    margin: 0;
+    border-width: 0;
+  }
+}
+
+/* Apply animation classes */
+.animate-tab-slide-right {
+  animation: tabSlideFromRight 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-tab-slide-left {
+  animation: tabSlideFromLeft 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-tab-fade-scale {
+  animation: tabFadeScale 0.2s ease-out both;
+}
+
+.animate-tab-open {
+  animation: tabOpenPop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.animate-tab-close {
+  animation: tabCloseCollapse 0.2s cubic-bezier(0.4, 0, 0.2, 1) both;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* ── Tab indicator — sliding bar under active tab ── */
+.tab-indicator {
+  position: absolute;
+  bottom: 0;
+  height: 2px;
+  border-radius: 1px 1px 0 0;
+  transition: left 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              width 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.2s ease;
+  pointer-events: none;
+  will-change: left, width;
+}
+
+/* Tab indicator glow effect */
+.tab-indicator::after {
+  content: '';
+  position: absolute;
+  inset: -2px -4px;
+  border-radius: 4px;
+  background: inherit;
+  opacity: 0.3;
+  filter: blur(6px);
+}
+
 /* Reduce motion for users who prefer it */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

@@ -17,6 +17,7 @@ import KpiDashboard from '@/components/KpiDashboard';
 import PatternList from '@/components/PatternList';
 import AnalysisPipeline from '@/components/AnalysisPipeline';
 import { useMounted } from '@/hooks/useMounted';
+import { useTabTransition, useTabIndicator, type TabDirection } from '@/hooks/useTabTransition';
 
 // Lazy: react-markdown solo se carga cuando se genera análisis IA
 const ReactMarkdown = dynamic(() => import('react-markdown'), { ssr: false });
@@ -107,6 +108,29 @@ export default function Home() {
   // ── Tab-based navigation state ──
   const [activeTab, setActiveTab] = useState<string>('monitor');
   const [dynamicTabs, setDynamicTabs] = useState<DynamicTab[]>([]);
+
+  // ── Tab transition animations ──
+  const dynamicTabIds = useMemo(() => dynamicTabs.map(t => t.id), [dynamicTabs]);
+  const { animationKey, direction } = useTabTransition(activeTab, dynamicTabIds);
+  const { indicator, setContainerRef: setTabBarRef, updateIndicator } = useTabIndicator();
+
+  // Map direction to CSS animation class
+  const tabContentAnimClass = direction === 'right' ? 'animate-tab-slide-right'
+    : direction === 'left' ? 'animate-tab-slide-left'
+    : 'animate-tab-fade-scale';
+
+  // ── Tab closing animation state ──
+  const [closingTabId, setClosingTabId] = useState<string | null>(null);
+
+  // ── Tab opening animation state ──
+  const [openingTabId, setOpeningTabId] = useState<string | null>(null);
+
+  // Clear opening animation after it completes
+  useEffect(() => {
+    if (!openingTabId) return;
+    const timer = setTimeout(() => setOpeningTabId(null), 300); // Match tabOpenPop duration
+    return () => clearTimeout(timer);
+  }, [openingTabId]);
 
   // ── Estados para Análisis en Panel de Foco ──
   const [analysisFullContent, setAnalysisFullContent] = useState<string | null>(null);
@@ -305,6 +329,7 @@ export default function Home() {
     });
 
     setActiveTab(id);
+    setOpeningTabId(id); // Trigger pop-in animation on the new tab
 
     // Set the appropriate selected state
     if (type === 'signal') {
@@ -321,35 +346,42 @@ export default function Home() {
     }
   }, [dynamicTabs]);
 
-  // ── Close dynamic tab ──
+  // ── Close dynamic tab (with animation) ──
   const closeDynamicTab = useCallback((tabId: string, e?: React.MouseEvent) => {
     e?.stopPropagation(); // Prevent tab activation when clicking ×
 
-    setDynamicTabs(prev => {
-      const tab = prev.find(t => t.id === tabId);
-      if (!tab) return prev;
+    // Trigger closing animation
+    setClosingTabId(tabId);
 
-      // Clean up related state
-      if (tab.type === 'signal') {
-        setSelectedSignal(null);
-        setAnalysisError(null);
-        abortRef.current?.abort();
-      } else if (tab.type === 'analysis') {
-        setSelectedAnalysis(null);
-        setAnalysisFullContent(null);
-        setAnalysisAiError(null);
-        analysisAbortRef.current?.abort();
-      } else if (tab.type === 'thread') {
-        setSelectedThread(null);
+    // After animation completes, actually remove the tab
+    setTimeout(() => {
+      setClosingTabId(null);
+      setDynamicTabs(prev => {
+        const tab = prev.find(t => t.id === tabId);
+        if (!tab) return prev;
+
+        // Clean up related state
+        if (tab.type === 'signal') {
+          setSelectedSignal(null);
+          setAnalysisError(null);
+          abortRef.current?.abort();
+        } else if (tab.type === 'analysis') {
+          setSelectedAnalysis(null);
+          setAnalysisFullContent(null);
+          setAnalysisAiError(null);
+          analysisAbortRef.current?.abort();
+        } else if (tab.type === 'thread') {
+          setSelectedThread(null);
+        }
+
+        return prev.filter(t => t.id !== tabId);
+      });
+
+      // If closing active tab, go to monitor
+      if (activeTab === tabId) {
+        setActiveTab('monitor');
       }
-
-      return prev.filter(t => t.id !== tabId);
-    });
-
-    // If closing active tab, go to monitor
-    if (activeTab === tabId) {
-      setActiveTab('monitor');
-    }
+    }, 200); // Match tabCloseCollapse animation duration
   }, [activeTab]);
 
   // ── READ FULL: Signal → dynamic tab ──
@@ -591,10 +623,11 @@ export default function Home() {
         <div className="flex-1 flex flex-col overflow-hidden">
 
         {/* ── TAB BAR — Monitor Activo + dynamic tabs ── */}
-        <div className="shrink-0 px-3 sm:px-6 py-1.5 flex items-center gap-1 border-b border-white/[0.04] overflow-x-auto" data-no-drag style={{ scrollbarWidth: 'none' }}>
+        <div ref={setTabBarRef} className="relative shrink-0 px-3 sm:px-6 py-1.5 flex items-center gap-1 border-b border-white/[0.04] overflow-x-auto" data-no-drag style={{ scrollbarWidth: 'none' }}>
           {/* Monitor Activo — fixed tab */}
           <button
             onClick={() => setActiveTab('monitor')}
+            ref={(el) => { if (el && activeTab === 'monitor') updateIndicator(el, '#00E5A0'); }}
             className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] transition-all duration-150 border ${
               activeTab === 'monitor'
                 ? 'text-[#00E5A0]/80 bg-[#00E5A0]/10 border-[#00E5A0]/20 shadow-sm'
@@ -617,11 +650,12 @@ export default function Home() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
+                ref={(el) => { if (el && isActive) updateIndicator(el, color); }}
                 className={`shrink-0 flex items-center gap-1.5 pl-2.5 pr-1.5 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] transition-all duration-150 border ${
                   isActive
                     ? 'border-white/[0.12] shadow-sm'
                     : 'text-white/35 border-white/[0.04] hover:text-white/50 hover:border-white/[0.08]'
-                }`}
+                } ${closingTabId === tab.id ? 'animate-tab-close' : openingTabId === tab.id ? 'animate-tab-open' : ''}`}
                 style={isActive ? { color, backgroundColor: `${color}10`, borderColor: `${color}25` } : undefined}
                 title={tab.title}
               >
@@ -647,6 +681,18 @@ export default function Home() {
               <span className="text-[9px] text-white/20 font-[family-name:var(--font-jetbrains-mono)]">· {dynamicTabs.length} abiertas</span>
             )}
           </div>
+
+          {/* Sliding indicator bar under active tab */}
+          {indicator.visible && (
+            <div
+              className="tab-indicator"
+              style={{
+                left: indicator.left,
+                width: indicator.width,
+                backgroundColor: indicator.color,
+              }}
+            />
+          )}
         </div>
 
         {/* ── CONTENT PANEL — single panel, switch by activeTab ── */}
@@ -656,7 +702,7 @@ export default function Home() {
 
               {/* ── CENTER COLUMN ── */}
               <div className={`flex flex-col gap-3 sm:gap-4 min-w-0 ${mobileTab === 'tv' ? 'hidden lg:flex' : 'flex'}`}>
-
+                <div key={animationKey} className={tabContentAnimClass}>
                 {activeTab === 'monitor' ? (
                   /* ═══════════════════════════════════════════════
                      MONITOR ACTIVO — Current Contexto content
@@ -1057,6 +1103,7 @@ export default function Home() {
                     </button>
                   </div>
                 )}
+                </div>{/* ── closes animation wrapper ── */}
               </div>
 
               {/* ── RIGHT COLUMN — always visible ── */}
