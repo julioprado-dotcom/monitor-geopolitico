@@ -220,17 +220,17 @@ export default function GeoMap({ signals, allSignals, filteredCount, selectedRel
       {/* Neon accent underline */}
       <div className="h-[1px] bg-gradient-to-r from-transparent via-[#00E5A0]/40 to-transparent" />
 
-      {/* Severidad — fila propia, full width */}
-      <div className="px-4 pt-3 pb-2 border-b border-white/[0.04]">
-        <div className="flex items-center justify-between mb-1.5">
-          <span className="text-[9px] font-bold text-white/30 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">
+      {/* Severidad — fila propia, centrada y ampliada */}
+      <div className="px-4 pt-3 pb-3 border-b border-white/[0.04]">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-[10px] font-bold text-white/30 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">
             Severidad
           </span>
-          <span className="text-[9px] text-white/25 font-[family-name:var(--font-jetbrains-mono)]">
+          <span className="text-[10px] text-white/25 font-[family-name:var(--font-jetbrains-mono)]">
             {filteredCount}<span className="text-white/15">/{allSignals.length}</span>
           </span>
         </div>
-        <div className="flex items-end gap-3" role="group" aria-label="Filtros por nivel de severidad">
+        <div className="flex items-end justify-center gap-5" role="group" aria-label="Filtros por nivel de severidad">
           {SEVERITY_LEVELS.map((sev) => {
             const count = allSignals.filter((s) => s.relevance === sev).length;
             const color = relevanceColors[sev];
@@ -247,26 +247,26 @@ export default function GeoMap({ signals, allSignals, filteredCount, selectedRel
                 aria-pressed={isSelected}
                 onClick={() => onToggleRelevance(sev)}
                 onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggleRelevance(sev); } }}
-                className="flex flex-col items-center gap-0.5 transition-all duration-150 cursor-pointer"
+                className="flex flex-col items-center gap-1 transition-all duration-150 cursor-pointer"
               >
                 {isSelected && (
                   <button
                     onClick={(e) => { e.stopPropagation(); onClearRelevance(); }}
-                    className="px-1 py-px rounded text-[6px] font-bold font-[family-name:var(--font-jetbrains-mono)] transition-colors"
+                    className="px-1.5 py-px rounded text-[7px] font-bold font-[family-name:var(--font-jetbrains-mono)] transition-colors"
                     style={{ backgroundColor: `${color}20`, color, border: `1px solid ${color}40` }}
                     title="Limpiar filtro"
                   >
-                    <X className="w-1.5 h-1.5 inline" /> <span className="ml-0.5">LIMPIAR</span>
+                    <X className="w-2 h-2 inline" /> <span className="ml-0.5">LIMPIAR</span>
                   </button>
                 )}
                 <span
-                  className="text-[10px] font-bold font-[family-name:var(--font-jetbrains-mono)] leading-none"
+                  className="text-sm font-bold font-[family-name:var(--font-jetbrains-mono)] leading-none"
                   style={{ color }}
                 >
                   {count}
                 </span>
                 <div
-                  className="w-6 h-8 rounded-sm relative overflow-hidden transition-all duration-150"
+                  className="w-10 h-14 rounded-sm relative overflow-hidden transition-all duration-150"
                   style={{
                     backgroundColor: `${color}15`,
                     border: isSelected ? `1.5px solid ${color}60` : '1px solid rgba(255,255,255,0.04)',
@@ -281,7 +281,7 @@ export default function GeoMap({ signals, allSignals, filteredCount, selectedRel
                   />
                 </div>
                 <span
-                  className="text-[7px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] text-center leading-none"
+                  className="text-[9px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] text-center leading-none"
                   style={{ color }}
                 >
                   {sev.slice(0, 3)}
@@ -293,7 +293,7 @@ export default function GeoMap({ signals, allSignals, filteredCount, selectedRel
       </div>
 
       {/* SVG Map */}
-      <div className="relative" style={{ height: 420 }}>
+      <div className="relative" style={{ height: 'auto', aspectRatio: '2 / 1' }}>
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center z-10">
             <div className="flex flex-col items-center gap-2">
@@ -317,7 +317,7 @@ export default function GeoMap({ signals, allSignals, filteredCount, selectedRel
 
         <svg
           viewBox="0 0 1000 500"
-          className="w-full h-full"
+          className="w-full h-full block"
           preserveAspectRatio="xMidYMid meet"
           role="img"
           aria-label="Mapa geopolítico interactivo con señales por región"
