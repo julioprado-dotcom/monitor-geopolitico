@@ -41,8 +41,8 @@ export default function AnalysisCard({ analysis, isExpanded, onToggleExpand, onR
 
   return (
     <article
-      className="glass rounded-xl overflow-hidden hover:bg-white/[0.04] transition-colors duration-150 group flex flex-col"
-      style={{ borderLeft: '3px solid #D4A017' }}
+      className="glass rounded-xl hover:bg-white/[0.04] transition-colors duration-150 group flex flex-col"
+      style={{ borderLeft: '3px solid #D4A017', overflow: 'clip' }}
       role="article"
       aria-label={`${analysis.title} — ${analysis.author}`}
     >

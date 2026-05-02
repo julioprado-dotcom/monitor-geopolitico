@@ -73,6 +73,14 @@ const CONTENT_TABS: { id: ContentTab; label: string; icon: typeof Radio; color: 
   { id: 'explorer', label: 'Hilos Geopolíticos', icon: GitBranch, color: '#38BDF8' },
 ];
 
+type DynamicTab = {
+  id: string;      // 'signal-{id}' | 'analysis-{id}' | 'thread-{id}'
+  type: 'signal' | 'analysis' | 'thread';
+  title: string;   // Short title for the tab label
+};
+
+const MAX_DYNAMIC_TABS = 5;
+
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRegion, setSelectedRegion] = useState<Region | null>(null);
@@ -93,8 +101,12 @@ export default function Home() {
   const [expandedSignalId, setExpandedSignalId] = useState<string | null>(null);
   const [expandedAnalysisId, setExpandedAnalysisId] = useState<string | null>(null);
 
-  // ── NEW: Selected thread for Foco panel ──
+  // ── NEW: Selected thread for detail panel ──
   const [selectedThread, setSelectedThread] = useState<Thread | null>(null);
+
+  // ── Tab-based navigation state ──
+  const [activeTab, setActiveTab] = useState<string>('monitor');
+  const [dynamicTabs, setDynamicTabs] = useState<DynamicTab[]>([]);
 
   // ── Estados para Análisis en Panel de Foco ──
   const [analysisFullContent, setAnalysisFullContent] = useState<string | null>(null);
@@ -103,12 +115,6 @@ export default function Home() {
   const [analysisAiStartTime, setAnalysisAiStartTime] = useState(0);
   const [analysisAiError, setAnalysisAiError] = useState<string | null>(null);
   const analysisAbortRef = useRef<AbortController | null>(null);
-
-  // ── Grab-to-scroll state ──
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStartX, setDragStartX] = useState(0);
-  const [dragScrollLeft, setDragScrollLeft] = useState(0);
 
   const filteredSignals = useMemo(() => {
     return demoSignals.filter((s) => {
@@ -270,60 +276,98 @@ export default function Home() {
     setExpandedAnalysisId((prev) => (prev === analysis.id ? null : analysis.id));
   }, []);
 
-  // ── Helper: scroll horizontal container to Foco panel ──
-  const scrollToFoco = useCallback((sectionId?: string) => {
-    const container = scrollContainerRef.current;
-    const focoPanel = document.getElementById('foco-panel');
-    if (!container || !focoPanel) return;
-    // Scroll horizontal container to show foco panel
-    const targetScrollLeft = focoPanel.offsetLeft;
-    container.scrollTo({ left: targetScrollLeft, behavior: 'smooth' });
-    // After horizontal scroll, scroll vertically to the specific section
-    if (sectionId) {
-      setTimeout(() => {
-        document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 350);
+  // ── Open dynamic tab: signal, analysis, or thread ──
+  const openDynamicTab = useCallback((type: 'signal' | 'analysis' | 'thread', item: Signal | Analysis | Thread) => {
+    const id = type === 'signal' ? `signal-${(item as Signal).id}`
+      : type === 'analysis' ? `analysis-${(item as Analysis).id}`
+      : `thread-${(item as Thread).id}`;
+
+    // Truncate title for tab label
+    const title = (item as any).title || (item as any).id;
+    const shortTitle = title.length > 28 ? title.slice(0, 28) + '…' : title;
+
+    // If tab already exists, just activate it
+    if (dynamicTabs.some(t => t.id === id)) {
+      setActiveTab(id);
+      // Also set the appropriate selected state
+      if (type === 'signal') setSelectedSignal(item as Signal);
+      else if (type === 'analysis') setSelectedAnalysis(item as Analysis);
+      else if (type === 'thread') setSelectedThread(item as Thread);
+      return;
     }
-  }, []);
 
-  // ── Helper: scroll horizontal container back to Contexto ──
-  const scrollToContexto = useCallback(() => {
-    const container = scrollContainerRef.current;
-    const contextoPanel = document.getElementById('panel-contexto');
-    if (!container || !contextoPanel) return;
-    container.scrollTo({ left: 0, behavior: 'smooth' });
-  }, []);
+    const newTab: DynamicTab = { id, type, title: shortTitle };
 
-  // ── READ FULL: Signal → Foco panel ──
+    // Enforce max tabs — remove oldest if at limit
+    setDynamicTabs(prev => {
+      const updated = prev.length >= MAX_DYNAMIC_TABS ? [...prev.slice(1), newTab] : [...prev, newTab];
+      return updated;
+    });
+
+    setActiveTab(id);
+
+    // Set the appropriate selected state
+    if (type === 'signal') {
+      setSelectedSignal(item as Signal);
+      setAnalysisError(null);
+      abortRef.current?.abort();
+    } else if (type === 'analysis') {
+      setSelectedAnalysis(item as Analysis);
+      setAnalysisFullContent(null);
+      setAnalysisAiError(null);
+      analysisAbortRef.current?.abort();
+    } else if (type === 'thread') {
+      setSelectedThread(item as Thread);
+    }
+  }, [dynamicTabs]);
+
+  // ── Close dynamic tab ──
+  const closeDynamicTab = useCallback((tabId: string, e?: React.MouseEvent) => {
+    e?.stopPropagation(); // Prevent tab activation when clicking ×
+
+    setDynamicTabs(prev => {
+      const tab = prev.find(t => t.id === tabId);
+      if (!tab) return prev;
+
+      // Clean up related state
+      if (tab.type === 'signal') {
+        setSelectedSignal(null);
+        setAnalysisError(null);
+        abortRef.current?.abort();
+      } else if (tab.type === 'analysis') {
+        setSelectedAnalysis(null);
+        setAnalysisFullContent(null);
+        setAnalysisAiError(null);
+        analysisAbortRef.current?.abort();
+      } else if (tab.type === 'thread') {
+        setSelectedThread(null);
+      }
+
+      return prev.filter(t => t.id !== tabId);
+    });
+
+    // If closing active tab, go to monitor
+    if (activeTab === tabId) {
+      setActiveTab('monitor');
+    }
+  }, [activeTab]);
+
+  // ── READ FULL: Signal → dynamic tab ──
   const handleReadFullSignal = useCallback((signal: Signal) => {
-    setSelectedSignal(signal);
-    // Do NOT clear selectedAnalysis or selectedThread — multi-slot Foco
-    setAnalysisError(null);
-    abortRef.current?.abort();
-    // Smart scroll: scroll to the signal section in foco
-    setTimeout(() => scrollToFoco('foco-signal'), 50);
-  }, [scrollToFoco]);
+    openDynamicTab('signal', signal);
+  }, [openDynamicTab]);
 
-  // ── READ FULL: Analysis → Foco panel (FIX: use scrollToFoco) ──
+  // ── READ FULL: Analysis → dynamic tab ──
   const handleReadFullAnalysis = useCallback((analysisItem: Analysis) => {
-    setSelectedAnalysis(analysisItem);
-    // Do NOT clear selectedSignal or selectedThread — multi-slot Foco
-    setAnalysisFullContent(null);
-    setAnalysisAiError(null);
-    analysisAbortRef.current?.abort();
-    // Smart scroll: ensure horizontal scroll to Foco, then vertical to analysis
-    setTimeout(() => scrollToFoco('foco-analysis'), 50);
-  }, [scrollToFoco]);
+    openDynamicTab('analysis', analysisItem);
+  }, [openDynamicTab]);
 
-  // ── Thread selection → Foco panel (FIX: use scrollToFoco) ──
+  // ── Thread selection → dynamic tab ──
   const handleSelectThread = useCallback((thread: Thread) => {
-    setSelectedThread(thread);
-    // Do NOT clear signal/analysis — multi-slot Foco
-    // Smart scroll: ensure horizontal scroll to Foco, then vertical to thread
-    setTimeout(() => scrollToFoco('foco-thread'), 50);
-  }, [scrollToFoco]);
+    openDynamicTab('thread', thread);
+  }, [openDynamicTab]);
 
-  // ── Click en señal desde Hilos: convierte ThreadSignal → Signal y abre en Foco ──
+  // ── Click en señal desde Hilos: convierte ThreadSignal → Signal y abre en tab ──
   const handleThreadSignalClick = useCallback((ts: ThreadSignal, region: Region) => {
     const signal: Signal = {
       id: ts.id,
@@ -346,45 +390,14 @@ export default function Home() {
 
   // ── GeoMap signal select → also uses readFull pattern ──
   const handleMapSelectSignal = useCallback((signal: Signal) => {
-    handleReadFullSignal(signal);
-  }, [handleReadFullSignal]);
+    openDynamicTab('signal', signal);
+  }, [openDynamicTab]);
 
-  // ── Navigate relation within thread (FIX: scroll horizontal first) ──
+  // ── Navigate relation within thread ──
   const handleNavigateThreadRelation = useCallback((threadId: string) => {
     const t = demoThreads.find((th) => th.id === threadId);
-    if (t) {
-      setSelectedThread(t);
-      setTimeout(() => scrollToFoco('foco-thread'), 50);
-    }
-  }, [scrollToFoco]);
-
-  // ── "← Volver" from Foco sections ──
-  const handleBackToContexto = useCallback(() => {
-    scrollToContexto();
-  }, []);
-
-  // ── Close Foco Signal section (NO borra análisis IA persistente) ──
-  const handleCloseFocoSignal = useCallback(() => {
-    setSelectedSignal(null);
-    setAnalysisError(null);
-    abortRef.current?.abort();
-    handleBackToContexto();
-  }, [handleBackToContexto]);
-
-  // ── Close Foco Analysis section (NO borra análisis IA persistente) ──
-  const handleCloseFocoAnalysis = useCallback(() => {
-    setSelectedAnalysis(null);
-    setAnalysisFullContent(null);
-    setAnalysisAiError(null);
-    analysisAbortRef.current?.abort();
-    handleBackToContexto();
-  }, [handleBackToContexto]);
-
-  // ── Close Foco Thread section ──
-  const handleCloseFocoThread = useCallback(() => {
-    setSelectedThread(null);
-    handleBackToContexto();
-  }, [handleBackToContexto]);
+    if (t) openDynamicTab('thread', t);
+  }, [openDynamicTab]);
 
   // ── Señales relacionadas al análisis seleccionado ──
   const relatedAnalysisSignals = useMemo(() => {
@@ -477,40 +490,8 @@ export default function Home() {
   // ── Cleanup abort refs ──
   useEffect(() => { return () => { abortRef.current?.abort(); analysisAbortRef.current?.abort(); }; }, []);
 
-  // ── Grab-to-scroll handlers ──
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    // Don't start drag on interactive elements
-    if (e.target.closest('button, a, input, select, textarea, [role="button"], [data-no-drag]')) return;
-    const container = scrollContainerRef.current;
-    if (!container) return;
-    setIsDragging(true);
-    setDragStartX(e.pageX - container.offsetLeft);
-    setDragScrollLeft(container.scrollLeft);
-  }, []);
-
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (!isDragging) return;
-    e.preventDefault();
-    const container = scrollContainerRef.current;
-    if (!container) return;
-    const x = e.pageX - container.offsetLeft;
-    const walk = (x - dragStartX) * 1.5;
-    container.scrollLeft = dragScrollLeft - walk;
-  }, [isDragging, dragStartX, dragScrollLeft]);
-
-  const handleMouseUp = useCallback(() => {
-    setIsDragging(false);
-  }, []);
-
-  const handleMouseLeave = useCallback(() => {
-    setIsDragging(false);
-  }, []);
-
   // ── Collapsible intelligence section (KPIs + Patterns + Map) ──
   const [intelSectionOpen, setIntelSectionOpen] = useState(false);
-
-  // ── Determine if Foco panel has content ──
-  const hasFocoContent = selectedSignal || selectedAnalysis || selectedThread;
 
   // ── Derivar: ID de señal actualmente analizando + resultado del mapa ──
   const currentSignalAnalysis = selectedSignal ? signalAiResults.get(selectedSignal.id) ?? null : null;
@@ -606,293 +587,275 @@ export default function Home() {
           <MGSidebar selectedRegion={selectedRegion} selectedClassifier={selectedClassifier} onRegionSelect={setSelectedRegion} onClassifierSelect={setSelectedClassifier} activeTab={contentTab} />
         </div>
 
-        {/* ── CONTENT COLUMN: Zone Nav Bar + Scroll Container (vertical stack) ── */}
+        {/* ── CONTENT COLUMN: Tab Bar + Single Panel (vertical stack) ── */}
         <div className="flex-1 flex flex-col overflow-hidden">
 
-        {/* ── ZONE NAV BAR — indicador Contexto / Foco ── */}
-        <div className="shrink-0 px-3 sm:px-6 py-1.5 flex items-center justify-between border-b border-white/[0.04]" data-no-drag>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={handleBackToContexto}
-              className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] transition-all duration-150 border ${!hasFocoContent ? 'text-[#00E5A0]/70 bg-[#00E5A0]/8 border-[#00E5A0]/15' : 'text-text-faint border-white/[0.04] hover:text-white/45 hover:border-border-default'}`}
-            >
-              <Radio className="w-3 h-3" />
-              Contexto
-            </button>
-            <span className="text-white/10 text-[10px]">→</span>
-            <button
-              onClick={() => scrollToFoco()}
-              className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] transition-all duration-150 border ${hasFocoContent ? 'text-[#D4A017]/70 bg-[#D4A017]/8 border-[#D4A017]/15' : 'text-text-faint border-white/[0.03] cursor-default'}`}
-              disabled={!hasFocoContent}
-            >
-              <BookOpen className="w-3 h-3" />
-              Foco
-              {hasFocoContent && (
-                <span className="h-1.5 w-1.5 rounded-full bg-[#D4A017] animate-pulse" />
-              )}
-            </button>
-          </div>
-          {/* Quick count indicators */}
-          <div className="hidden sm:flex items-center gap-4 text-[9px] font-[family-name:var(--font-jetbrains-mono)]">
-            <span className="text-text-faint">{filteredSignals.length} señales</span>
-            <span className="text-text-faint">{filteredAnalysis.length} en profundidad</span>
-            <span className="text-text-faint">{filteredThreads.length} hilos</span>
+        {/* ── TAB BAR — Monitor Activo + dynamic tabs ── */}
+        <div className="shrink-0 px-3 sm:px-6 py-1.5 flex items-center gap-1 border-b border-white/[0.04] overflow-x-auto" data-no-drag style={{ scrollbarWidth: 'none' }}>
+          {/* Monitor Activo — fixed tab */}
+          <button
+            onClick={() => setActiveTab('monitor')}
+            className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] transition-all duration-150 border ${
+              activeTab === 'monitor'
+                ? 'text-[#00E5A0]/80 bg-[#00E5A0]/10 border-[#00E5A0]/20 shadow-sm'
+                : 'text-white/40 border-white/[0.04] hover:text-white/60 hover:border-white/[0.08]'
+            }`}
+          >
+            <Radio className="w-3 h-3" />
+            <span className="hidden sm:inline">Monitor Activo</span>
+            <span className="sm:hidden">Monitor</span>
+          </button>
+
+          {/* Dynamic tabs */}
+          {dynamicTabs.map((tab) => {
+            const isActive = activeTab === tab.id;
+            const iconMap = { signal: Radio, analysis: Brain, thread: GitBranch };
+            const colorMap = { signal: '#00E5A0', analysis: '#D4A017', thread: '#38BDF8' };
+            const Icon = iconMap[tab.type];
+            const color = colorMap[tab.type];
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`shrink-0 flex items-center gap-1.5 pl-2.5 pr-1.5 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] transition-all duration-150 border ${
+                  isActive
+                    ? 'border-white/[0.12] shadow-sm'
+                    : 'text-white/35 border-white/[0.04] hover:text-white/50 hover:border-white/[0.08]'
+                }`}
+                style={isActive ? { color, backgroundColor: `${color}10`, borderColor: `${color}25` } : undefined}
+                title={tab.title}
+              >
+                <Icon className="w-3 h-3 shrink-0" />
+                <span className="max-w-[120px] sm:max-w-[180px] truncate">{tab.title}</span>
+                <span
+                  onClick={(e) => closeDynamicTab(tab.id, e)}
+                  className="ml-0.5 flex items-center justify-center w-4 h-4 rounded-full hover:bg-white/10 text-white/25 hover:text-white/60 transition-colors cursor-pointer"
+                  title="Cerrar pestaña"
+                >
+                  ×
+                </span>
+              </button>
+            );
+          })}
+
+          {/* Spacer + Quick counts */}
+          <div className="ml-auto shrink-0 hidden sm:flex items-center gap-3 pl-3 border-l border-white/[0.04]">
+            <span className="text-[9px] text-text-faint font-[family-name:var(--font-jetbrains-mono)]">{filteredSignals.length} señales</span>
+            <span className="text-[9px] text-text-faint font-[family-name:var(--font-jetbrains-mono)]">{filteredAnalysis.length} en profundidad</span>
+            <span className="text-[9px] text-text-faint font-[family-name:var(--font-jetbrains-mono)]">{filteredThreads.length} hilos</span>
+            {dynamicTabs.length > 0 && (
+              <span className="text-[9px] text-white/20 font-[family-name:var(--font-jetbrains-mono)]">· {dynamicTabs.length} abiertas</span>
+            )}
           </div>
         </div>
 
-        {/* Horizontal scroll container — GRAB TO SCROLL */}
-        <div
-          ref={scrollContainerRef}
-          className={`flex-1 flex flex-row overflow-x-auto snap-x snap-mandatory select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
-          style={{ scrollBehavior: isDragging ? 'auto' : 'smooth' }}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseLeave}
-        >
-          {/* Panel 1: Contexto (current dashboard) */}
-          <section id="panel-contexto" className="min-w-full snap-start overflow-y-auto">
-            <div className="max-w-screen-2xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-5">
-              <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-4 h-full">
+        {/* ── CONTENT PANEL — single panel, switch by activeTab ── */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="max-w-screen-2xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-5">
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-4 h-full">
 
-                {/* Center column */}
-                <div className={`flex flex-col gap-3 sm:gap-4 min-w-0 ${mobileTab === 'tv' ? 'hidden lg:flex' : 'flex'}`}>
+              {/* ── CENTER COLUMN ── */}
+              <div className={`flex flex-col gap-3 sm:gap-4 min-w-0 ${mobileTab === 'tv' ? 'hidden lg:flex' : 'flex'}`}>
 
-            {/* 1. Buscador — acceso inmediato */}
-            <SearchBar value={searchQuery} onChange={setSearchQuery} />
+                {activeTab === 'monitor' ? (
+                  /* ═══════════════════════════════════════════════
+                     MONITOR ACTIVO — Current Contexto content
+                     ═══════════════════════════════════════════════ */
+                  <>
+                    {/* 1. Buscador */}
+                    <SearchBar value={searchQuery} onChange={setSearchQuery} />
 
-            {/* 2. Pestañas */}
-            <div className="flex gap-1 p-1 rounded-xl bg-[#111827]/90 border border-border-subtle" data-no-drag>
-              {CONTENT_TABS.map((tab) => {
-                const Icon = tab.icon;
-                const isActive = contentTab === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => { setContentTab(tab.id); if (mobileTab !== 'tv') setMobileTab(tab.id); }}
-                    className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-2 sm:px-3 rounded-lg text-[10px] sm:text-[11px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] transition-all duration-150 ${
-                      isActive ? 'shadow-sm' : 'text-white/35 hover:text-white/55 hover:bg-white/[0.03]'
-                    }`}
-                    style={isActive ? { color: tab.color, backgroundColor: `${tab.color}12`, boxShadow: `0 0 12px ${tab.color}10` } : undefined}
-                  >
-                    <Icon className="w-3.5 h-3.5" />
-                    <span className="hidden sm:inline">{tab.label}</span>
-                    <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
-                  </button>
-                );
-              })}
-            </div>
+                    {/* 2. Sub-tabs: Señales / En profundidad / Hilos */}
+                    <div className="flex gap-1 p-1 rounded-xl bg-[#111827]/90 border border-border-subtle" data-no-drag>
+                      {CONTENT_TABS.map((tab) => {
+                        const Icon = tab.icon;
+                        const isActive = contentTab === tab.id;
+                        return (
+                          <button
+                            key={tab.id}
+                            onClick={() => { setContentTab(tab.id); if (mobileTab !== 'tv') setMobileTab(tab.id); }}
+                            className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-2 sm:px-3 rounded-lg text-[10px] sm:text-[11px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] transition-all duration-150 ${
+                              isActive ? 'shadow-sm' : 'text-white/35 hover:text-white/55 hover:bg-white/[0.03]'
+                            }`}
+                            style={isActive ? { color: tab.color, backgroundColor: `${tab.color}12`, boxShadow: `0 0 12px ${tab.color}10` } : undefined}
+                          >
+                            <Icon className="w-3.5 h-3.5" />
+                            <span className="hidden sm:inline">{tab.label}</span>
+                            <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
 
-            {/* 4. Tarjetas — Señales Geopolíticas (accordion) */}
-            {contentTab === 'signals' && (
-              <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 content-auto" data-no-drag>
-                  {filteredSignals.map((signal) => (
-                    <SignalCard
-                      key={signal.id}
-                      signal={signal}
-                      onRegionClick={setSelectedRegion}
-                      onClassifierClick={setSelectedClassifier}
-                      isExpanded={expandedSignalId === signal.id}
-                      onToggleExpand={handleToggleExpandSignal}
-                      onReadFull={handleReadFullSignal}
-                      hasAiAnalysis={signalAiResults.has(signal.id)}
-                    />
-                  ))}
-                  {filteredSignals.length > 0 && (
-                    <div className="sm:col-span-2 flex justify-center">
+                    {/* 3. Content based on sub-tab */}
+                    {/* --- Señales Geopolíticas (accordion) --- */}
+                    {contentTab === 'signals' && (
+                      <>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 content-auto" data-no-drag>
+                          {filteredSignals.map((signal) => (
+                            <SignalCard
+                              key={signal.id}
+                              signal={signal}
+                              onRegionClick={setSelectedRegion}
+                              onClassifierClick={setSelectedClassifier}
+                              isExpanded={expandedSignalId === signal.id}
+                              onToggleExpand={handleToggleExpandSignal}
+                              onReadFull={handleReadFullSignal}
+                              hasAiAnalysis={signalAiResults.has(signal.id)}
+                            />
+                          ))}
+                          {filteredSignals.length > 0 && (
+                            <div className="sm:col-span-2 flex justify-center">
+                              <button
+                                onClick={() => { if (filteredSignals.length >= 2) setComparisonSignal(filteredSignals[0]); }}
+                                className="mt-2 flex items-center gap-2 px-4 py-2 rounded-xl bg-[#00E5A0]/5 border border-[#00E5A0]/15 text-[#00E5A0]/60 hover:bg-[#00E5A0]/10 hover:text-[#00E5A0]/80 transition-colors text-[11px] font-bold font-[family-name:var(--font-space-grotesk)]"
+                              >
+                                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M11 18H8a2 2 0 0 1-2-2V9"/></svg>
+                                Comparar fuentes ({filteredSignals.length} señales geopolíticas)
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                        {filteredSignals.length === 0 && (
+                          <div className="text-center py-16">
+                            <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-4">
+                              <Radar className="w-8 h-8 text-text-faint" />
+                            </div>
+                            <p className="text-sm text-text-faint font-[family-name:var(--font-space-grotesk)]">No se encontraron señales con los filtros actuales</p>
+                          </div>
+                        )}
+                      </>
+                    )}
+
+                    {/* --- En profundidad (accordion) --- */}
+                    {contentTab === 'analysis' && (
+                      <>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 content-auto" data-no-drag>
+                          {filteredAnalysis.map((a) => (
+                            <AnalysisCard
+                              key={a.id}
+                              analysis={a}
+                              isExpanded={expandedAnalysisId === a.id}
+                              onToggleExpand={handleToggleExpandAnalysis}
+                              onReadFull={handleReadFullAnalysis}
+                              hasAiAnalysis={analysisAiResults.has(a.id)}
+                            />
+                          ))}
+                        </div>
+                        {filteredAnalysis.length === 0 && (
+                          <div className="text-center py-16">
+                            <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-4">
+                              <Brain className="w-8 h-8 text-[#D4A017]/20" />
+                            </div>
+                            <p className="text-sm text-text-faint font-[family-name:var(--font-space-grotesk)]">No se encontraron artículos en profundidad con los filtros actuales</p>
+                          </div>
+                        )}
+                      </>
+                    )}
+
+                    {/* --- Hilos Geopolíticos --- */}
+                    {contentTab === 'explorer' && (
+                      <>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 overflow-hidden" data-no-drag>
+                          {([
+                            { id: null as ThreadStatus | 'SEGUIDOS' | null, label: 'Todos', color: '#64748B' },
+                            { id: 'EN_VIVO' as ThreadStatus, label: 'En Vivo', color: '#EF4444' },
+                            { id: 'EVOLUCION' as ThreadStatus, label: 'Evolución', color: '#F59E0B' },
+                            { id: 'RESUELTO' as ThreadStatus, label: 'Resueltos', color: '#00E5A0' },
+                            { id: 'DORMANTE' as ThreadStatus, label: 'Dormantes', color: '#64748B' },
+                            { id: 'SEGUIDOS' as const, label: 'Seguidos', color: '#38BDF8' },
+                          ]).map((f) => {
+                            const isActive = threadFilter === f.id;
+                            const count = f.id === 'SEGUIDOS'
+                              ? followedThreads.size
+                              : f.id === null
+                                ? demoThreads.length
+                                : demoThreads.filter((t) => t.status === f.id).length;
+                            return (
+                              <button
+                                key={f.label}
+                                onClick={() => setThreadFilter(isActive ? null : f.id)}
+                                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] transition-all duration-150 border ${
+                                  isActive ? 'shadow-sm' : 'text-white/35 hover:text-white/55 border-white/[0.04] hover:border-border-default'
+                                }`}
+                                style={isActive ? { color: f.color, backgroundColor: `${f.color}12`, borderColor: `${f.color}30` } : undefined}
+                              >
+                                <span className={`w-1.5 h-1.5 rounded-full ${f.id === 'EN_VIVO' && isActive ? 'animate-pulse' : ''}`} style={{ backgroundColor: f.color }} />
+                                {f.label}
+                                <span className="opacity-50">({count})</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                        <div className="flex flex-col gap-3" data-no-drag>
+                          {filteredThreads.map((thread) => (
+                            <ThreadCard
+                              key={thread.id}
+                              thread={thread}
+                              isFollowed={followedThreads.has(thread.id)}
+                              onToggleFollow={toggleFollowThread}
+                              onSelectThread={handleSelectThread}
+                              onSignalClick={handleThreadSignalClick}
+                            />
+                          ))}
+                          {filteredThreads.length === 0 && (
+                            <div className="text-center py-16">
+                              <div className="w-16 h-16 rounded-2xl bg-white/[0.03] flex items-center justify-center mx-auto mb-4 border border-border-subtle">
+                                <GitBranch className="w-8 h-8 text-[#38BDF8]/20" />
+                              </div>
+                              <p className="text-sm text-text-faint font-[family-name:var(--font-space-grotesk)]">No hay hilos con los filtros actuales</p>
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    )}
+
+                    {/* ── INTELIGENCIA VISUAL — KPIs + Patrones + Mapa (colapsable) ── */}
+                    <div data-no-drag>
                       <button
-                        onClick={() => { if (filteredSignals.length >= 2) setComparisonSignal(filteredSignals[0]); }}
-                        className="mt-2 flex items-center gap-2 px-4 py-2 rounded-xl bg-[#00E5A0]/5 border border-[#00E5A0]/15 text-[#00E5A0]/60 hover:bg-[#00E5A0]/10 hover:text-[#00E5A0]/80 transition-colors text-[11px] font-bold font-[family-name:var(--font-space-grotesk)]"
+                        onClick={() => setIntelSectionOpen(!intelSectionOpen)}
+                        className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl glass border border-border-subtle hover:border-white/[0.10] transition-colors"
                       >
-                        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M11 18H8a2 2 0 0 1-2-2V9"/></svg>
-                        Comparar fuentes ({filteredSignals.length} señales geopolíticas)
+                        <div className="flex items-center gap-2">
+                          <Radar className="w-3.5 h-3.5 text-[#00E5A0]/50" />
+                          <span className="text-[10px] font-bold text-white/40 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">Inteligencia Visual</span>
+                          <span className="text-[9px] text-text-faint font-[family-name:var(--font-jetbrains-mono)]">KPIs · Patrones · Mapa</span>
+                        </div>
+                        <ChevronRight className={`w-4 h-4 text-text-faint transition-transform duration-200 ${intelSectionOpen ? 'rotate-90' : ''}`} />
                       </button>
+                      {intelSectionOpen && (
+                        <div className="flex flex-col gap-3 mt-3 animate-collapse-reveal">
+                          <KpiDashboard signals={filteredSignals} />
+                          <div className="border-l-2 border-[#00E5A0] pl-4 glass p-4 rounded-lg">
+                            <h3 className="text-[9px] sm:text-[10px] font-bold text-[#00E5A0] mb-2 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">Patrones Detectados (24h)</h3>
+                            <PatternList />
+                          </div>
+                          <GeoMap
+                            signals={filteredSignals}
+                            allSignals={demoSignals}
+                            filteredCount={filteredSignals.length}
+                            selectedRelevances={selectedRelevances}
+                            onSelectSignal={handleMapSelectSignal}
+                            onToggleRelevance={toggleRelevance}
+                            onClearRelevance={() => setSelectedRelevances(new Set())}
+                            analyzedSignalIds={signalAiResults}
+                          />
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-                {filteredSignals.length === 0 && (
-                  <div className="text-center py-16">
-                    <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-4">
-                      <Radar className="w-8 h-8 text-text-faint" />
-                    </div>
-                    <p className="text-sm text-text-faint font-[family-name:var(--font-space-grotesk)]">No se encontraron señales con los filtros actuales</p>
-                  </div>
-                )}
-              </>
-            )}
-
-            {/* 4. Tarjetas — En profundidad (accordion) */}
-            {contentTab === 'analysis' && (
-              <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 content-auto" data-no-drag>
-                  {filteredAnalysis.map((a) => (
-                    <AnalysisCard
-                      key={a.id}
-                      analysis={a}
-                      isExpanded={expandedAnalysisId === a.id}
-                      onToggleExpand={handleToggleExpandAnalysis}
-                      onReadFull={handleReadFullAnalysis}
-                      hasAiAnalysis={analysisAiResults.has(a.id)}
-                    />
-                  ))}
-                </div>
-                {filteredAnalysis.length === 0 && (
-                  <div className="text-center py-16">
-                    <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-4">
-                      <Brain className="w-8 h-8 text-[#D4A017]/20" />
-                    </div>
-                    <p className="text-sm text-text-faint font-[family-name:var(--font-space-grotesk)]">No se encontraron artículos en profundidad con los filtros actuales</p>
-                  </div>
-                )}
-              </>
-            )}
-
-            {/* 4. Explorador Geopolítico — threads always go to Foco */}
-            {contentTab === 'explorer' && (
-              <>
-                {/* Filtros rápidos — grid sin scroll */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 overflow-hidden" data-no-drag>
-                  {([
-                    { id: null as ThreadStatus | 'SEGUIDOS' | null, label: 'Todos', color: '#64748B' },
-                    { id: 'EN_VIVO' as ThreadStatus, label: 'En Vivo', color: '#EF4444' },
-                    { id: 'EVOLUCION' as ThreadStatus, label: 'Evolución', color: '#F59E0B' },
-                    { id: 'RESUELTO' as ThreadStatus, label: 'Resueltos', color: '#00E5A0' },
-                    { id: 'DORMANTE' as ThreadStatus, label: 'Dormantes', color: '#64748B' },
-                    { id: 'SEGUIDOS' as const, label: 'Seguidos', color: '#38BDF8' },
-                  ]).map((f) => {
-                    const isActive = threadFilter === f.id;
-                    const count = f.id === 'SEGUIDOS'
-                      ? followedThreads.size
-                      : f.id === null
-                        ? demoThreads.length
-                        : demoThreads.filter((t) => t.status === f.id).length;
-                    return (
-                      <button
-                        key={f.label}
-                        onClick={() => setThreadFilter(isActive ? null : f.id)}
-                        className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] transition-all duration-150 border ${
-                          isActive ? 'shadow-sm' : 'text-white/35 hover:text-white/55 border-white/[0.04] hover:border-border-default'
-                        }`}
-                        style={isActive ? { color: f.color, backgroundColor: `${f.color}12`, borderColor: `${f.color}30` } : undefined}
-                      >
-                        <span className={`w-1.5 h-1.5 rounded-full ${f.id === 'EN_VIVO' && isActive ? 'animate-pulse' : ''}`} style={{ backgroundColor: f.color }} />
-                        {f.label}
-                        <span className="opacity-50">({count})</span>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {/* Thread list — clicking any thread goes to Foco */}
-                <div className="flex flex-col gap-3" data-no-drag>
-                  {filteredThreads.map((thread) => (
-                    <ThreadCard
-                      key={thread.id}
-                      thread={thread}
-                      isFollowed={followedThreads.has(thread.id)}
-                      onToggleFollow={toggleFollowThread}
-                      onSelectThread={handleSelectThread}
-                      onSignalClick={handleThreadSignalClick}
-                    />
-                  ))}
-                  {filteredThreads.length === 0 && (
-                    <div className="text-center py-16">
-                      <div className="w-16 h-16 rounded-2xl bg-white/[0.03] flex items-center justify-center mx-auto mb-4 border border-border-subtle">
-                        <GitBranch className="w-8 h-8 text-[#38BDF8]/20" />
-                      </div>
-                      <p className="text-sm text-text-faint font-[family-name:var(--font-space-grotesk)]">No hay hilos con los filtros actuales</p>
-                    </div>
-                  )}
-                </div>
-              </>
-            )}
-
-            {/* ── SECCIÓN INTELIGENCIA: KPIs + Patrones + Mapa (colapsable) ── */}
-            <div data-no-drag>
-              <button
-                onClick={() => setIntelSectionOpen(!intelSectionOpen)}
-                className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl glass border border-border-subtle hover:border-white/[0.10] transition-colors"
-              >
-                <div className="flex items-center gap-2">
-                  <Radar className="w-3.5 h-3.5 text-[#00E5A0]/50" />
-                  <span className="text-[10px] font-bold text-white/40 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">Inteligencia Visual</span>
-                  <span className="text-[9px] text-text-faint font-[family-name:var(--font-jetbrains-mono)]">KPIs · Patrones · Mapa</span>
-                </div>
-                <ChevronRight className={`w-4 h-4 text-text-faint transition-transform duration-200 ${intelSectionOpen ? 'rotate-90' : ''}`} />
-              </button>
-
-              {intelSectionOpen && (
-                <div className="flex flex-col gap-3 mt-3 animate-collapse-reveal">
-                  <KpiDashboard signals={filteredSignals} />
-                  <div className="border-l-2 border-[#00E5A0] pl-4 glass p-4 rounded-lg">
-                    <h3 className="text-[9px] sm:text-[10px] font-bold text-[#00E5A0] mb-2 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">Patrones Detectados (24h)</h3>
-                    <PatternList />
-                  </div>
-                  <GeoMap
-                    signals={filteredSignals}
-                    allSignals={demoSignals}
-                    filteredCount={filteredSignals.length}
-                    selectedRelevances={selectedRelevances}
-                    onSelectSignal={handleMapSelectSignal}
-                    onToggleRelevance={toggleRelevance}
-                    onClearRelevance={() => setSelectedRelevances(new Set())}
-                    analyzedSignalIds={signalAiResults}
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-
-                {/* Right column — desktop always visible, mobile only on TV tab */}
-                <div className={`flex-col gap-3 ${mobileTab !== 'tv' ? 'hidden lg:flex' : 'flex lg:flex'}`}>
-                  <LivePlayer onOpenFloating={(ch) => setFloatingChannel(ch)} />
-                  {/* LatestSignals + SourceClassifier solo en desktop o en TV tab con espacio */}
-                  <div className="hidden lg:flex flex-col gap-3">
-                    <LatestSignals onSignalClick={handleReadFullSignal} />
-                    <SourceClassifier />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Panel 2: Foco — MULTI-SLOT */}
-          <section id="foco-panel" className="min-w-full snap-start overflow-y-auto bg-[#0A0F1C]" style={{ padding: '2rem' }}>
-            {!hasFocoContent ? (
-              <div className="flex flex-col items-center justify-center py-32">
-                <div className="w-20 h-20 rounded-2xl bg-white/[0.03] flex items-center justify-center border border-border-subtle mb-6">
-                  <Radar className="w-10 h-10 text-white/10" />
-                </div>
-                <p className="text-sm text-text-faint font-[family-name:var(--font-space-grotesk)]">Selecciona una señal, artículo o hilo para ver el contenido detallado.</p>
-                <button
-                  onClick={handleBackToContexto}
-                  className="mt-6 flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.03] border border-border-subtle text-white/35 hover:text-white/55 hover:bg-white/[0.06] transition-colors text-xs font-bold font-[family-name:var(--font-space-grotesk)]"
-                >
-                  ← Volver al panel
-                </button>
-              </div>
-            ) : (
-              <div className="max-w-3xl mx-auto flex flex-col gap-0">
-                {/* ═══ FOCO SEÑAL ═══ */}
-                {selectedSignal && (
-                  <div id="foco-signal" className="pb-2">
-                    {/* Botón de Volver */}
-                    <button
-                      onClick={handleCloseFocoSignal}
-                      className="text-slate-400 hover:text-white mb-6 flex items-center gap-2 text-sm"
-                    >
-                      ← Volver al panel
-                    </button>
-
+                  </>
+                ) : activeTab.startsWith('signal-') && selectedSignal ? (
+                  /* ═══════════════════════════════════════════════
+                     SIGNAL DETAIL TAB
+                     ═══════════════════════════════════════════════ */
+                  <div className="max-w-3xl mx-auto">
                     {/* Section header */}
                     <div className="flex items-center gap-2 mb-4">
                       <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]" style={{ backgroundColor: '#00E5A015', color: '#00E5A0', border: '1px solid #00E5A025' }}>
                         Señal
                       </span>
                     </div>
-
-                    {/* Cabecera de la Señal */}
+                    {/* Header */}
                     <div className="mb-6">
                       <div className="flex items-center gap-2 mb-2 text-xs text-slate-400">
                         <span className={`px-2 py-0.5 rounded font-bold`} style={{ backgroundColor: `${relevanceColors[selectedSignal.relevance]}22`, color: relevanceColors[selectedSignal.relevance] }}>
@@ -900,74 +863,40 @@ export default function Home() {
                         </span>
                         <span>{selectedSignal.source}</span>
                       </div>
-                      <h2 className="text-2xl font-bold text-white leading-tight mb-4" style={{ fontFamily: 'Space Grotesk' }}>
-                        {selectedSignal.title}
-                      </h2>
-                      <p className="text-slate-300 text-lg leading-relaxed">
-                        {selectedSignal.summary}
-                      </p>
+                      <h2 className="text-2xl font-bold text-white leading-tight mb-4" style={{ fontFamily: 'Space Grotesk' }}>{selectedSignal.title}</h2>
+                      <p className="text-slate-300 text-lg leading-relaxed">{selectedSignal.summary}</p>
                     </div>
-
-                    {/* Contenido Completo */}
-                    <div className="mb-4 text-slate-300 leading-relaxed whitespace-pre-line border-l-2 border-slate-700 pl-4">
-                      {selectedSignal.fullContent || selectedSignal.summary}
-                    </div>
-
-                    {/* Enlace al artículo original */}
+                    {/* Full content */}
+                    <div className="mb-4 text-slate-300 leading-relaxed whitespace-pre-line border-l-2 border-slate-700 pl-4">{selectedSignal.fullContent || selectedSignal.summary}</div>
+                    {/* Source URL */}
                     {selectedSignal.sourceUrl && (
-                      <a
-                        href={selectedSignal.sourceUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 mb-6 px-4 py-2 bg-white/[0.03] border border-border-default text-white/40 hover:text-white/60 hover:bg-white/[0.06] rounded-xl transition-colors text-xs font-bold font-[family-name:var(--font-space-grotesk)]"
-                      >
-                        <ExternalLink className="w-3.5 h-3.5" />
-                        Ir al artículo original
+                      <a href={selectedSignal.sourceUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 mb-6 px-4 py-2 bg-white/[0.03] border border-border-default text-white/40 hover:text-white/60 hover:bg-white/[0.06] rounded-xl transition-colors text-xs font-bold font-[family-name:var(--font-space-grotesk)]">
+                        <ExternalLink className="w-3.5 h-3.5" />Ir al artículo original
                       </a>
                     )}
-
-                    {/* Botón de comparar fuentes — solo si la señal existe en demoSignals */}
+                    {/* Compare sources */}
                     {demoSignals.some((s) => s.id === selectedSignal.id) && (
-                    <div className="mb-6">
-                      <button
-                        onClick={() => setComparisonSignal(selectedSignal)}
-                        aria-label={`Comparar cobertura de ${selectedSignal.title} con otras fuentes`}
-                        className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-white/[0.03] border border-border-subtle text-white/50 hover:text-white/70 hover:bg-white/[0.06] rounded-xl transition-colors text-xs font-bold font-[family-name:var(--font-space-grotesk)]"
-                      >
-                        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M11 18H8a2 2 0 0 1-2-2V9"/></svg>
-                        Comparar fuentes de esta señal
-                      </button>
-                    </div>
+                      <div className="mb-6">
+                        <button onClick={() => setComparisonSignal(selectedSignal)} className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-white/[0.03] border border-border-subtle text-white/50 hover:text-white/70 hover:bg-white/[0.06] rounded-xl transition-colors text-xs font-bold font-[family-name:var(--font-space-grotesk)]">
+                          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M11 18H8a2 2 0 0 1-2-2V9"/></svg>
+                          Comparar fuentes de esta señal
+                        </button>
+                      </div>
                     )}
-
-                    {/* Botón de IA + Análisis (PERSISTENTE — no se pierde al navegar) */}
+                    {/* AI Analysis section — PERSISTENT */}
                     <div className="mb-8" aria-live="polite" aria-atomic="true">
                       {!currentSignalAnalysis && !isAnalyzingSignal && !analysisError && (
-                        <button
-                          onClick={() => selectedSignal && fetchAnalysis(selectedSignal)}
-                          className="w-full flex items-center justify-center gap-2 py-3 px-6 bg-[#00E5A0]/10 border border-[#00E5A0]/20 text-[#00E5A0] rounded-xl hover:bg-[#00E5A0]/20 transition-colors font-bold font-[family-name:var(--font-space-grotesk)]"
-                        >
-                          <Brain className="w-4 h-4" />
-                          Analizar con IA desde el Sur Global
+                        <button onClick={() => selectedSignal && fetchAnalysis(selectedSignal)} className="w-full flex items-center justify-center gap-2 py-3 px-6 bg-[#00E5A0]/10 border border-[#00E5A0]/20 text-[#00E5A0] rounded-xl hover:bg-[#00E5A0]/20 transition-colors font-bold font-[family-name:var(--font-space-grotesk)]">
+                          <Brain className="w-4 h-4" />Analizar con IA desde el Sur Global
                         </button>
                       )}
-
-                      {isAnalyzingSignal && (
-                        <AnalysisPipeline variant="signal" startTime={analysisStartTime} />
-                      )}
-
+                      {isAnalyzingSignal && <AnalysisPipeline variant="signal" startTime={analysisStartTime} />}
                       {analysisError && !isAnalyzingSignal && (
                         <div className="glass rounded-xl p-4 flex flex-col items-center gap-3" role="alert">
                           <p className="text-sm text-red-400 font-[family-name:var(--font-space-grotesk)]">{analysisError}</p>
-                          <button
-                            onClick={() => selectedSignal && fetchAnalysis(selectedSignal)}
-                            className="px-4 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold hover:bg-red-500/20 transition-colors font-[family-name:var(--font-jetbrains-mono)]"
-                          >
-                            Reintentar
-                          </button>
+                          <button onClick={() => selectedSignal && fetchAnalysis(selectedSignal)} className="px-4 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold hover:bg-red-500/20 transition-colors font-[family-name:var(--font-jetbrains-mono)]">Reintentar</button>
                         </div>
                       )}
-
                       {currentSignalAnalysis && !isAnalyzingSignal && (
                         <div className="flex flex-col gap-3">
                           <div className="flex items-center justify-between mb-2">
@@ -975,136 +904,65 @@ export default function Home() {
                               <Brain className="w-4 h-4 text-[#00E5A0]" />
                               <span className="text-sm font-bold text-[#00E5A0]/80 font-[family-name:var(--font-space-grotesk)]">Análisis IA — Perspectiva Sur Global</span>
                             </div>
-                            <button
-                              onClick={() => selectedSignal && handleDismissSignalAi(selectedSignal.id)}
-                              className="px-2 py-1 rounded-lg bg-white/[0.03] border border-border-subtle text-white/30 hover:text-red-400 hover:border-red-500/20 transition-colors text-[9px] font-bold font-[family-name:var(--font-jetbrains-mono)]"
-                              title="Descartar análisis"
-                            >
-                              Descartar
-                            </button>
+                            <button onClick={() => selectedSignal && handleDismissSignalAi(selectedSignal.id)} className="px-2 py-1 rounded-lg bg-white/[0.03] border border-border-subtle text-white/30 hover:text-red-400 hover:border-red-500/20 transition-colors text-[9px] font-bold font-[family-name:var(--font-jetbrains-mono)]" title="Descartar análisis">Descartar</button>
                           </div>
                           <div className="glass rounded-xl p-4 prose-invert">
-                            <ReactMarkdown
-                              components={{
-                                h3: ({ children }) => (
-                                  <h3 className="text-xs font-bold text-[#00E5A0]/70 uppercase tracking-wider mb-2 mt-4 first:mt-0 font-[family-name:var(--font-jetbrains-mono)]">{children}</h3>
-                                ),
-                                h2: ({ children }) => (
-                                  <h2 className="text-xs font-bold text-[#00E5A0]/70 uppercase tracking-wider mb-2 mt-4 first:mt-0 font-[family-name:var(--font-jetbrains-mono)]">{children}</h2>
-                                ),
-                                strong: ({ children }) => (
-                                  <strong className="text-white/90 font-bold">{children}</strong>
-                                ),
-                                p: ({ children }) => (
-                                  <p className="text-sm text-white/65 leading-relaxed mb-3 last:mb-0 font-[family-name:var(--font-space-grotesk)]">{children}</p>
-                                ),
-                                ul: ({ children }) => (
-                                  <ul className="text-sm text-white/65 leading-relaxed mb-3 pl-4 list-disc font-[family-name:var(--font-space-grotesk)]">{children}</ul>
-                                ),
-                                ol: ({ children }) => (
-                                  <ol className="text-sm text-white/65 leading-relaxed mb-3 pl-4 list-decimal font-[family-name:var(--font-space-grotesk)]">{children}</ol>
-                                ),
-                                li: ({ children }) => (
-                                  <li className="mb-1">{children}</li>
-                                ),
-                              }}
-                            >
-                              {currentSignalAnalysis}
-                            </ReactMarkdown>
+                            <ReactMarkdown components={{
+                              h3: ({ children }) => <h3 className="text-xs font-bold text-[#00E5A0]/70 uppercase tracking-wider mb-2 mt-4 first:mt-0 font-[family-name:var(--font-jetbrains-mono)]">{children}</h3>,
+                              h2: ({ children }) => <h2 className="text-xs font-bold text-[#00E5A0]/70 uppercase tracking-wider mb-2 mt-4 first:mt-0 font-[family-name:var(--font-jetbrains-mono)]">{children}</h2>,
+                              strong: ({ children }) => <strong className="text-white/90 font-bold">{children}</strong>,
+                              p: ({ children }) => <p className="text-sm text-white/65 leading-relaxed mb-3 last:mb-0 font-[family-name:var(--font-space-grotesk)]">{children}</p>,
+                              ul: ({ children }) => <ul className="text-sm text-white/65 leading-relaxed mb-3 pl-4 list-disc font-[family-name:var(--font-space-grotesk)]">{children}</ul>,
+                              ol: ({ children }) => <ol className="text-sm text-white/65 leading-relaxed mb-3 pl-4 list-decimal font-[family-name:var(--font-space-grotesk)]">{children}</ol>,
+                              li: ({ children }) => <li className="mb-1">{children}</li>,
+                            }}>{currentSignalAnalysis}</ReactMarkdown>
                           </div>
                         </div>
                       )}
                     </div>
-
-                    {/* Divider */}
-                    {(selectedAnalysis || selectedThread) && (
-                      <div className="border-t border-border-subtle my-8" />
-                    )}
                   </div>
-                )}
-
-                {/* ═══ FOCO ANÁLISIS ═══ */}
-                {selectedAnalysis && (
-                  <div id="foco-analysis" className="pb-2">
-                    {/* ← Volver */}
-                    <button
-                      onClick={handleCloseFocoAnalysis}
-                      className="text-slate-400 hover:text-white mb-6 flex items-center gap-2 text-sm"
-                    >
-                      ← Volver al panel
-                    </button>
-
-                    {/* Section header */}
+                ) : activeTab.startsWith('analysis-') && selectedAnalysis ? (
+                  /* ═══════════════════════════════════════════════
+                     ANALYSIS DETAIL TAB
+                     ═══════════════════════════════════════════════ */
+                  <div className="max-w-3xl mx-auto">
                     <div className="flex items-center gap-2 mb-4">
-                      <span
-                        className="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]"
-                        style={{ backgroundColor: '#D4A01720', color: '#D4A017', border: '1px solid #D4A01730' }}
-                      >
-                        En profundidad
-                      </span>
+                      <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]" style={{ backgroundColor: '#D4A01720', color: '#D4A017', border: '1px solid #D4A01730' }}>En profundidad</span>
                     </div>
-
-                    {/* Badge + readTime + date */}
                     <div className="flex items-center flex-wrap gap-2 mb-3">
-                      <span className="flex items-center gap-1 text-[10px] text-white/35 font-[family-name:var(--font-jetbrains-mono)]">
-                        <BookOpen className="w-3.5 h-3.5" />
-                        {selectedAnalysis.readTime} min lectura
-                      </span>
-                      <span className="text-[10px] text-text-faint ml-auto font-[family-name:var(--font-jetbrains-mono)]">
-                        {mounted ? new Date(selectedAnalysis.timestamp).toLocaleDateString('es', { year: 'numeric', month: 'long', day: 'numeric' }) : selectedAnalysis.id}
-                      </span>
+                      <span className="flex items-center gap-1 text-[10px] text-white/35 font-[family-name:var(--font-jetbrains-mono)]"><BookOpen className="w-3.5 h-3.5" />{selectedAnalysis.readTime} min lectura</span>
+                      <span className="text-[10px] text-text-faint ml-auto font-[family-name:var(--font-jetbrains-mono)]">{mounted ? new Date(selectedAnalysis.timestamp).toLocaleDateString('es', { year: 'numeric', month: 'long', day: 'numeric' }) : selectedAnalysis.id}</span>
                     </div>
-
-                    {/* Hero image */}
                     {selectedAnalysis.image && (
                       <div className="relative w-full h-48 overflow-hidden rounded-xl mb-3">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={selectedAnalysis.image} alt={selectedAnalysis.title} className="w-full h-full object-cover" loading="lazy" decoding="async" />
                         <div className="absolute inset-0 bg-gradient-to-t from-[#0A0F1C] to-transparent" />
                       </div>
                     )}
-
-                    {/* Title */}
-                    <h2 className="text-lg sm:text-xl font-bold text-white mb-3 font-[family-name:var(--font-space-grotesk)]">
-                      {selectedAnalysis.title}
-                    </h2>
-
-                    {/* Author + region */}
+                    <h2 className="text-lg sm:text-xl font-bold text-white mb-3 font-[family-name:var(--font-space-grotesk)]">{selectedAnalysis.title}</h2>
                     <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl mb-4 flex-wrap" style={{ backgroundColor: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
                       <div className="flex items-center gap-1.5 shrink-0">
                         <User className="w-3.5 h-3.5 text-white/30" />
                         <span className="text-xs font-bold text-white/70 font-[family-name:var(--font-space-grotesk)]">{selectedAnalysis.author}</span>
-                        {selectedAnalysis.authorRole && (<>
-                          <span className="text-white/10 text-xs">·</span>
-                          <span className="text-[10px] text-white/35 font-[family-name:var(--font-jetbrains-mono)]">{selectedAnalysis.authorRole}</span>
-                        </>)}
+                        {selectedAnalysis.authorRole && (<><span className="text-white/10 text-xs">·</span><span className="text-[10px] text-white/35 font-[family-name:var(--font-jetbrains-mono)]">{selectedAnalysis.authorRole}</span></>)}
                       </div>
                       <span className="text-white/10 text-xs">·</span>
                       <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]" style={{ backgroundColor: '#D4A01712', color: '#D4A01770' }}>{selectedAnalysis.region}</span>
                     </div>
-
-                    {/* Full content — lazy loaded */}
                     <div className="mb-4">
                       {!analysisFullContent ? (
-                        <div className="flex items-center gap-2 py-4">
-                          <div className="w-4 h-4 border-2 border-white/10 border-t-white/30 rounded-full animate-spin" />
-                          <span className="text-xs text-white/30 font-[family-name:var(--font-jetbrains-mono)]">Cargando contenido...</span>
-                        </div>
+                        <div className="flex items-center gap-2 py-4"><div className="w-4 h-4 border-2 border-white/10 border-t-white/30 rounded-full animate-spin" /><span className="text-xs text-white/30 font-[family-name:var(--font-jetbrains-mono)]">Cargando contenido...</span></div>
                       ) : (
                         analysisFullContent.split('\n\n').map((paragraph, i) => (
                           <p key={i} className="text-sm text-white/70 leading-relaxed mb-3 last:mb-0 font-[family-name:var(--font-space-grotesk)]">{paragraph}</p>
                         ))
                       )}
                     </div>
-
-                    {/* Tags */}
                     <div className="flex items-center flex-wrap gap-2 mb-3">
                       {selectedAnalysis.tags.map((tag) => (
                         <span key={tag} className="px-2 py-0.5 rounded text-[10px] font-bold font-[family-name:var(--font-jetbrains-mono)]" style={{ backgroundColor: '#D4A01712', color: '#D4A01770' }}>{tag}</span>
                       ))}
                     </div>
-
-                    {/* Related signals */}
                     {relatedAnalysisSignals.length > 0 && (
                       <div className="mb-4">
                         <div className="flex items-center gap-2 mb-2.5">
@@ -1113,11 +971,7 @@ export default function Home() {
                         </div>
                         <div className="flex flex-col gap-1.5">
                           {relatedAnalysisSignals.map(({ signal }) => (
-                            <button
-                              key={signal.id}
-                              onClick={() => handleReadFullSignal(signal)}
-                              className="text-left flex items-start gap-2.5 px-3 py-2 rounded-lg bg-white/[0.02] border border-white/[0.04] hover:bg-white/[0.05] hover:border-white/[0.1] transition-colors"
-                            >
+                            <button key={signal.id} onClick={() => handleReadFullSignal(signal)} className="text-left flex items-start gap-2.5 px-3 py-2 rounded-lg bg-white/[0.02] border border-white/[0.04] hover:bg-white/[0.05] hover:border-white/[0.1] transition-colors">
                               <div className="min-w-0 flex-1">
                                 <p className="text-[11px] font-bold text-white/60 leading-snug font-[family-name:var(--font-space-grotesk)] line-clamp-2">{signal.title}</p>
                                 <div className="flex items-center gap-2 mt-1">
@@ -1132,25 +986,16 @@ export default function Home() {
                         </div>
                       </div>
                     )}
-
-                    {/* Divider */}
                     <div className="w-full h-px bg-white/[0.06] mb-6" />
-
-                    {/* AI Analysis (PERSISTENTE — no se pierde al navegar) */}
+                    {/* AI Analysis */}
                     <div className="mb-8" aria-live="polite" aria-atomic="true">
                       {!currentAnalysisAiResult && !isAnalyzingArticle && !analysisAiError && (
-                        <button
-                          onClick={fetchAnalysisAi}
-                          disabled={!analysisFullContent}
-                          className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl transition-colors duration-150 font-[family-name:var(--font-space-grotesk)] ${analysisFullContent ? 'bg-[#D4A017]/10 border border-[#D4A017]/20 text-[#D4A017] hover:bg-[#D4A017]/20' : 'bg-white/[0.03] border border-border-subtle text-text-faint cursor-not-allowed'}`}
-                        >
+                        <button onClick={fetchAnalysisAi} disabled={!analysisFullContent} className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl transition-colors duration-150 font-[family-name:var(--font-space-grotesk)] ${analysisFullContent ? 'bg-[#D4A017]/10 border border-[#D4A017]/20 text-[#D4A017] hover:bg-[#D4A017]/20' : 'bg-white/[0.03] border border-border-subtle text-text-faint cursor-not-allowed'}`}>
                           <Brain className={`w-4 h-4 ${!analysisFullContent ? 'animate-pulse' : ''}`} />
                           <span className="text-sm font-bold">{analysisFullContent ? 'Análisis IA — Perspectiva Sur Global' : 'Cargando contenido...'}</span>
                         </button>
                       )}
-                      {isAnalyzingArticle && (
-                        <AnalysisPipeline variant="analysis" startTime={analysisAiStartTime} />
-                      )}
+                      {isAnalyzingArticle && <AnalysisPipeline variant="analysis" startTime={analysisAiStartTime} />}
                       {analysisAiError && !isAnalyzingArticle && (
                         <div className="glass rounded-xl p-4 flex flex-col items-center gap-3" role="alert">
                           <p className="text-sm text-red-400 font-[family-name:var(--font-space-grotesk)]">{analysisAiError}</p>
@@ -1164,61 +1009,66 @@ export default function Home() {
                               <Brain className="w-4 h-4 text-[#D4A017]" />
                               <span className="text-sm font-bold text-[#D4A017]/80 font-[family-name:var(--font-space-grotesk)]">Análisis IA — Perspectiva Sur Global</span>
                             </div>
-                            <button
-                              onClick={() => selectedAnalysis && handleDismissAnalysisAi(selectedAnalysis.id)}
-                              className="px-2 py-1 rounded-lg bg-white/[0.03] border border-border-subtle text-white/30 hover:text-red-400 hover:border-red-500/20 transition-colors text-[9px] font-bold font-[family-name:var(--font-jetbrains-mono)]"
-                              title="Descartar análisis"
-                            >
-                              Descartar
-                            </button>
+                            <button onClick={() => selectedAnalysis && handleDismissAnalysisAi(selectedAnalysis.id)} className="px-2 py-1 rounded-lg bg-white/[0.03] border border-border-subtle text-white/30 hover:text-red-400 hover:border-red-500/20 transition-colors text-[9px] font-bold font-[family-name:var(--font-jetbrains-mono)]" title="Descartar análisis">Descartar</button>
                           </div>
                           <div className="glass rounded-xl p-4 prose-invert">
-                            <ReactMarkdown
-                              components={{
-                                h3: ({ children }) => <h3 className="text-xs font-bold text-[#D4A017]/70 uppercase tracking-wider mb-2 mt-4 first:mt-0 font-[family-name:var(--font-jetbrains-mono)]">{children}</h3>,
-                                h2: ({ children }) => <h2 className="text-xs font-bold text-[#D4A017]/70 uppercase tracking-wider mb-2 mt-4 first:mt-0 font-[family-name:var(--font-jetbrains-mono)]">{children}</h2>,
-                                strong: ({ children }) => <strong className="text-white/90 font-bold">{children}</strong>,
-                                p: ({ children }) => <p className="text-sm text-white/65 leading-relaxed mb-3 last:mb-0 font-[family-name:var(--font-space-grotesk)]">{children}</p>,
-                                ul: ({ children }) => <ul className="text-sm text-white/65 leading-relaxed mb-3 pl-4 list-disc font-[family-name:var(--font-space-grotesk)]">{children}</ul>,
-                                ol: ({ children }) => <ol className="text-sm text-white/65 leading-relaxed mb-3 pl-4 list-decimal font-[family-name:var(--font-space-grotesk)]">{children}</ol>,
-                                li: ({ children }) => <li className="mb-1">{children}</li>,
-                              }}
-                            >{currentAnalysisAiResult}</ReactMarkdown>
+                            <ReactMarkdown components={{
+                              h3: ({ children }) => <h3 className="text-xs font-bold text-[#D4A017]/70 uppercase tracking-wider mb-2 mt-4 first:mt-0 font-[family-name:var(--font-jetbrains-mono)]">{children}</h3>,
+                              h2: ({ children }) => <h2 className="text-xs font-bold text-[#D4A017]/70 uppercase tracking-wider mb-2 mt-4 first:mt-0 font-[family-name:var(--font-jetbrains-mono)]">{children}</h2>,
+                              strong: ({ children }) => <strong className="text-white/90 font-bold">{children}</strong>,
+                              p: ({ children }) => <p className="text-sm text-white/65 leading-relaxed mb-3 last:mb-0 font-[family-name:var(--font-space-grotesk)]">{children}</p>,
+                              ul: ({ children }) => <ul className="text-sm text-white/65 leading-relaxed mb-3 pl-4 list-disc font-[family-name:var(--font-space-grotesk)]">{children}</ul>,
+                              ol: ({ children }) => <ol className="text-sm text-white/65 leading-relaxed mb-3 pl-4 list-decimal font-[family-name:var(--font-space-grotesk)]">{children}</ol>,
+                              li: ({ children }) => <li className="mb-1">{children}</li>,
+                            }}>{currentAnalysisAiResult}</ReactMarkdown>
                           </div>
                         </div>
                       )}
                     </div>
-
-                    {/* Disclaimer */}
                     <div className="border-t border-border-subtle pt-3">
-                      <p className="text-[9px] text-text-faint leading-relaxed font-[family-name:var(--font-jetbrains-mono)]">
-                        Los análisis publicados en esta sección reflejan la perspectiva editorial de Óptica Sur Global. Las fuentes citadas son verificables y públicas.
-                      </p>
+                      <p className="text-[9px] text-text-faint leading-relaxed font-[family-name:var(--font-jetbrains-mono)]">Los análisis publicados en esta sección reflejan la perspectiva editorial de Óptica Sur Global. Las fuentes citadas son verificables y públicas.</p>
                     </div>
-
-                    {/* Divider */}
-                    {selectedThread && (
-                      <div className="border-t border-border-subtle my-8" />
-                    )}
                   </div>
-                )}
-
-                {/* ═══ FOCO HILO ═══ */}
-                {selectedThread && (
-                  <div id="foco-thread" className="pb-2">
+                ) : activeTab.startsWith('thread-') && selectedThread ? (
+                  /* ═══════════════════════════════════════════════
+                     THREAD DETAIL TAB
+                     ═══════════════════════════════════════════════ */
+                  <div className="max-w-3xl mx-auto">
                     <ThreadDetail
                       thread={selectedThread}
                       isFollowed={followedThreads.has(selectedThread.id)}
                       onToggleFollow={toggleFollowThread}
-                      onClose={handleCloseFocoThread}
+                      onClose={() => closeDynamicTab(`thread-${selectedThread.id}`)}
                       onNavigateRelation={handleNavigateThreadRelation}
                       onSignalClick={handleThreadSignalClick}
                     />
                   </div>
+                ) : (
+                  /* ═══════════════════════════════════════════════
+                     FALLBACK — tab data not found, go back to monitor
+                     ═══════════════════════════════════════════════ */
+                  <div className="flex flex-col items-center justify-center py-32">
+                    <div className="w-20 h-20 rounded-2xl bg-white/[0.03] flex items-center justify-center border border-border-subtle mb-6">
+                      <Radar className="w-10 h-10 text-white/10" />
+                    </div>
+                    <p className="text-sm text-text-faint font-[family-name:var(--font-space-grotesk)]">Contenido no disponible.</p>
+                    <button onClick={() => setActiveTab('monitor')} className="mt-6 flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.03] border border-border-subtle text-white/35 hover:text-white/55 hover:bg-white/[0.06] transition-colors text-xs font-bold font-[family-name:var(--font-space-grotesk)]">
+                      ← Volver al Monitor Activo
+                    </button>
+                  </div>
                 )}
               </div>
-            )}
-          </section>
+
+              {/* ── RIGHT COLUMN — always visible ── */}
+              <div className={`flex-col gap-3 ${mobileTab !== 'tv' ? 'hidden lg:flex' : 'flex lg:flex'}`}>
+                <LivePlayer onOpenFloating={(ch) => setFloatingChannel(ch)} />
+                <div className="hidden lg:flex flex-col gap-3">
+                  <LatestSignals onSignalClick={handleReadFullSignal} />
+                  <SourceClassifier />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         </div>{/* ── closes CONTENT COLUMN wrapper ── */}
       </div>
