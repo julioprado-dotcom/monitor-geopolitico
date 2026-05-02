@@ -583,8 +583,11 @@ export default function Home() {
           <MGSidebar selectedRegion={selectedRegion} selectedClassifier={selectedClassifier} onRegionSelect={setSelectedRegion} onClassifierSelect={setSelectedClassifier} activeTab={contentTab} />
         </div>
 
+        {/* ── CONTENT COLUMN: Zone Nav Bar + Scroll Container (vertical stack) ── */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+
         {/* ── ZONE NAV BAR — indicador Contexto / Foco ── */}
-        <div className="shrink-0 px-3 sm:px-6 py-1.5 flex items-center justify-between border-b border-white/[0.04]">
+        <div className="shrink-0 px-3 sm:px-6 py-1.5 flex items-center justify-between border-b border-white/[0.04]" data-no-drag>
           <div className="flex items-center gap-3">
             <button
               onClick={handleBackToContexto}
@@ -1179,6 +1182,7 @@ export default function Home() {
             )}
           </section>
         </div>
+        </div>{/* ── closes CONTENT COLUMN wrapper ── */}
       </div>
 
       {/* FLOATING PROJECTOR */}
