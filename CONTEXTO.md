@@ -38,9 +38,9 @@ sleep 10 && curl -s -o /dev/null -w "%{http_code}" http://localhost:3000
 ## 2. IDENTIDAD DEL PROYECTO
 
 Nombre: Monitor Geopolítico — News Connect
-Versión: 1.0.0-meridian (archivo estable — pre-rediseño de navegación)
+Versión: 1.0.0-meridian (archivo estable) → desarrollo activo post-v1.0.0
 Repositorio: https://github.com/julioprado-dotcom/monitor-geopolitico
-Último commit: pending — archive release v1.0.0-meridian
+Último commit: 34042d7 — feat: tab transition animations — slide, fade, indicator, open/close
 Tags: v0.9.0-meridian, v0.9.1-meridian, v0.9.2-meridian, v0.9.3-meridian, v0.9.4-meridian, v0.9.5-meridian, v1.0.0-meridian
 Descripción: Plataforma de monitoreo geopolítico con óptica del Sur Global que recopila, clasifica y analiza señales de múltiples fuentes mediante IA. Combina un sistema de TV en vivo con análisis automatizado para ofrecer una perspectiva crítica y no hegemónica de la realidad internacional.
 
@@ -63,7 +63,7 @@ src/components/ — 13 componentes: FloatingProjector.tsx (293 líneas), Proyect
 src/components/ui/ — 53 componentes shadcn/ui (accordion, alert, badge, button, card, dialog, drawer, select, tabs, tooltip, etc.)
 src/data/ — channels.ts (14 canales de TV con metadatos de streaming), signals.ts (tipos TypeScript + datos demo + sourceCountry compartido + DISCLAIMER actualizado con marca Newsconnect), signalContent.ts (contenido completo de señales SIG-xxx, lazy load), analysis.ts (tipos TypeScript + datos de análisis ANL-xxx), analysisContent.ts (contenido completo de análisis, lazy load)
 src/lib/ — db.ts (Prisma ORM), utils.ts, analysisPrompt.ts (prompt compartido de análisis con 7 dimensiones y 2 tipos), rateLimit.ts
-src/hooks/ — use-toast.ts, use-mobile.ts, useMounted.ts
+src/hooks/ — use-toast.ts, use-mobile.ts, useMounted.ts, useTabTransition.ts (animaciones direction-aware de tabs), useFocusTrap.ts
 docs/ — 14 documentos estratégicos (ver §22-23) + 3 PDFs (Marco_Conceptual.pdf NO cambiar)
 CONTEXTO.md, PROTOCOLO_GIT.md, .gitignore (incluye .zscripts/, worklog.md, download/)
 
@@ -156,8 +156,8 @@ Historial_Desarrollo.pdf: referencia 0.8.0 DESACTUALIZADO (pendiente actualizaci
 Marco Conceptual: v0.9.0
 Tags Git: v0.9.0-meridian, v0.9.1-meridian, v0.9.2-meridian, v0.9.3-meridian, v0.9.4-meridian, v0.9.5-meridian, v1.0.0-meridian
 
-### v1.0.0-meridian — VERSIÓN ARCHIVO ESTABLE
-**Hito**: Primera versión estable completa de la arquitectura Meridian. Contiene todo el desarrollo hasta la sesión del 2026-05-02, antes del rediseño de navegación horizontal. Esta versión se archiva como punto de restauración seguro.
+### v1.0.0-meridian — VERSIÓN ARCHIVO ESTABLE (tag v1.0.0-meridian, commit 85a24d8)
+**Hito**: Primera versión estable completa de la arquitectura Meridian. Contiene todo el desarrollo hasta la sesión del 2026-05-02, antes del rediseño de navegación. Esta versión se archiva como punto de restauración seguro.
 
 **Estado funcional al archivar:**
 - Dashboard Contexto/Foco con navegación horizontal grab-to-scroll
@@ -178,14 +178,51 @@ Tags Git: v0.9.0-meridian, v0.9.1-meridian, v0.9.2-meridian, v0.9.3-meridian, v0
 - MIG-01 + MIG-02: tipos centralizados, config unificada
 - Code audit limpio: 0 inconsistencias tras eliminación de import Tv no usado
 
-**Componentes (20 custom + 53 shadcn/ui):**
-SignalCard, AnalysisCard, AnalysisPipeline, AnalysisOverlay, SignalOverlay, GeoMap, SearchBar, SourceClassifier, SourceComparisonView, HLSPlayer, LivePlayer, FloatingProjector, ProyectorWindow, KpiDashboard, LatestSignals, MetricsBar, PatternList, MGSidebar, Explorer/ThreadCard, Explorer/ThreadDetail
-
 **Notas de archivo:**
 - v0.9.5-meridian permanece como tag de respaldo inmediato
-- La próxima versión iniciará el rediseño de navegación (Monitor Activo + Pizarra)
 - analysisPrompt.ts (207 líneas) es INMUTABLE
 - SignalOverlay.tsx y AnalysisOverlay.tsx existen en disco pero NO se importan
+
+---
+
+### Post-v1.0.0 — Desarrollo activo (commits dba4a3b, 3d8e92f, 34042d7)
+
+**Commit dba4a3b — Tab-based navigation (Monitor Activo + dynamic sticky tabs):**
+- Reemplazada navegación horizontal grab-to-scroll (Contexto/Foco) por sistema de pestañas
+- Monitor Activo: tab fija con 3 sub-tabs (Señales Geopolíticas | En profundidad | Hilos Geopolíticos)
+- Pestañas dinámicas: al clicar "Leer artículo completo" o seleccionar hilo → abre tab con × para cerrar
+- Max 5 tabs dinámicas, FIFO al superar límite
+- Tab state: `activeTab` (string), `dynamicTabs` (DynamicTab[])
+- Shell companion (columna derecha) siempre visible: GeoMap, LivePlayer, LatestSignals, SourceClassifier
+- Tipo DynamicTab: { id: 'signal-{id}' | 'analysis-{id}' | 'thread-{id}', type, title: string }
+- page.tsx reducido de ~1,267 a ~1,163 líneas
+
+**Commit 3d8e92f — Rename tab "Análisis" → "En profundidad":**
+- Renombrada etiqueta de tab y badge en: page.tsx, MGSidebar.tsx, AnalysisCard.tsx
+- NO se tocaron variables internas ni labels "Análisis IA"
+
+**Commit 34042d7 — Tab transition animations:**
+- Hook `useTabTransition`: calcula dirección (left/right) según posición en tab bar
+- Hook `useTabIndicator`: rastrea posición/width del botón activo para indicador deslizante
+- 5 animaciones CSS GPU-accelerated (transform+opacity only):
+  · tabSlideFromRight (0.22s cubic-bezier spring): contenido desliza desde derecha
+  · tabSlideFromLeft (0.22s): contenido desliza desde izquierda
+  · tabFadeScale (0.2s): fallback con scale+fade
+  · tabOpenPop (0.28s con overshoot): nueva pestaña spring pop-in
+  · tabCloseCollapse (0.2s): pestaña cierra colapsando con max-width transition
+- Indicador deslizante: barra con glow (::after con blur) sigue la tab activa (0.25s)
+- Colores de indicador por tipo: señal #00E5A0, análisis #D4A017, hilo #38BDF8
+- Archivo nuevo: src/hooks/useTabTransition.ts (102 líneas)
+- Respects prefers-reduced-motion
+
+**Estado actual del page.tsx:**
+- ~1,163 líneas, 31 useState, 25+ useCallback, 5 useMemo, 7 dynamic imports
+- Arquitectura: Tab bar (arriba) → Content panel (centro, animado) → Right column (fija)
+- Sub-tabs de Monitor Activo renderizan como pilas condicionales (NO lazy/suspend)
+- Contenido animado envuelto en `<div key={animationKey} className={tabContentAnimClass}>`
+- Indicador renderizado como `.tab-indicator` absoluto dentro del tab bar container
+- openingTabId/closingTabId controlan animaciones de apertura/cierre de tabs dinámicas
+- Scroll del content panel se resetea al cambiar de tab (comportamiento actual)
 
 ### Changelog v0.9.5-meridian (desde v0.9.4) — MANTENIDO COMO REFERENCIA
 - Panel de Foco multi-slot (señal + análisis + hilo simultáneos) con scroll horizontal grab-to-scroll
@@ -234,7 +271,15 @@ Ver plan completo: /home/z/my-project/docs/PLAN_PROXY_ANTICENSURA.md
 
 ## 15. TAREAS PENDIENTES
 
-PRE-REQUISITO: Ejecutar migraciones de docs/PLAN_MIGRACION.md (22 migraciones, ~3 días) antes de iniciar cualquier tarea funcional. Ver también docs/PLAN_IMPLEMENTACION.md para el plan completo con cronograma.
+### POST-v1.0.0 — Mejoras inmediatas de UX
+1. **Scroll memory por tab**: guardar scroll position en ref por tabId y restaurar al volver (actualmente se resetea)
+2. **GeoMap context-aware**: pasar `focusRegion` prop cuando se activa tab de señal → mapa zoom a la región de la señal
+3. **Mobile tab experience**: en mobile (< lg), la tab bar necesita scroll horizontal + maybe drawer para sub-tabs
+4. **Performance: lazy/suspend sub-tabs**: las 3 pilas condicionales de Monitor Activo se renderizan siempre; considerar React.lazy o Suspense para las no activas
+5. **Refactor page.tsx**: 1,163 líneas con 31 useState es muy pesado. Extraer lógica de tabs a hook custom, maybe extract dynamic tab panel a componente propio
+6. **Tab keyboard navigation**: Ctrl+Tab / Ctrl+Shift+Tab para ciclar tabs, Ctrl+W para cerrar tab activa
+
+### PRE-REQUISITO: Ejecutar migraciones de docs/PLAN_MIGRACION.md (22 migraciones, ~3 días) antes de iniciar cualquier tarea funcional. Ver también docs/PLAN_IMPLEMENTACION.md para el plan completo con cronograma.
 
 Prioridad 0 — URGENTE (bugs activos en la UI):
 1. ~~**Overlays (SignalOverlay + AnalysisOverlay) — flecha scroll y botón cerrar**~~ ✅ RESUELTO (sesión 2026-04-29)
