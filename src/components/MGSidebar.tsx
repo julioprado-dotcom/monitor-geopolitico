@@ -40,7 +40,7 @@ const regionIcons: Record<string, string> = {
 
 const tabLabels: Record<ContentTab, string> = {
   signals: 'Señales Geopolíticas',
-  analysis: 'Análisis',
+  analysis: 'En profundidad',
   explorer: 'Hilos Geopolíticos',
 };
 

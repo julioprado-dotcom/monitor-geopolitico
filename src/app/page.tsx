@@ -69,7 +69,7 @@ type MobileTab = ContentTab | 'tv';
 
 const CONTENT_TABS: { id: ContentTab; label: string; icon: typeof Radio; color: string }[] = [
   { id: 'signals', label: 'Señales Geopolíticas', icon: Radio, color: '#00E5A0' },
-  { id: 'analysis', label: 'Análisis', icon: Brain, color: '#D4A017' },
+  { id: 'analysis', label: 'En profundidad', icon: Brain, color: '#D4A017' },
   { id: 'explorer', label: 'Hilos Geopolíticos', icon: GitBranch, color: '#38BDF8' },
 ];
 
@@ -635,7 +635,7 @@ export default function Home() {
           {/* Quick count indicators */}
           <div className="hidden sm:flex items-center gap-4 text-[9px] font-[family-name:var(--font-jetbrains-mono)]">
             <span className="text-text-faint">{filteredSignals.length} señales</span>
-            <span className="text-text-faint">{filteredAnalysis.length} análisis</span>
+            <span className="text-text-faint">{filteredAnalysis.length} en profundidad</span>
             <span className="text-text-faint">{filteredThreads.length} hilos</span>
           </div>
         </div>
@@ -722,7 +722,7 @@ export default function Home() {
               </>
             )}
 
-            {/* 4. Tarjetas — Análisis (accordion) */}
+            {/* 4. Tarjetas — En profundidad (accordion) */}
             {contentTab === 'analysis' && (
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 content-auto" data-no-drag>
@@ -742,7 +742,7 @@ export default function Home() {
                     <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-4">
                       <Brain className="w-8 h-8 text-[#D4A017]/20" />
                     </div>
-                    <p className="text-sm text-text-faint font-[family-name:var(--font-space-grotesk)]">No se encontraron análisis con los filtros actuales</p>
+                    <p className="text-sm text-text-faint font-[family-name:var(--font-space-grotesk)]">No se encontraron artículos en profundidad con los filtros actuales</p>
                   </div>
                 )}
               </>
@@ -864,7 +864,7 @@ export default function Home() {
                 <div className="w-20 h-20 rounded-2xl bg-white/[0.03] flex items-center justify-center border border-border-subtle mb-6">
                   <Radar className="w-10 h-10 text-white/10" />
                 </div>
-                <p className="text-sm text-text-faint font-[family-name:var(--font-space-grotesk)]">Selecciona una señal, análisis o hilo para ver el contenido detallado.</p>
+                <p className="text-sm text-text-faint font-[family-name:var(--font-space-grotesk)]">Selecciona una señal, artículo o hilo para ver el contenido detallado.</p>
                 <button
                   onClick={handleBackToContexto}
                   className="mt-6 flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.03] border border-border-subtle text-white/35 hover:text-white/55 hover:bg-white/[0.06] transition-colors text-xs font-bold font-[family-name:var(--font-space-grotesk)]"
@@ -1040,7 +1040,7 @@ export default function Home() {
                         className="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]"
                         style={{ backgroundColor: '#D4A01720', color: '#D4A017', border: '1px solid #D4A01730' }}
                       >
-                        Análisis
+                        En profundidad
                       </span>
                     </div>
 

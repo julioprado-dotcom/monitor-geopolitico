@@ -72,7 +72,7 @@ export default function AnalysisCard({ analysis, isExpanded, onToggleExpand, onR
               className="px-2 py-0.5 rounded text-[9px] font-bold uppercase font-[family-name:var(--font-jetbrains-mono)]"
               style={{ backgroundColor: 'rgba(212,160,23,0.2)', color: '#D4A017', border: '1px solid rgba(212,160,23,0.3)' }}
             >
-              Análisis
+              En profundidad
             </span>
           </div>
         </div>
@@ -176,7 +176,7 @@ export default function AnalysisCard({ analysis, isExpanded, onToggleExpand, onR
               }}
               className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-[#D4A017]/10 border border-[#D4A017]/20 text-[#D4A017] rounded-xl hover:bg-[#D4A017]/20 transition-colors text-[11px] font-bold font-[family-name:var(--font-space-grotesk)]"
             >
-              Leer análisis completo
+              Leer artículo completo
             </button>
           </div>
         </div>
