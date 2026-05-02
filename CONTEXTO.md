@@ -38,10 +38,10 @@ sleep 10 && curl -s -o /dev/null -w "%{http_code}" http://localhost:3000
 ## 2. IDENTIDAD DEL PROYECTO
 
 Nombre: Monitor Geopolítico — News Connect
-Versión: 0.9.0-meridian
+Versión: 0.9.5-meridian
 Repositorio: https://github.com/julioprado-dotcom/monitor-geopolitico
-Último commit: b1ca829 — refactor: renombrar valor técnico de región 'LATAM' → 'LATINOAMÉRICA'
-Tags: v0.9.0-meridian, v0.9.1-meridian
+Último commit: 2432ec9 — fix: remove unused Tv import — code audit cleanup
+Tags: v0.9.0-meridian, v0.9.1-meridian, v0.9.2-meridian, v0.9.3-meridian, v0.9.4-meridian, v0.9.5-meridian
 Descripción: Plataforma de monitoreo geopolítico con óptica del Sur Global que recopila, clasifica y analiza señales de múltiples fuentes mediante IA. Combina un sistema de TV en vivo con análisis automatizado para ofrecer una perspectiva crítica y no hegemónica de la realidad internacional.
 
 ## 3. STACK TECNOLÓGICO
@@ -151,10 +151,28 @@ Principales gaps en Historial de Desarrollo: Subsistema TV completo no registrad
 
 ## 10. VERSIONES
 
-package.json: 0.9.0-meridian
+package.json: 0.9.5-meridian
 Historial_Desarrollo.pdf: referencia 0.8.0 DESACTUALIZADO (pendiente actualización)
 Marco Conceptual: v0.9.0
-Tags Git: v0.9.0-meridian, v0.9.1-meridian, v0.9.2-meridian
+Tags Git: v0.9.0-meridian, v0.9.1-meridian, v0.9.2-meridian, v0.9.3-meridian, v0.9.4-meridian, v0.9.5-meridian
+
+### Changelog v0.9.5-meridian (desde v0.9.4)
+- Panel de Foco multi-slot (señal + análisis + hilo simultáneos) con scroll horizontal grab-to-scroll
+- Eliminación de overlays (SignalOverlay, AnalysisOverlay) — todo es inline en Contexto/Foco
+- Accordion inline en SignalCard y AnalysisCard (expandir sin abrir modal)
+- Mapa geopolítico interactivo (GeoMap) con D3-geo + TopoJSON, filtros de severidad
+- Análisis IA PERSISTENTE: resultados guardados en Map<string, string>, sobreviven navegación
+- Brain badges en tarjetas Contexto cuando tienen análisis IA disponible
+- GeoMap: glow verde + badge "IA" en marcadores con análisis, pulse ring animado
+- AnalysisPipeline: componente animado 4 fases (Clasificación → Contexto → Verificación → Síntesis)
+- Comparación de fuentes (SourceComparisonView) integrada en Foco
+- Hilos Geopolíticos (Explorer) con ThreadCard + ThreadDetail en Foco
+- KPIs dinámicos + Patrones Detectados en sección Inteligencia Visual colapsable
+- Enlace "Ir al artículo original" en señales expandidas
+- Fase 2 accesibilidad (a11y) — skip-to-content, ARIA, focus-visible, reduced-motion
+- Fase 1-2 SEO — JSON-LD ampliado, sitemap dinámico, robots.txt
+- MIG-01 + MIG-02 — tipos centralizados en @/types, configuración unificada
+- Datos: 57 señales con fullContent poblado
 
 ## 11. PREFERENCIAS DEL USUARIO
 
