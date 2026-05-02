@@ -202,7 +202,7 @@ export default function GeoMap({ signals, allSignals, filteredCount, selectedRel
   return (
     <div className="glass-strong rounded-xl overflow-hidden">
       {/* Title bar */}
-      <div className="px-4 py-3 border-b border-white/[0.06] flex items-center justify-between">
+      <div className="px-4 py-3 border-b border-border-subtle flex items-center justify-between">
         <div className="flex items-center gap-2">
           <svg className="w-4 h-4 text-[#00E5A0]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="10" />
@@ -213,7 +213,7 @@ export default function GeoMap({ signals, allSignals, filteredCount, selectedRel
             Mapa Geopolítico
           </h2>
         </div>
-        <span className="text-[9px] text-white/30 font-[family-name:var(--font-jetbrains-mono)] uppercase tracking-wider">
+        <span className="text-[9px] text-text-faint font-[family-name:var(--font-jetbrains-mono)] uppercase tracking-wider">
           {signals.length} señales activas
         </span>
       </div>
@@ -221,13 +221,13 @@ export default function GeoMap({ signals, allSignals, filteredCount, selectedRel
       <div className="h-[1px] bg-gradient-to-r from-transparent via-[#00E5A0]/40 to-transparent" />
 
       {/* Severidad — fila propia, centrada y ampliada */}
-      <div className="px-4 pt-3 pb-3 border-b border-white/[0.04]">
+      <div className="px-4 pt-3 pb-3 border-b border-border-subtle">
         <div className="flex items-center justify-between mb-1.5">
-          <span className="text-[9px] font-bold text-white/30 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">
+          <span className="text-[9px] font-bold text-text-faint uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">
             Severidad
           </span>
-          <span className="text-[9px] text-white/25 font-[family-name:var(--font-jetbrains-mono)]">
-            {filteredCount}<span className="text-white/15">/{allSignals.length}</span>
+          <span className="text-[9px] text-text-faint font-[family-name:var(--font-jetbrains-mono)]">
+            {filteredCount}<span className="text-text-faint">/{allSignals.length}</span>
           </span>
         </div>
         <div className="flex items-end gap-2.5" role="group" aria-label="Filtros por nivel de severidad">
@@ -298,7 +298,7 @@ export default function GeoMap({ signals, allSignals, filteredCount, selectedRel
           <div className="absolute inset-0 flex items-center justify-center z-10">
             <div className="flex flex-col items-center gap-2">
               <div className="w-8 h-8 border-2 border-[#00E5A0]/30 border-t-[#00E5A0] rounded-full animate-spin" />
-              <span className="text-[10px] text-white/30 font-[family-name:var(--font-jetbrains-mono)]">
+              <span className="text-[10px] text-text-faint font-[family-name:var(--font-jetbrains-mono)]">
                 Cargando mapa mundial...
               </span>
             </div>
@@ -459,7 +459,7 @@ export default function GeoMap({ signals, allSignals, filteredCount, selectedRel
                 <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: relevanceColors[hoveredSignal.relevance] }} />
                 <span className="text-[8px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]"
                   style={{ color: relevanceColors[hoveredSignal.relevance] }}>{hoveredSignal.relevance}</span>
-                <span className="text-[8px] text-white/30 font-[family-name:var(--font-jetbrains-mono)]">· {regionLabels[hoveredSignal.region]}</span>
+                <span className="text-[8px] text-text-faint font-[family-name:var(--font-jetbrains-mono)]">· {regionLabels[hoveredSignal.region]}</span>
               </div>
               <p className="text-[11px] text-white/80 font-[family-name:var(--font-space-grotesk)] leading-snug line-clamp-2">{hoveredSignal.title}</p>
               <p className="text-[9px] text-white/35 font-[family-name:var(--font-jetbrains-mono)] mt-1">{hoveredSignal.source}</p>
@@ -469,7 +469,7 @@ export default function GeoMap({ signals, allSignals, filteredCount, selectedRel
       </div>
 
       {/* Region color legend — debajo del mapa */}
-      <div className="px-4 py-1.5 border-t border-white/[0.04] flex items-center gap-3 overflow-x-auto">
+      <div className="px-4 py-1.5 border-t border-border-subtle flex items-center gap-3 overflow-x-auto">
         {(Object.keys(regionChoroplethColors) as Region[]).map((region) => (
           <div key={region} className="flex items-center gap-1.5 shrink-0">
             <span

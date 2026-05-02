@@ -34,14 +34,14 @@ const LivePlayer = dynamic(() => import('@/components/LivePlayer'), {
   ssr: false,
   loading: () => (
     <div className="glass rounded-xl overflow-hidden">
-      <div className="px-3 py-2 border-b border-white/[0.06] flex items-center gap-2">
+      <div className="px-3 py-2 border-b border-border-subtle flex items-center gap-2">
         <div className="w-2 h-2 rounded-full bg-[#00E5A0]/30 animate-pulse" />
         <span className="text-[10px] font-bold text-white/30 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">Monitor en Vivo</span>
       </div>
       <div className="relative bg-black" style={{ aspectRatio: '16/9' }}>
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
           <div className="w-6 h-6 border-2 border-[#00E5A0]/20 border-t-[#00E5A0]/40 rounded-full animate-spin" />
-          <span className="text-[8px] text-white/20 font-[family-name:var(--font-jetbrains-mono)]">Cargando reproductor...</span>
+          <span className="text-[8px] text-text-faint font-[family-name:var(--font-jetbrains-mono)]">Cargando reproductor...</span>
         </div>
       </div>
     </div>
@@ -514,14 +514,14 @@ export default function Home() {
   return (
     <div className="h-screen flex flex-col bg-[#0A0F1C] text-[#F1F5F9] overflow-hidden">
       {/* HEADER */}
-      <header className="w-full glass-strong border-b border-white/[0.06] sticky top-0 z-50">
+      <header className="w-full glass-strong border-b border-border-subtle sticky top-0 z-50">
         <div className="max-w-screen-2xl mx-auto px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-2">
           {/* Left: hamburger (mobile) + logo */}
           <div className="flex items-center gap-2">
             {/* Hamburger — solo visible en < lg */}
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="lg:hidden flex items-center justify-center w-9 h-9 rounded-lg bg-white/5 border border-white/[0.08] text-white/50 hover:text-white/80 hover:bg-white/10 transition-colors"
+              className="lg:hidden flex items-center justify-center w-9 h-9 rounded-lg bg-white/5 border border-border-default text-white/50 hover:text-white/80 hover:bg-white/10 transition-colors"
               aria-label="Abrir filtros"
             >
               <Menu className="w-4 h-4" />
@@ -539,7 +539,7 @@ export default function Home() {
             <h1 className="text-base sm:text-2xl font-bold text-white tracking-tight font-[family-name:var(--font-space-grotesk)] truncate">Monitor Geopolítico</h1>
             <span className="text-slate-500 text-xs hidden sm:block">Traduciendo señales en patrones de poder.</span>
             <p className="text-[9px] sm:text-[11px] text-white/40 mt-0.5 font-[family-name:var(--font-space-grotesk)] hidden sm:block">
-              Inteligencia geopolítica de acceso libre · <span className="text-[#00E5A0]/50">Meridian</span> <span className="text-white/25">v0.9.0</span>
+              Inteligencia geopolítica de acceso libre · <span className="text-[#00E5A0]/50">Meridian</span> <span className="text-text-faint">v0.9.0</span>
             </p>
           </div>
 
@@ -560,7 +560,7 @@ export default function Home() {
         />
       )}
       <aside
-        className={`fixed top-0 left-0 z-40 h-full w-[260px] transform transition-transform duration-200 ease-out lg:hidden overflow-y-auto bg-[#0A0F1C]/95 backdrop-blur-sm border-r border-white/[0.06] ${
+        className={`fixed top-0 left-0 z-40 h-full w-[260px] transform transition-transform duration-200 ease-out lg:hidden overflow-y-auto glass-subtle border-r border-border-subtle ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
         style={{ willChange: 'transform' }}
@@ -579,7 +579,7 @@ export default function Home() {
       {/* MAIN AREA */}
       <div className="flex-1 flex overflow-hidden">
         {/* Sidebar — desktop only (mobile usa offcanvas) */}
-        <div className="hidden lg:block w-[200px] shrink-0 overflow-y-auto border-r border-white/[0.06] p-2">
+        <div className="hidden lg:block w-[200px] shrink-0 overflow-y-auto border-r border-border-subtle p-2">
           <MGSidebar selectedRegion={selectedRegion} selectedClassifier={selectedClassifier} onRegionSelect={setSelectedRegion} onClassifierSelect={setSelectedClassifier} activeTab={contentTab} />
         </div>
 
@@ -588,7 +588,7 @@ export default function Home() {
           <div className="flex items-center gap-3">
             <button
               onClick={handleBackToContexto}
-              className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] transition-all duration-150 border ${!hasFocoContent ? 'text-[#00E5A0]/70 bg-[#00E5A0]/8 border-[#00E5A0]/15' : 'text-white/25 border-white/[0.04] hover:text-white/45 hover:border-white/[0.08]'}`}
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] transition-all duration-150 border ${!hasFocoContent ? 'text-[#00E5A0]/70 bg-[#00E5A0]/8 border-[#00E5A0]/15' : 'text-text-faint border-white/[0.04] hover:text-white/45 hover:border-border-default'}`}
             >
               <Radio className="w-3 h-3" />
               Contexto
@@ -596,7 +596,7 @@ export default function Home() {
             <span className="text-white/10 text-[10px]">→</span>
             <button
               onClick={() => scrollToFoco()}
-              className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] transition-all duration-150 border ${hasFocoContent ? 'text-[#D4A017]/70 bg-[#D4A017]/8 border-[#D4A017]/15' : 'text-white/15 border-white/[0.03] cursor-default'}`}
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] transition-all duration-150 border ${hasFocoContent ? 'text-[#D4A017]/70 bg-[#D4A017]/8 border-[#D4A017]/15' : 'text-text-faint border-white/[0.03] cursor-default'}`}
               disabled={!hasFocoContent}
             >
               <BookOpen className="w-3 h-3" />
@@ -608,9 +608,9 @@ export default function Home() {
           </div>
           {/* Quick count indicators */}
           <div className="hidden sm:flex items-center gap-4 text-[9px] font-[family-name:var(--font-jetbrains-mono)]">
-            <span className="text-white/20">{filteredSignals.length} señales</span>
-            <span className="text-white/20">{filteredAnalysis.length} análisis</span>
-            <span className="text-white/20">{filteredThreads.length} hilos</span>
+            <span className="text-text-faint">{filteredSignals.length} señales</span>
+            <span className="text-text-faint">{filteredAnalysis.length} análisis</span>
+            <span className="text-text-faint">{filteredThreads.length} hilos</span>
           </div>
         </div>
 
@@ -636,7 +636,7 @@ export default function Home() {
             <SearchBar value={searchQuery} onChange={setSearchQuery} />
 
             {/* 2. Pestañas */}
-            <div className="flex gap-1 p-1 rounded-xl bg-[#111827]/90 border border-white/[0.06]" data-no-drag>
+            <div className="flex gap-1 p-1 rounded-xl bg-[#111827]/90 border border-border-subtle" data-no-drag>
               {CONTENT_TABS.map((tab) => {
                 const Icon = tab.icon;
                 const isActive = contentTab === tab.id;
@@ -687,9 +687,9 @@ export default function Home() {
                 {filteredSignals.length === 0 && (
                   <div className="text-center py-16">
                     <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-4">
-                      <Radar className="w-8 h-8 text-white/15" />
+                      <Radar className="w-8 h-8 text-text-faint" />
                     </div>
-                    <p className="text-sm text-white/25 font-[family-name:var(--font-space-grotesk)]">No se encontraron señales con los filtros actuales</p>
+                    <p className="text-sm text-text-faint font-[family-name:var(--font-space-grotesk)]">No se encontraron señales con los filtros actuales</p>
                   </div>
                 )}
               </>
@@ -714,7 +714,7 @@ export default function Home() {
                     <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-4">
                       <Brain className="w-8 h-8 text-[#D4A017]/20" />
                     </div>
-                    <p className="text-sm text-white/25 font-[family-name:var(--font-space-grotesk)]">No se encontraron análisis con los filtros actuales</p>
+                    <p className="text-sm text-text-faint font-[family-name:var(--font-space-grotesk)]">No se encontraron análisis con los filtros actuales</p>
                   </div>
                 )}
               </>
@@ -744,7 +744,7 @@ export default function Home() {
                         key={f.label}
                         onClick={() => setThreadFilter(isActive ? null : f.id)}
                         className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] transition-all duration-150 border ${
-                          isActive ? 'shadow-sm' : 'text-white/35 hover:text-white/55 border-white/[0.04] hover:border-white/[0.08]'
+                          isActive ? 'shadow-sm' : 'text-white/35 hover:text-white/55 border-white/[0.04] hover:border-border-default'
                         }`}
                         style={isActive ? { color: f.color, backgroundColor: `${f.color}12`, borderColor: `${f.color}30` } : undefined}
                       >
@@ -770,10 +770,10 @@ export default function Home() {
                   ))}
                   {filteredThreads.length === 0 && (
                     <div className="text-center py-16">
-                      <div className="w-16 h-16 rounded-2xl bg-white/[0.03] flex items-center justify-center mx-auto mb-4 border border-white/[0.06]">
+                      <div className="w-16 h-16 rounded-2xl bg-white/[0.03] flex items-center justify-center mx-auto mb-4 border border-border-subtle">
                         <GitBranch className="w-8 h-8 text-[#38BDF8]/20" />
                       </div>
-                      <p className="text-sm text-white/25 font-[family-name:var(--font-space-grotesk)]">No hay hilos con los filtros actuales</p>
+                      <p className="text-sm text-text-faint font-[family-name:var(--font-space-grotesk)]">No hay hilos con los filtros actuales</p>
                     </div>
                   )}
                 </div>
@@ -784,14 +784,14 @@ export default function Home() {
             <div data-no-drag>
               <button
                 onClick={() => setIntelSectionOpen(!intelSectionOpen)}
-                className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl glass border border-white/[0.06] hover:border-white/[0.10] transition-colors"
+                className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl glass border border-border-subtle hover:border-white/[0.10] transition-colors"
               >
                 <div className="flex items-center gap-2">
                   <Radar className="w-3.5 h-3.5 text-[#00E5A0]/50" />
                   <span className="text-[10px] font-bold text-white/40 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">Inteligencia Visual</span>
-                  <span className="text-[9px] text-white/20 font-[family-name:var(--font-jetbrains-mono)]">KPIs · Patrones · Mapa</span>
+                  <span className="text-[9px] text-text-faint font-[family-name:var(--font-jetbrains-mono)]">KPIs · Patrones · Mapa</span>
                 </div>
-                <ChevronRight className={`w-4 h-4 text-white/25 transition-transform duration-200 ${intelSectionOpen ? 'rotate-90' : ''}`} />
+                <ChevronRight className={`w-4 h-4 text-text-faint transition-transform duration-200 ${intelSectionOpen ? 'rotate-90' : ''}`} />
               </button>
 
               {intelSectionOpen && (
@@ -832,13 +832,13 @@ export default function Home() {
           <section id="foco-panel" className="min-w-full snap-start overflow-y-auto bg-[#0A0F1C]" style={{ padding: '2rem' }}>
             {!hasFocoContent ? (
               <div className="flex flex-col items-center justify-center py-32">
-                <div className="w-20 h-20 rounded-2xl bg-white/[0.03] flex items-center justify-center border border-white/[0.06] mb-6">
+                <div className="w-20 h-20 rounded-2xl bg-white/[0.03] flex items-center justify-center border border-border-subtle mb-6">
                   <Radar className="w-10 h-10 text-white/10" />
                 </div>
-                <p className="text-sm text-white/25 font-[family-name:var(--font-space-grotesk)]">Selecciona una señal, análisis o hilo para ver el contenido detallado.</p>
+                <p className="text-sm text-text-faint font-[family-name:var(--font-space-grotesk)]">Selecciona una señal, análisis o hilo para ver el contenido detallado.</p>
                 <button
                   onClick={handleBackToContexto}
-                  className="mt-6 flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.03] border border-white/[0.06] text-white/35 hover:text-white/55 hover:bg-white/[0.06] transition-colors text-xs font-bold font-[family-name:var(--font-space-grotesk)]"
+                  className="mt-6 flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.03] border border-border-subtle text-white/35 hover:text-white/55 hover:bg-white/[0.06] transition-colors text-xs font-bold font-[family-name:var(--font-space-grotesk)]"
                 >
                   ← Volver al panel
                 </button>
@@ -890,7 +890,7 @@ export default function Home() {
                         href={selectedSignal.sourceUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 mb-6 px-4 py-2 bg-white/[0.03] border border-white/[0.08] text-white/40 hover:text-white/60 hover:bg-white/[0.06] rounded-xl transition-colors text-xs font-bold font-[family-name:var(--font-space-grotesk)]"
+                        className="inline-flex items-center gap-2 mb-6 px-4 py-2 bg-white/[0.03] border border-border-default text-white/40 hover:text-white/60 hover:bg-white/[0.06] rounded-xl transition-colors text-xs font-bold font-[family-name:var(--font-space-grotesk)]"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
                         Ir al artículo original
@@ -903,7 +903,7 @@ export default function Home() {
                       <button
                         onClick={() => setComparisonSignal(selectedSignal)}
                         aria-label={`Comparar cobertura de ${selectedSignal.title} con otras fuentes`}
-                        className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-white/[0.03] border border-white/[0.06] text-white/50 hover:text-white/70 hover:bg-white/[0.06] rounded-xl transition-colors text-xs font-bold font-[family-name:var(--font-space-grotesk)]"
+                        className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-white/[0.03] border border-border-subtle text-white/50 hover:text-white/70 hover:bg-white/[0.06] rounded-xl transition-colors text-xs font-bold font-[family-name:var(--font-space-grotesk)]"
                       >
                         <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M11 18H8a2 2 0 0 1-2-2V9"/></svg>
                         Comparar fuentes de esta señal
@@ -983,7 +983,7 @@ export default function Home() {
 
                     {/* Divider */}
                     {(selectedAnalysis || selectedThread) && (
-                      <div className="border-t border-white/[0.06] my-8" />
+                      <div className="border-t border-border-subtle my-8" />
                     )}
                   </div>
                 )}
@@ -1015,7 +1015,7 @@ export default function Home() {
                         <BookOpen className="w-3.5 h-3.5" />
                         {selectedAnalysis.readTime} min lectura
                       </span>
-                      <span className="text-[10px] text-white/25 ml-auto font-[family-name:var(--font-jetbrains-mono)]">
+                      <span className="text-[10px] text-text-faint ml-auto font-[family-name:var(--font-jetbrains-mono)]">
                         {mounted ? new Date(selectedAnalysis.timestamp).toLocaleDateString('es', { year: 'numeric', month: 'long', day: 'numeric' }) : selectedAnalysis.id}
                       </span>
                     </div>
@@ -1086,9 +1086,9 @@ export default function Home() {
                               <div className="min-w-0 flex-1">
                                 <p className="text-[11px] font-bold text-white/60 leading-snug font-[family-name:var(--font-space-grotesk)] line-clamp-2">{signal.title}</p>
                                 <div className="flex items-center gap-2 mt-1">
-                                  <span className="text-[9px] text-white/25 font-[family-name:var(--font-jetbrains-mono)]">{signal.source}</span>
+                                  <span className="text-[9px] text-text-faint font-[family-name:var(--font-jetbrains-mono)]">{signal.source}</span>
                                   <span className="text-white/10 text-[9px]">·</span>
-                                  <span className="text-[9px] text-white/20 font-[family-name:var(--font-jetbrains-mono)]">{signal.region}</span>
+                                  <span className="text-[9px] text-text-faint font-[family-name:var(--font-jetbrains-mono)]">{signal.region}</span>
                                 </div>
                               </div>
                               <span className="shrink-0 px-1.5 py-0.5 rounded text-[9px] font-bold font-[family-name:var(--font-jetbrains-mono)]" style={{ backgroundColor: `${relevanceColors[signal.relevance]}18`, color: relevanceColors[signal.relevance] }}>{signal.relevance}</span>
@@ -1107,7 +1107,7 @@ export default function Home() {
                         <button
                           onClick={fetchAnalysisAi}
                           disabled={!analysisFullContent}
-                          className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl transition-colors duration-150 font-[family-name:var(--font-space-grotesk)] ${analysisFullContent ? 'bg-[#D4A017]/10 border border-[#D4A017]/20 text-[#D4A017] hover:bg-[#D4A017]/20' : 'bg-white/[0.03] border border-white/[0.06] text-white/20 cursor-not-allowed'}`}
+                          className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl transition-colors duration-150 font-[family-name:var(--font-space-grotesk)] ${analysisFullContent ? 'bg-[#D4A017]/10 border border-[#D4A017]/20 text-[#D4A017] hover:bg-[#D4A017]/20' : 'bg-white/[0.03] border border-border-subtle text-text-faint cursor-not-allowed'}`}
                         >
                           <Brain className={`w-4 h-4 ${!analysisFullContent ? 'animate-pulse' : ''}`} />
                           <span className="text-sm font-bold">{analysisFullContent ? 'Análisis IA — Perspectiva Sur Global' : 'Cargando contenido...'}</span>
@@ -1149,15 +1149,15 @@ export default function Home() {
                     </div>
 
                     {/* Disclaimer */}
-                    <div className="border-t border-white/[0.06] pt-3">
-                      <p className="text-[9px] text-white/20 leading-relaxed font-[family-name:var(--font-jetbrains-mono)]">
+                    <div className="border-t border-border-subtle pt-3">
+                      <p className="text-[9px] text-text-faint leading-relaxed font-[family-name:var(--font-jetbrains-mono)]">
                         Los análisis publicados en esta sección reflejan la perspectiva editorial de Óptica Sur Global. Las fuentes citadas son verificables y públicas.
                       </p>
                     </div>
 
                     {/* Divider */}
                     {selectedThread && (
-                      <div className="border-t border-white/[0.06] my-8" />
+                      <div className="border-t border-border-subtle my-8" />
                     )}
                   </div>
                 )}
@@ -1199,9 +1199,9 @@ export default function Home() {
       )}
 
       {/* FOOTER */}
-      <footer className="w-full glass-strong border-t border-white/[0.06]">
+      <footer className="w-full glass-strong border-t border-border-subtle">
         <div className="max-w-screen-2xl mx-auto px-3 sm:px-6 py-3 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span className="text-[10px] sm:text-[11px] text-white/25 tracking-wider font-[family-name:var(--font-jetbrains-mono)]">
+          <span className="text-[10px] sm:text-[11px] text-text-faint tracking-wider font-[family-name:var(--font-jetbrains-mono)]">
             Acceso libre · Código abierto · Datos públicos
           </span>
           <div className="flex items-center gap-3">
@@ -1209,7 +1209,7 @@ export default function Home() {
               href="https://github.com/julioprado-dotcom/monitor-geopolitico"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[10px] text-white/25 hover:text-white/50 transition-colors font-[family-name:var(--font-jetbrains-mono)]"
+              className="text-[10px] text-text-faint hover:text-white/50 transition-colors font-[family-name:var(--font-jetbrains-mono)]"
             >
               GitHub
             </a>

@@ -33,7 +33,7 @@ export default function SearchBar({ value, onChange }: SearchBarProps) {
         onChange={(e) => onChange(e.target.value)}
         placeholder="Buscar señales geopolíticas, regiones, fuentes..."
         aria-label="Buscar señales geopolíticas"
-        className="flex-1 bg-transparent text-sm text-white/80 placeholder:text-white/25 outline-none font-[family-name:var(--font-space-grotesk)]"
+        className="flex-1 bg-transparent text-sm text-white/80 placeholder:text-text-faint outline-none font-[family-name:var(--font-space-grotesk)]"
       />
       {value ? (
         <button
@@ -44,7 +44,7 @@ export default function SearchBar({ value, onChange }: SearchBarProps) {
           <X className="w-3 h-3 text-white/40" />
         </button>
       ) : (
-        <kbd className="hidden sm:flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-[9px] text-white/25 font-[family-name:var(--font-jetbrains-mono)]">
+        <kbd className="hidden sm:flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-white/5 border border-border-strong text-[9px] text-text-faint font-[family-name:var(--font-jetbrains-mono)]">
           <span className="text-[8px]">⌘</span>K
         </kbd>
       )}
