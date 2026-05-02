@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { Radar, Menu, Tv, Radio, Brain, GitBranch, BookOpen, User, ChevronRight, ExternalLink } from 'lucide-react';
+import { Radar, Menu, Radio, Brain, GitBranch, BookOpen, User, ChevronRight, ExternalLink } from 'lucide-react';
 import { demoSignals, type Relevance, type Region, type Signal, relevanceColors } from '@/data/signals';
 import { demoAnalysis, type Analysis } from '@/data/analysis';
 import { demoThreads, type Thread, type ThreadStatus, type ThreadSignal } from '@/data/threads';
