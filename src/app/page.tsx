@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { Radar, Menu, Tv, Radio, Brain, GitBranch, Loader2, BookOpen, User, ChevronRight, ExternalLink } from 'lucide-react';
+import { Radar, Menu, Tv, Radio, Brain, GitBranch, BookOpen, User, ChevronRight, ExternalLink } from 'lucide-react';
 import { demoSignals, type Relevance, type Region, type Signal, relevanceColors } from '@/data/signals';
 import { demoAnalysis, type Analysis } from '@/data/analysis';
 import { demoThreads, type Thread, type ThreadStatus, type ThreadSignal } from '@/data/threads';
@@ -15,6 +15,7 @@ import ThreadCard from '@/components/Explorer/ThreadCard';
 import ThreadDetail from '@/components/Explorer/ThreadDetail';
 import KpiDashboard from '@/components/KpiDashboard';
 import PatternList from '@/components/PatternList';
+import AnalysisPipeline from '@/components/AnalysisPipeline';
 import { useMounted } from '@/hooks/useMounted';
 
 // Lazy: react-markdown solo se carga cuando se genera análisis IA
@@ -99,6 +100,7 @@ export default function Home() {
   const [analysisFullContent, setAnalysisFullContent] = useState<string | null>(null);
   const [analysisAiResult, setAnalysisAiResult] = useState<string | null>(null);
   const [analysisAiLoading, setAnalysisAiLoading] = useState(false);
+  const [analysisAiStartTime, setAnalysisAiStartTime] = useState(0);
   const [analysisAiError, setAnalysisAiError] = useState<string | null>(null);
   const analysisAbortRef = useRef<AbortController | null>(null);
 
@@ -190,6 +192,7 @@ export default function Home() {
   const [analysis, setAnalysis] = useState<string | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
+  const [analysisStartTime, setAnalysisStartTime] = useState(0);
   const abortRef = useRef<AbortController | null>(null);
 
   const fetchAnalysis = useCallback(async (signal: Signal) => {
@@ -200,6 +203,7 @@ export default function Home() {
     setAnalyzing(true);
     setAnalysisError(null);
     setAnalysis(null);
+    setAnalysisStartTime(Date.now());
 
     try {
       const payload = {
@@ -432,6 +436,7 @@ export default function Home() {
     setAnalysisAiLoading(true);
     setAnalysisAiError(null);
     setAnalysisAiResult(null);
+    setAnalysisAiStartTime(Date.now());
 
     try {
       const payload = {
@@ -927,10 +932,7 @@ export default function Home() {
                       )}
 
                       {analyzing && (
-                        <div className="flex flex-col items-center gap-3 py-8" role="status">
-                          <Loader2 className="w-6 h-6 text-[#00E5A0] animate-spin" />
-                          <span className="text-sm text-white/50 font-[family-name:var(--font-space-grotesk)]">Generando análisis...</span>
-                        </div>
+                        <AnalysisPipeline variant="signal" startTime={analysisStartTime} />
                       )}
 
                       {analysisError && (
@@ -1117,10 +1119,7 @@ export default function Home() {
                         </button>
                       )}
                       {analysisAiLoading && (
-                        <div className="flex flex-col items-center gap-3 py-8" role="status">
-                          <Loader2 className="w-6 h-6 text-[#D4A017] animate-spin" />
-                          <span className="text-sm text-white/50 font-[family-name:var(--font-space-grotesk)]">Generando análisis...</span>
-                        </div>
+                        <AnalysisPipeline variant="analysis" startTime={analysisAiStartTime} />
                       )}
                       {analysisAiError && (
                         <div className="glass rounded-xl p-4 flex flex-col items-center gap-3" role="alert">
