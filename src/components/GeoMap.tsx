@@ -201,56 +201,100 @@ export default function GeoMap({ signals, allSignals, filteredCount, selectedRel
 
   return (
     <div className="glass-strong rounded-xl overflow-hidden">
-      {/* Title bar */}
-      <div className="px-4 py-3 border-b border-white/[0.06] flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <svg className="w-4 h-4 text-[#00E5A0]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="10" />
-            <path d="M2 12h20" />
-            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-          </svg>
-          <h2 className="text-sm font-bold text-white font-[family-name:var(--font-space-grotesk)]">
-            Mapa Geopolítico
-          </h2>
-          <span className="text-[9px] text-white/30 font-[family-name:var(--font-jetbrains-mono)] uppercase tracking-wider">
-            {signals.length} señales activas
-          </span>
-        </div>
-        {/* Relevance legend */}
-        <div className="hidden sm:flex items-center gap-2">
-          {LEGEND_ITEMS.map((item) => (
-            <div key={item.relevance} className="flex items-center gap-1">
-              <span
-                className="w-2 h-2 rounded-full shrink-0"
-                style={{ backgroundColor: relevanceColors[item.relevance] }}
-              />
-              <span className="text-[8px] text-white/40 font-[family-name:var(--font-jetbrains-mono)] uppercase tracking-wider">
-                {item.label}
+      {/* Header: Título + Severidad */}
+      <div className="border-b border-white/[0.06]">
+        <div className="px-4 py-3 flex items-start justify-between gap-4">
+          {/* Izquierda: título */}
+          <div className="flex items-center gap-2 shrink-0">
+            <svg className="w-4 h-4 text-[#00E5A0]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M2 12h20" />
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+            </svg>
+            <div className="flex flex-col">
+              <h2 className="text-sm font-bold text-white font-[family-name:var(--font-space-grotesk)] leading-tight">
+                Mapa Geopolítico
+              </h2>
+              <span className="text-[9px] text-white/30 font-[family-name:var(--font-jetbrains-mono)] uppercase tracking-wider">
+                {signals.length} señales activas
               </span>
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Neon accent underline */}
-      <div className="h-[1px] bg-gradient-to-r from-transparent via-[#00E5A0]/40 to-transparent" />
-
-      {/* Region color legend */}
-      <div className="px-4 py-1.5 border-b border-white/[0.04] flex items-center gap-3 overflow-x-auto">
-        {(Object.keys(regionChoroplethColors) as Region[]).map((region) => (
-          <div key={region} className="flex items-center gap-1.5 shrink-0">
-            <span
-              className="w-2.5 h-2.5 rounded-sm shrink-0 border"
-              style={{
-                backgroundColor: regionChoroplethColors[region].fill,
-                borderColor: regionChoroplethColors[region].stroke,
-              }}
-            />
-            <span className="text-[8px] text-white/35 font-[family-name:var(--font-jetbrains-mono)] uppercase tracking-wider">
-              {regionLabels[region]}
-            </span>
           </div>
-        ))}
+
+          {/* Derecha: Severidad — barras verticales compactas */}
+          <div className="flex flex-col items-end shrink-0">
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="text-[9px] font-bold text-white/30 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">
+                Severidad
+              </span>
+              <span className="text-[9px] text-white/25 font-[family-name:var(--font-jetbrains-mono)]">
+                {filteredCount}<span className="text-white/15">/{allSignals.length}</span>
+              </span>
+            </div>
+            <div className="flex items-end gap-1.5" role="group" aria-label="Filtros por nivel de severidad">
+              {SEVERITY_LEVELS.map((sev) => {
+                const count = allSignals.filter((s) => s.relevance === sev).length;
+                const color = relevanceColors[sev];
+                const isSelected = selectedRelevances.has(sev);
+                const maxCount = Math.max(...SEVERITY_LEVELS.map((s) => allSignals.filter((sig) => sig.relevance === s).length), 1);
+                const heightPct = maxCount > 0 ? (count / maxCount) * 100 : 0;
+
+                return (
+                  <div
+                    key={sev}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Filtrar por severidad ${sev}${isSelected ? ' (seleccionado)' : ''} — ${count} señales`}
+                    aria-pressed={isSelected}
+                    onClick={() => onToggleRelevance(sev)}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggleRelevance(sev); } }}
+                    className="flex flex-col items-center gap-0.5 transition-all duration-150 cursor-pointer"
+                  >
+                    {isSelected && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); onClearRelevance(); }}
+                        className="px-1 py-px rounded text-[6px] font-bold font-[family-name:var(--font-jetbrains-mono)] transition-colors"
+                        style={{ backgroundColor: `${color}20`, color, border: `1px solid ${color}40` }}
+                        title="Limpiar filtro"
+                      >
+                        <X className="w-1.5 h-1.5 inline" />
+                      </button>
+                    )}
+                    <span
+                      className="text-[9px] font-bold font-[family-name:var(--font-jetbrains-mono)] leading-none"
+                      style={{ color }}
+                    >
+                      {count}
+                    </span>
+                    <div
+                      className="w-5 h-7 rounded-sm relative overflow-hidden transition-all duration-150"
+                      style={{
+                        backgroundColor: `${color}15`,
+                        border: isSelected ? `1.5px solid ${color}60` : '1px solid rgba(255,255,255,0.04)',
+                      }}
+                    >
+                      <div
+                        className="absolute bottom-0 left-0 right-0 rounded-sm transition-all duration-400"
+                        style={{
+                          height: `${heightPct}%`,
+                          backgroundColor: color,
+                        }}
+                      />
+                    </div>
+                    <span
+                      className="text-[6px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] text-center leading-none"
+                      style={{ color }}
+                    >
+                      {sev.slice(0, 3)}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+        {/* Neon accent underline */}
+        <div className="h-[1px] bg-gradient-to-r from-transparent via-[#00E5A0]/40 to-transparent" />
       </div>
 
       {/* SVG Map */}
@@ -429,84 +473,20 @@ export default function GeoMap({ signals, allSignals, filteredCount, selectedRel
         )}
       </div>
 
-      {/* Severidad — barras interactivas integradas */}
-      <div className="px-4 pt-3 pb-3 border-t border-white/[0.06]">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-[9px] font-bold text-white/30 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">
-            Severidad
-          </span>
-          <span className="text-[9px] text-white/25 font-[family-name:var(--font-jetbrains-mono)]">
-            {filteredCount}<span className="text-white/15">/{allSignals.length}</span>
-          </span>
-        </div>
-        <div className="flex items-end gap-2.5" role="group" aria-label="Filtros por nivel de severidad">
-          {SEVERITY_LEVELS.map((sev) => {
-            const count = allSignals.filter((s) => s.relevance === sev).length;
-            const color = relevanceColors[sev];
-            const isSelected = selectedRelevances.has(sev);
-            const maxCount = Math.max(...SEVERITY_LEVELS.map((s) => allSignals.filter((sig) => sig.relevance === s).length), 1);
-            const heightPct = maxCount > 0 ? (count / maxCount) * 100 : 0;
-
-            return (
-              <div
-                key={sev}
-                role="button"
-                tabIndex={0}
-                aria-label={`Filtrar por severidad ${sev}${isSelected ? ' (seleccionado)' : ''} — ${count} señales`}
-                aria-pressed={isSelected}
-                onClick={() => onToggleRelevance(sev)}
-                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggleRelevance(sev); } }}
-                className="flex-1 flex flex-col items-center gap-1 transition-all duration-150 cursor-pointer"
-              >
-                {isSelected && (
-                  <button
-                    onClick={(e) => { e.stopPropagation(); onClearRelevance(); }}
-                    className="px-1 py-px rounded text-[7px] font-bold font-[family-name:var(--font-jetbrains-mono)] transition-colors"
-                    style={{ backgroundColor: `${color}20`, color, border: `1px solid ${color}40` }}
-                    title="Limpiar filtro"
-                  >
-                    <X className="w-2 h-2 inline" /> <span className="ml-0.5">LIMPIAR</span>
-                  </button>
-                )}
-                <span
-                  className="text-[10px] font-bold font-[family-name:var(--font-jetbrains-mono)] leading-none"
-                  style={{ color }}
-                >
-                  {count}
-                </span>
-                <div
-                  className="w-full h-8 rounded-sm relative overflow-hidden transition-all duration-150"
-                  style={{
-                    backgroundColor: `${color}15`,
-                    border: isSelected ? `1.5px solid ${color}60` : '1px solid rgba(255,255,255,0.04)',
-                  }}
-                >
-                  <div
-                    className="absolute bottom-0 left-0 right-0 rounded-sm transition-all duration-400"
-                    style={{
-                      height: `${heightPct}%`,
-                      backgroundColor: color,
-                    }}
-                  />
-                </div>
-                <span
-                  className="text-[7px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] text-center leading-none"
-                  style={{ color }}
-                >
-                  {sev}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Mobile legends */}
-      <div className="sm:hidden px-4 py-2 border-t border-white/[0.06] flex flex-wrap items-center gap-x-3 gap-y-1">
-        {LEGEND_ITEMS.map((item) => (
-          <div key={item.relevance} className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: relevanceColors[item.relevance] }} />
-            <span className="text-[8px] text-white/40 font-[family-name:var(--font-jetbrains-mono)] uppercase tracking-wider">{item.label}</span>
+      {/* Region color legend — debajo del mapa */}
+      <div className="px-4 py-1.5 border-t border-white/[0.04] flex items-center gap-3 overflow-x-auto">
+        {(Object.keys(regionChoroplethColors) as Region[]).map((region) => (
+          <div key={region} className="flex items-center gap-1.5 shrink-0">
+            <span
+              className="w-2.5 h-2.5 rounded-sm shrink-0 border"
+              style={{
+                backgroundColor: regionChoroplethColors[region].fill,
+                borderColor: regionChoroplethColors[region].stroke,
+              }}
+            />
+            <span className="text-[8px] text-white/35 font-[family-name:var(--font-jetbrains-mono)] uppercase tracking-wider">
+              {regionLabels[region]}
+            </span>
           </div>
         ))}
       </div>
