@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { type Analysis } from '@/data/analysis';
-import { Clock, BookOpen, ChevronDown, ChevronUp } from 'lucide-react';
+import { Clock, BookOpen, ChevronDown, ChevronUp, Brain } from 'lucide-react';
 import { useMounted } from '@/hooks/useMounted';
 import { timeAgo } from '@/lib/utils-time';
 
@@ -11,9 +11,10 @@ interface AnalysisCardProps {
   isExpanded: boolean;
   onToggleExpand: (a: Analysis) => void;
   onReadFull: (a: Analysis) => void;
+  hasAiAnalysis?: boolean;
 }
 
-export default function AnalysisCard({ analysis, isExpanded, onToggleExpand, onReadFull }: AnalysisCardProps) {
+export default function AnalysisCard({ analysis, isExpanded, onToggleExpand, onReadFull, hasAiAnalysis }: AnalysisCardProps) {
   const mounted = useMounted();
   const [imgVisible, setImgVisible] = useState(false);
   const imgRef = useRef<HTMLDivElement>(null);
@@ -130,6 +131,13 @@ export default function AnalysisCard({ analysis, isExpanded, onToggleExpand, onR
               </span>
             </div>
             <div className="flex items-center gap-1.5">
+              {/* Badge IA — indica que este análisis tiene análisis IA disponible */}
+              {hasAiAnalysis && (
+                <span className="relative flex items-center justify-center" title="Análisis IA disponible">
+                  <span className="absolute inset-0 rounded-full bg-[#D4A017]/20 animate-pulse" />
+                  <Brain className="w-4 h-4 text-[#D4A017] relative" />
+                </span>
+              )}
               <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-[#D4A017]/10 text-[#D4A017]/60 font-[family-name:var(--font-jetbrains-mono)]">
                 {analysis.region}
               </span>
@@ -142,20 +150,35 @@ export default function AnalysisCard({ analysis, isExpanded, onToggleExpand, onR
           </div>
         </div>
 
-        {/* Expanded section — "Leer análisis completo" button */}
+        {/* Expanded section — botones de acción */}
         <div
-          className={`overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-20 opacity-100 mt-3' : 'max-h-0 opacity-0 mt-0'}`}
+          className={`overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-28 opacity-100 mt-3' : 'max-h-0 opacity-0 mt-0'}`}
         >
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onReadFull(analysis);
-            }}
-            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-[#D4A017]/10 border border-[#D4A017]/20 text-[#D4A017] rounded-xl hover:bg-[#D4A017]/20 transition-colors text-[11px] font-bold font-[family-name:var(--font-space-grotesk)]"
-          >
-            Leer análisis completo
-          </button>
+          <div className="flex flex-col gap-2">
+            {hasAiAnalysis && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onReadFull(analysis);
+                }}
+                className="w-full flex items-center justify-center gap-2 py-2 px-4 bg-[#D4A017]/8 border border-[#D4A017]/15 text-[#D4A017]/70 hover:bg-[#D4A017]/15 hover:text-[#D4A017] rounded-xl transition-colors text-[10px] font-bold font-[family-name:var(--font-space-grotesk)]"
+              >
+                <Brain className="w-3 h-3" />
+                Ver análisis IA
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onReadFull(analysis);
+              }}
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-[#D4A017]/10 border border-[#D4A017]/20 text-[#D4A017] rounded-xl hover:bg-[#D4A017]/20 transition-colors text-[11px] font-bold font-[family-name:var(--font-space-grotesk)]"
+            >
+              Leer análisis completo
+            </button>
+          </div>
         </div>
       </div>
     </article>

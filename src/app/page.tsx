@@ -98,8 +98,8 @@ export default function Home() {
 
   // ── Estados para Análisis en Panel de Foco ──
   const [analysisFullContent, setAnalysisFullContent] = useState<string | null>(null);
-  const [analysisAiResult, setAnalysisAiResult] = useState<string | null>(null);
-  const [analysisAiLoading, setAnalysisAiLoading] = useState(false);
+  const [analysisAiResults, setAnalysisAiResults] = useState<Map<string, string>>(() => new Map());
+  const [analysisAiAnalyzingId, setAnalysisAiAnalyzingId] = useState<string | null>(null);
   const [analysisAiStartTime, setAnalysisAiStartTime] = useState(0);
   const [analysisAiError, setAnalysisAiError] = useState<string | null>(null);
   const analysisAbortRef = useRef<AbortController | null>(null);
@@ -188,9 +188,9 @@ export default function Home() {
     return threads;
   }, [threadFilter, followedThreads, selectedRegion, selectedClassifier, searchQuery]);
 
-  // ── Análisis IA en Panel de Foco (for Signal) ──
-  const [analysis, setAnalysis] = useState<string | null>(null);
-  const [analyzing, setAnalyzing] = useState(false);
+  // ── Análisis IA PERSISTENTE (no se pierde al navegar) ──
+  const [signalAiResults, setSignalAiResults] = useState<Map<string, string>>(() => new Map());
+  const [analyzingId, setAnalyzingId] = useState<string | null>(null);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
   const [analysisStartTime, setAnalysisStartTime] = useState(0);
   const abortRef = useRef<AbortController | null>(null);
@@ -200,9 +200,8 @@ export default function Home() {
     const controller = new AbortController();
     abortRef.current = controller;
 
-    setAnalyzing(true);
+    setAnalyzingId(signal.id);
     setAnalysisError(null);
-    setAnalysis(null);
     setAnalysisStartTime(Date.now());
 
     try {
@@ -252,11 +251,12 @@ export default function Home() {
       if (!data.analysis) {
         throw new Error('El análisis no se generó correctamente. Intenta de nuevo.');
       }
-      setAnalysis(data.analysis);
+      // Guardar resultado PERSISTENTE — no se pierde al navegar
+      setSignalAiResults(prev => new Map(prev).set(signal.id, data.analysis!));
     } catch (err: any) {
       if (err.name !== 'AbortError') setAnalysisError(err.message || 'Error de conexión');
     } finally {
-      setAnalyzing(false);
+      setAnalyzingId(null);
     }
   }, []);
 
@@ -298,7 +298,6 @@ export default function Home() {
   const handleReadFullSignal = useCallback((signal: Signal) => {
     setSelectedSignal(signal);
     // Do NOT clear selectedAnalysis or selectedThread — multi-slot Foco
-    setAnalysis(null);
     setAnalysisError(null);
     abortRef.current?.abort();
     // Smart scroll: scroll to the signal section in foco
@@ -310,7 +309,6 @@ export default function Home() {
     setSelectedAnalysis(analysisItem);
     // Do NOT clear selectedSignal or selectedThread — multi-slot Foco
     setAnalysisFullContent(null);
-    setAnalysisAiResult(null);
     setAnalysisAiError(null);
     analysisAbortRef.current?.abort();
     // Smart scroll: ensure horizontal scroll to Foco, then vertical to analysis
@@ -365,20 +363,18 @@ export default function Home() {
     scrollToContexto();
   }, []);
 
-  // ── Close Foco Signal section ──
+  // ── Close Foco Signal section (NO borra análisis IA persistente) ──
   const handleCloseFocoSignal = useCallback(() => {
     setSelectedSignal(null);
-    setAnalysis(null);
     setAnalysisError(null);
     abortRef.current?.abort();
     handleBackToContexto();
   }, [handleBackToContexto]);
 
-  // ── Close Foco Analysis section ──
+  // ── Close Foco Analysis section (NO borra análisis IA persistente) ──
   const handleCloseFocoAnalysis = useCallback(() => {
     setSelectedAnalysis(null);
     setAnalysisFullContent(null);
-    setAnalysisAiResult(null);
     setAnalysisAiError(null);
     analysisAbortRef.current?.abort();
     handleBackToContexto();
@@ -433,9 +429,8 @@ export default function Home() {
     const controller = new AbortController();
     analysisAbortRef.current = controller;
 
-    setAnalysisAiLoading(true);
+    setAnalysisAiAnalyzingId(selectedAnalysis.id);
     setAnalysisAiError(null);
-    setAnalysisAiResult(null);
     setAnalysisAiStartTime(Date.now());
 
     try {
@@ -470,11 +465,12 @@ export default function Home() {
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       if (!data.analysis) throw new Error('El análisis no se generó correctamente.');
-      setAnalysisAiResult(data.analysis);
+      // Guardar resultado PERSISTENTE — no se pierde al navegar
+      setAnalysisAiResults(prev => new Map(prev).set(selectedAnalysis.id, data.analysis!));
     } catch (err: any) {
       if (err.name !== 'AbortError') setAnalysisAiError(err.message || 'Error de conexión');
     } finally {
-      setAnalysisAiLoading(false);
+      setAnalysisAiAnalyzingId(null);
     }
   }, [selectedAnalysis, analysisFullContent]);
 
@@ -515,6 +511,28 @@ export default function Home() {
 
   // ── Determine if Foco panel has content ──
   const hasFocoContent = selectedSignal || selectedAnalysis || selectedThread;
+
+  // ── Derivar: ID de señal actualmente analizando + resultado del mapa ──
+  const currentSignalAnalysis = selectedSignal ? signalAiResults.get(selectedSignal.id) ?? null : null;
+  const isAnalyzingSignal = analyzingId !== null && selectedSignal?.id === analyzingId;
+  const currentAnalysisAiResult = selectedAnalysis ? analysisAiResults.get(selectedAnalysis.id) ?? null : null;
+  const isAnalyzingArticle = analysisAiAnalyzingId !== null && selectedAnalysis?.id === analysisAiAnalyzingId;
+
+  // ── Dismiss handlers: descartar análisis IA persistente ──
+  const handleDismissSignalAi = useCallback((signalId: string) => {
+    setSignalAiResults(prev => {
+      const next = new Map(prev);
+      next.delete(signalId);
+      return next;
+    });
+  }, []);
+  const handleDismissAnalysisAi = useCallback((analysisId: string) => {
+    setAnalysisAiResults(prev => {
+      const next = new Map(prev);
+      next.delete(analysisId);
+      return next;
+    });
+  }, []);
 
   return (
     <div className="h-screen flex flex-col bg-[#0A0F1C] text-[#F1F5F9] overflow-hidden">
@@ -678,6 +696,7 @@ export default function Home() {
                       isExpanded={expandedSignalId === signal.id}
                       onToggleExpand={handleToggleExpandSignal}
                       onReadFull={handleReadFullSignal}
+                      hasAiAnalysis={signalAiResults.has(signal.id)}
                     />
                   ))}
                   {filteredSignals.length > 0 && (
@@ -714,6 +733,7 @@ export default function Home() {
                       isExpanded={expandedAnalysisId === a.id}
                       onToggleExpand={handleToggleExpandAnalysis}
                       onReadFull={handleReadFullAnalysis}
+                      hasAiAnalysis={analysisAiResults.has(a.id)}
                     />
                   ))}
                 </div>
@@ -817,6 +837,7 @@ export default function Home() {
                     onSelectSignal={handleMapSelectSignal}
                     onToggleRelevance={toggleRelevance}
                     onClearRelevance={() => setSelectedRelevances(new Set())}
+                    analyzedSignalIds={signalAiResults}
                   />
                 </div>
               )}
@@ -919,9 +940,9 @@ export default function Home() {
                     </div>
                     )}
 
-                    {/* Botón de IA + Análisis */}
+                    {/* Botón de IA + Análisis (PERSISTENTE — no se pierde al navegar) */}
                     <div className="mb-8" aria-live="polite" aria-atomic="true">
-                      {!analysis && !analyzing && !analysisError && (
+                      {!currentSignalAnalysis && !isAnalyzingSignal && !analysisError && (
                         <button
                           onClick={() => selectedSignal && fetchAnalysis(selectedSignal)}
                           className="w-full flex items-center justify-center gap-2 py-3 px-6 bg-[#00E5A0]/10 border border-[#00E5A0]/20 text-[#00E5A0] rounded-xl hover:bg-[#00E5A0]/20 transition-colors font-bold font-[family-name:var(--font-space-grotesk)]"
@@ -931,11 +952,11 @@ export default function Home() {
                         </button>
                       )}
 
-                      {analyzing && (
+                      {isAnalyzingSignal && (
                         <AnalysisPipeline variant="signal" startTime={analysisStartTime} />
                       )}
 
-                      {analysisError && (
+                      {analysisError && !isAnalyzingSignal && (
                         <div className="glass rounded-xl p-4 flex flex-col items-center gap-3" role="alert">
                           <p className="text-sm text-red-400 font-[family-name:var(--font-space-grotesk)]">{analysisError}</p>
                           <button
@@ -947,11 +968,20 @@ export default function Home() {
                         </div>
                       )}
 
-                      {analysis && (
+                      {currentSignalAnalysis && !isAnalyzingSignal && (
                         <div className="flex flex-col gap-3">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Brain className="w-4 h-4 text-[#00E5A0]" />
-                            <span className="text-sm font-bold text-[#00E5A0]/80 font-[family-name:var(--font-space-grotesk)]">Análisis IA — Perspectiva Sur Global</span>
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                              <Brain className="w-4 h-4 text-[#00E5A0]" />
+                              <span className="text-sm font-bold text-[#00E5A0]/80 font-[family-name:var(--font-space-grotesk)]">Análisis IA — Perspectiva Sur Global</span>
+                            </div>
+                            <button
+                              onClick={() => selectedSignal && handleDismissSignalAi(selectedSignal.id)}
+                              className="px-2 py-1 rounded-lg bg-white/[0.03] border border-border-subtle text-white/30 hover:text-red-400 hover:border-red-500/20 transition-colors text-[9px] font-bold font-[family-name:var(--font-jetbrains-mono)]"
+                              title="Descartar análisis"
+                            >
+                              Descartar
+                            </button>
                           </div>
                           <div className="glass rounded-xl p-4 prose-invert">
                             <ReactMarkdown
@@ -979,7 +1009,7 @@ export default function Home() {
                                 ),
                               }}
                             >
-                              {analysis}
+                              {currentSignalAnalysis}
                             </ReactMarkdown>
                           </div>
                         </div>
@@ -1106,9 +1136,9 @@ export default function Home() {
                     {/* Divider */}
                     <div className="w-full h-px bg-white/[0.06] mb-6" />
 
-                    {/* AI Analysis */}
+                    {/* AI Analysis (PERSISTENTE — no se pierde al navegar) */}
                     <div className="mb-8" aria-live="polite" aria-atomic="true">
-                      {!analysisAiResult && !analysisAiLoading && !analysisAiError && (
+                      {!currentAnalysisAiResult && !isAnalyzingArticle && !analysisAiError && (
                         <button
                           onClick={fetchAnalysisAi}
                           disabled={!analysisFullContent}
@@ -1118,20 +1148,29 @@ export default function Home() {
                           <span className="text-sm font-bold">{analysisFullContent ? 'Análisis IA — Perspectiva Sur Global' : 'Cargando contenido...'}</span>
                         </button>
                       )}
-                      {analysisAiLoading && (
+                      {isAnalyzingArticle && (
                         <AnalysisPipeline variant="analysis" startTime={analysisAiStartTime} />
                       )}
-                      {analysisAiError && (
+                      {analysisAiError && !isAnalyzingArticle && (
                         <div className="glass rounded-xl p-4 flex flex-col items-center gap-3" role="alert">
                           <p className="text-sm text-red-400 font-[family-name:var(--font-space-grotesk)]">{analysisAiError}</p>
                           <button onClick={fetchAnalysisAi} className="px-4 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold hover:bg-red-500/20 transition-colors font-[family-name:var(--font-jetbrains-mono)]">Reintentar</button>
                         </div>
                       )}
-                      {analysisAiResult && (
+                      {currentAnalysisAiResult && !isAnalyzingArticle && (
                         <div className="flex flex-col gap-3">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Brain className="w-4 h-4 text-[#D4A017]" />
-                            <span className="text-sm font-bold text-[#D4A017]/80 font-[family-name:var(--font-space-grotesk)]">Análisis IA — Perspectiva Sur Global</span>
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                              <Brain className="w-4 h-4 text-[#D4A017]" />
+                              <span className="text-sm font-bold text-[#D4A017]/80 font-[family-name:var(--font-space-grotesk)]">Análisis IA — Perspectiva Sur Global</span>
+                            </div>
+                            <button
+                              onClick={() => selectedAnalysis && handleDismissAnalysisAi(selectedAnalysis.id)}
+                              className="px-2 py-1 rounded-lg bg-white/[0.03] border border-border-subtle text-white/30 hover:text-red-400 hover:border-red-500/20 transition-colors text-[9px] font-bold font-[family-name:var(--font-jetbrains-mono)]"
+                              title="Descartar análisis"
+                            >
+                              Descartar
+                            </button>
                           </div>
                           <div className="glass rounded-xl p-4 prose-invert">
                             <ReactMarkdown
@@ -1144,7 +1183,7 @@ export default function Home() {
                                 ol: ({ children }) => <ol className="text-sm text-white/65 leading-relaxed mb-3 pl-4 list-decimal font-[family-name:var(--font-space-grotesk)]">{children}</ol>,
                                 li: ({ children }) => <li className="mb-1">{children}</li>,
                               }}
-                            >{analysisAiResult}</ReactMarkdown>
+                            >{currentAnalysisAiResult}</ReactMarkdown>
                           </div>
                         </div>
                       )}

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { type Signal, type Region, relevanceColors, sourceLevelLabels, sourceLevelColors, sourceCountry } from '@/data/signals';
-import { ShieldCheck, ShieldAlert, Clock, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
+import { ShieldCheck, ShieldAlert, Clock, ChevronDown, ChevronUp, ExternalLink, Brain } from 'lucide-react';
 import { useMounted } from '@/hooks/useMounted';
 import { timeAgo, isRecent } from '@/lib/utils-time';
 
@@ -13,9 +13,10 @@ interface SignalCardProps {
   isExpanded: boolean;
   onToggleExpand: (signal: Signal) => void;
   onReadFull: (signal: Signal) => void;
+  hasAiAnalysis?: boolean;
 }
 
-export default function SignalCard({ signal, onRegionClick, onClassifierClick, isExpanded, onToggleExpand, onReadFull }: SignalCardProps) {
+export default function SignalCard({ signal, onRegionClick, onClassifierClick, isExpanded, onToggleExpand, onReadFull, hasAiAnalysis }: SignalCardProps) {
   const relevanceColor = relevanceColors[signal.relevance];
   const mounted = useMounted();
   // isRecent solo en cliente para evitar hydration mismatch (Date.now() difiere server vs client)
@@ -103,6 +104,13 @@ export default function SignalCard({ signal, onRegionClick, onClassifierClick, i
               <span className="relative flex h-1.5 w-1.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00E5A0] opacity-75" />
                 <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#00E5A0]" />
+              </span>
+            )}
+            {/* Badge IA — indica que esta señal tiene análisis IA disponible */}
+            {hasAiAnalysis && (
+              <span className="relative flex items-center justify-center" title="Análisis IA disponible">
+                <span className="absolute inset-0 rounded-full bg-[#00E5A0]/20 animate-pulse" />
+                <Brain className="w-4 h-4 text-[#00E5A0] relative" />
               </span>
             )}
           </div>
@@ -202,9 +210,22 @@ export default function SignalCard({ signal, onRegionClick, onClassifierClick, i
 
         {/* Expanded section — botones de acción */}
         <div
-          className={`overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-28 opacity-100 mt-3' : 'max-h-0 opacity-0 mt-0'}`}
+          className={`overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-40 opacity-100 mt-3' : 'max-h-0 opacity-0 mt-0'}`}
         >
           <div className="flex flex-col gap-2">
+            {hasAiAnalysis && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onReadFull(signal);
+                }}
+                className="w-full flex items-center justify-center gap-2 py-2 px-4 bg-[#00E5A0]/8 border border-[#00E5A0]/15 text-[#00E5A0]/70 hover:bg-[#00E5A0]/15 hover:text-[#00E5A0] rounded-xl transition-colors text-[10px] font-bold font-[family-name:var(--font-space-grotesk)]"
+              >
+                <Brain className="w-3 h-3" />
+                Ver análisis IA
+              </button>
+            )}
             <button
               type="button"
               onClick={(e) => {

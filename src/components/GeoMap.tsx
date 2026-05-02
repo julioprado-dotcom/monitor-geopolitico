@@ -17,6 +17,7 @@ interface GeoMapProps {
   onSelectSignal: (signal: Signal) => void;
   onToggleRelevance: (s: Relevance) => void;
   onClearRelevance: () => void;
+  analyzedSignalIds?: Map<string, string>;
 }
 
 const LEGEND_ITEMS: { relevance: Relevance; label: string }[] = [
@@ -50,7 +51,7 @@ const DEFAULT_CENTROIDS: Record<Region, [number, number]> = {
 
 const SEVERITY_LEVELS: Relevance[] = ['CRÍTICA', 'ALTA', 'MEDIA', 'BAJA', 'INFORMATIVA'];
 
-export default function GeoMap({ signals, allSignals, filteredCount, selectedRelevances, onSelectSignal, onToggleRelevance, onClearRelevance }: GeoMapProps) {
+export default function GeoMap({ signals, allSignals, filteredCount, selectedRelevances, onSelectSignal, onToggleRelevance, onClearRelevance, analyzedSignalIds }: GeoMapProps) {
   const [hoveredSignal, setHoveredSignal] = useState<Signal | null>(null);
   const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
@@ -405,9 +406,18 @@ export default function GeoMap({ signals, allSignals, filteredCount, selectedRel
             const color = relevanceColors[signal.relevance];
             const isCritical = signal.relevance === 'CRÍTICA';
             const isHovered = hoveredSignal?.id === signal.id;
+            const isAnalyzed = analyzedSignalIds?.has(signal.id) ?? false;
 
             return (
               <g key={signal.id}>
+                {/* AI Analysis glow — ring especial para señales analizadas */}
+                {isAnalyzed && !prefersReducedMotion && (
+                  <circle cx={cx} cy={cy} r="14" fill="none" stroke="#00E5A0" strokeWidth="1.5" opacity="0.6">
+                    <animate attributeName="r" values="8;20" dur="3s" repeatCount="indefinite" />
+                    <animate attributeName="opacity" values="0.5;0" dur="3s" repeatCount="indefinite" />
+                  </circle>
+                )}
+
                 {/* Pulse ring for CRÍTICA */}
                 {isCritical && !prefersReducedMotion && (
                   <>
@@ -422,14 +432,14 @@ export default function GeoMap({ signals, allSignals, filteredCount, selectedRel
                   </>
                 )}
 
-                {/* Outer glow */}
-                <circle cx={cx} cy={cy} r={isHovered ? 12 : 8} fill={color}
-                  opacity={isHovered ? 0.15 : 0.08}
+                {/* Outer glow — más grande si tiene análisis IA */}
+                <circle cx={cx} cy={cy} r={isHovered || isAnalyzed ? 12 : 8} fill={isAnalyzed ? '#00E5A0' : color}
+                  opacity={isHovered ? 0.15 : isAnalyzed ? 0.12 : 0.08}
                   filter={isCritical ? 'url(#criticalGlow)' : 'url(#markerGlow)'}
                   style={{ pointerEvents: 'none' }} />
 
-                {/* Main dot */}
-                <circle cx={cx} cy={cy} r={isHovered ? 6 : 4.5} fill={color}
+                {/* Main dot — borde brillante si tiene análisis IA */}
+                <circle cx={cx} cy={cy} r={isHovered ? 6 : 4.5} fill={isAnalyzed ? '#00E5A0' : color}
                   opacity={isHovered ? 1 : 0.85}
                   filter={isCritical ? 'url(#criticalGlow)' : 'url(#markerGlow)'}
                   className="cursor-pointer transition-all duration-200"
@@ -438,13 +448,21 @@ export default function GeoMap({ signals, allSignals, filteredCount, selectedRel
                   onMouseLeave={handleMarkerLeave}
                   onClick={() => handleMarkerClick(signal)}
                   role="button" tabIndex={0}
-                  aria-label={`Señal: ${signal.title}. Relevancia: ${signal.relevance}. Fuente: ${signal.source}`}
+                  aria-label={`Señal: ${signal.title}. Relevancia: ${signal.relevance}. Fuente: ${signal.source}${isAnalyzed ? '. Con análisis IA disponible.' : ''}`}
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleMarkerClick(signal); }} />
 
                 {/* Inner bright core */}
                 <circle cx={cx} cy={cy} r={isHovered ? 2.5 : 1.8} fill="white"
                   opacity={isHovered ? 0.9 : 0.5}
                   style={{ pointerEvents: 'none' }} />
+
+                {/* IA badge icon — pequeño indicador */}
+                {isAnalyzed && (
+                  <g style={{ pointerEvents: 'none' }}>
+                    <circle cx={cx + 6} cy={cy - 6} r="4.5" fill="#0A0F1C" stroke="#00E5A0" strokeWidth="0.8" opacity="0.9" />
+                    <text x={cx + 6} y={cy - 4} textAnchor="middle" fontSize="5" fill="#00E5A0" fontWeight="bold" fontFamily="system-ui">IA</text>
+                  </g>
+                )}
               </g>
             );
           })}
@@ -460,6 +478,9 @@ export default function GeoMap({ signals, allSignals, filteredCount, selectedRel
                 <span className="text-[8px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]"
                   style={{ color: relevanceColors[hoveredSignal.relevance] }}>{hoveredSignal.relevance}</span>
                 <span className="text-[8px] text-text-faint font-[family-name:var(--font-jetbrains-mono)]">· {regionLabels[hoveredSignal.region]}</span>
+                {analyzedSignalIds?.has(hoveredSignal.id) && (
+                  <span className="text-[7px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] px-1 py-0.5 rounded bg-[#00E5A0]/15 text-[#00E5A0] ml-auto">IA</span>
+                )}
               </div>
               <p className="text-[11px] text-white/80 font-[family-name:var(--font-space-grotesk)] leading-snug line-clamp-2">{hoveredSignal.title}</p>
               <p className="text-[9px] text-white/35 font-[family-name:var(--font-jetbrains-mono)] mt-1">{hoveredSignal.source}</p>
