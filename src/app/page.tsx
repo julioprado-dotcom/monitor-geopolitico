@@ -27,7 +27,6 @@ const SourceClassifier = dynamic(() => import('@/components/SourceClassifier'));
 
 // ── Dynamic imports: solo se cargan cuando se necesitan (cero impacto en carga inicial) ──
 const GeoMap = dynamic(() => import('@/components/GeoMap'), { ssr: false });
-const AnalysisOverlay = dynamic(() => import('@/components/AnalysisOverlay'), { ssr: false });
 const FloatingProjector = dynamic(() => import('@/components/FloatingProjector'), { ssr: false });
 const SourceComparisonView = dynamic(() => import('@/components/SourceComparisonView'), { ssr: false });
 // LivePlayer: carga diferida — se renderiza DESPUÉS de las tarjetas de señales
@@ -302,7 +301,7 @@ export default function Home() {
     setTimeout(() => scrollToFoco('foco-signal'), 50);
   }, [scrollToFoco]);
 
-  // ── READ FULL: Analysis → Foco panel ──
+  // ── READ FULL: Analysis → Foco panel (FIX: use scrollToFoco) ──
   const handleReadFullAnalysis = useCallback((analysisItem: Analysis) => {
     setSelectedAnalysis(analysisItem);
     // Do NOT clear selectedSignal or selectedThread — multi-slot Foco
@@ -310,21 +309,17 @@ export default function Home() {
     setAnalysisAiResult(null);
     setAnalysisAiError(null);
     analysisAbortRef.current?.abort();
-    // Smart scroll: scroll to the analysis section in foco
-    setTimeout(() => {
-      document.getElementById('foco-analysis')?.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'start' });
-    }, 50);
-  }, []);
+    // Smart scroll: ensure horizontal scroll to Foco, then vertical to analysis
+    setTimeout(() => scrollToFoco('foco-analysis'), 50);
+  }, [scrollToFoco]);
 
-  // ── Thread selection → Foco panel ──
+  // ── Thread selection → Foco panel (FIX: use scrollToFoco) ──
   const handleSelectThread = useCallback((thread: Thread) => {
     setSelectedThread(thread);
     // Do NOT clear signal/analysis — multi-slot Foco
-    // Smart scroll: scroll to the thread section in foco
-    setTimeout(() => {
-      document.getElementById('foco-thread')?.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'start' });
-    }, 50);
-  }, []);
+    // Smart scroll: ensure horizontal scroll to Foco, then vertical to thread
+    setTimeout(() => scrollToFoco('foco-thread'), 50);
+  }, [scrollToFoco]);
 
   // ── Click en señal desde Hilos: convierte ThreadSignal → Signal y abre en Foco ──
   const handleThreadSignalClick = useCallback((ts: ThreadSignal, region: Region) => {
@@ -352,16 +347,14 @@ export default function Home() {
     handleReadFullSignal(signal);
   }, [handleReadFullSignal]);
 
-  // ── Navigate relation within thread ──
+  // ── Navigate relation within thread (FIX: scroll horizontal first) ──
   const handleNavigateThreadRelation = useCallback((threadId: string) => {
     const t = demoThreads.find((th) => th.id === threadId);
     if (t) {
       setSelectedThread(t);
-      setTimeout(() => {
-        document.getElementById('foco-thread')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
+      setTimeout(() => scrollToFoco('foco-thread'), 50);
     }
-  }, []);
+  }, [scrollToFoco]);
 
   // ── "← Volver" from Foco sections ──
   const handleBackToContexto = useCallback(() => {
@@ -512,6 +505,9 @@ export default function Home() {
     setIsDragging(false);
   }, []);
 
+  // ── Collapsible intelligence section (KPIs + Patterns + Map) ──
+  const [intelSectionOpen, setIntelSectionOpen] = useState(false);
+
   // ── Determine if Foco panel has content ──
   const hasFocoContent = selectedSignal || selectedAnalysis || selectedThread;
 
@@ -587,6 +583,37 @@ export default function Home() {
           <MGSidebar selectedRegion={selectedRegion} selectedClassifier={selectedClassifier} onRegionSelect={setSelectedRegion} onClassifierSelect={setSelectedClassifier} activeTab={contentTab} />
         </div>
 
+        {/* ── ZONE NAV BAR — indicador Contexto / Foco ── */}
+        <div className="shrink-0 px-3 sm:px-6 py-1.5 flex items-center justify-between border-b border-white/[0.04]">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleBackToContexto}
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] transition-all duration-150 border ${!hasFocoContent ? 'text-[#00E5A0]/70 bg-[#00E5A0]/8 border-[#00E5A0]/15' : 'text-white/25 border-white/[0.04] hover:text-white/45 hover:border-white/[0.08]'}`}
+            >
+              <Radio className="w-3 h-3" />
+              Contexto
+            </button>
+            <span className="text-white/10 text-[10px]">→</span>
+            <button
+              onClick={() => scrollToFoco()}
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] transition-all duration-150 border ${hasFocoContent ? 'text-[#D4A017]/70 bg-[#D4A017]/8 border-[#D4A017]/15' : 'text-white/15 border-white/[0.03] cursor-default'}`}
+              disabled={!hasFocoContent}
+            >
+              <BookOpen className="w-3 h-3" />
+              Foco
+              {hasFocoContent && (
+                <span className="h-1.5 w-1.5 rounded-full bg-[#D4A017] animate-pulse" />
+              )}
+            </button>
+          </div>
+          {/* Quick count indicators */}
+          <div className="hidden sm:flex items-center gap-4 text-[9px] font-[family-name:var(--font-jetbrains-mono)]">
+            <span className="text-white/20">{filteredSignals.length} señales</span>
+            <span className="text-white/20">{filteredAnalysis.length} análisis</span>
+            <span className="text-white/20">{filteredThreads.length} hilos</span>
+          </div>
+        </div>
+
         {/* Horizontal scroll container — GRAB TO SCROLL */}
         <div
           ref={scrollContainerRef}
@@ -604,28 +631,11 @@ export default function Home() {
 
                 {/* Center column */}
                 <div className={`flex flex-col gap-3 sm:gap-4 min-w-0 ${mobileTab === 'tv' ? 'hidden lg:flex' : 'flex'}`}>
-            {/* 0. Inteligencia Visual: KPIs + Patrones */}
-            <KpiDashboard signals={filteredSignals} />
-            <div className="border-l-2 border-[#00E5A0] pl-4 glass p-4 rounded-lg">
-              <h3 className="text-[9px] sm:text-[10px] font-bold text-[#00E5A0] mb-2 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">Patrones Detectados (24h)</h3>
-              <PatternList />
-            </div>
 
-            {/* 0.5 Mapa Geopolítico + Severidad (integrado) */}
-            <GeoMap
-              signals={filteredSignals}
-              allSignals={demoSignals}
-              filteredCount={filteredSignals.length}
-              selectedRelevances={selectedRelevances}
-              onSelectSignal={handleMapSelectSignal}
-              onToggleRelevance={toggleRelevance}
-              onClearRelevance={() => setSelectedRelevances(new Set())}
-            />
-
-            {/* 2. Buscador */}
+            {/* 1. Buscador — acceso inmediato */}
             <SearchBar value={searchQuery} onChange={setSearchQuery} />
 
-            {/* 3. Pestañas */}
+            {/* 2. Pestañas */}
             <div className="flex gap-1 p-1 rounded-xl bg-[#111827]/90 border border-white/[0.06]" data-no-drag>
               {CONTENT_TABS.map((tab) => {
                 const Icon = tab.icon;
@@ -769,6 +779,40 @@ export default function Home() {
                 </div>
               </>
             )}
+
+            {/* ── SECCIÓN INTELIGENCIA: KPIs + Patrones + Mapa (colapsable) ── */}
+            <div data-no-drag>
+              <button
+                onClick={() => setIntelSectionOpen(!intelSectionOpen)}
+                className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl glass border border-white/[0.06] hover:border-white/[0.10] transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  <Radar className="w-3.5 h-3.5 text-[#00E5A0]/50" />
+                  <span className="text-[10px] font-bold text-white/40 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">Inteligencia Visual</span>
+                  <span className="text-[9px] text-white/20 font-[family-name:var(--font-jetbrains-mono)]">KPIs · Patrones · Mapa</span>
+                </div>
+                <ChevronRight className={`w-4 h-4 text-white/25 transition-transform duration-200 ${intelSectionOpen ? 'rotate-90' : ''}`} />
+              </button>
+
+              {intelSectionOpen && (
+                <div className="flex flex-col gap-3 mt-3 animate-collapse-reveal">
+                  <KpiDashboard signals={filteredSignals} />
+                  <div className="border-l-2 border-[#00E5A0] pl-4 glass p-4 rounded-lg">
+                    <h3 className="text-[9px] sm:text-[10px] font-bold text-[#00E5A0] mb-2 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">Patrones Detectados (24h)</h3>
+                    <PatternList />
+                  </div>
+                  <GeoMap
+                    signals={filteredSignals}
+                    allSignals={demoSignals}
+                    filteredCount={filteredSignals.length}
+                    selectedRelevances={selectedRelevances}
+                    onSelectSignal={handleMapSelectSignal}
+                    onToggleRelevance={toggleRelevance}
+                    onClearRelevance={() => setSelectedRelevances(new Set())}
+                  />
+                </div>
+              )}
+            </div>
           </div>
 
                 {/* Right column — desktop always visible, mobile only on TV tab */}
@@ -1145,10 +1189,6 @@ export default function Home() {
           onMinimize={() => setFloatingChannel(null)}
         />
       )}
-
-      {/* SIGNAL OVERLAY — desactivado: el Panel de Foco reemplaza esta funcionalidad */}
-
-      {/* ANALYSIS OVERLAY — desactivado: el Panel de Foco reemplaza esta funcionalidad */}
 
       {/* SOURCE COMPARISON VIEW */}
       {comparisonSignal && (
