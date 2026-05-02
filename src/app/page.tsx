@@ -7,7 +7,7 @@ import { demoSignals, type Relevance, type Region, type Signal, relevanceColors 
 import { demoAnalysis, type Analysis } from '@/data/analysis';
 import { demoThreads, type Thread, type ThreadStatus, type ThreadSignal } from '@/data/threads';
 import { type TVChannel } from '@/data/channels';
-import MetricsBar from '@/components/MetricsBar';
+
 import SignalCard from '@/components/SignalCard';
 import AnalysisCard from '@/components/AnalysisCard';
 import SearchBar from '@/components/SearchBar';
@@ -611,11 +611,16 @@ export default function Home() {
               <PatternList />
             </div>
 
-            {/* 0.5 Mapa Geopolítico */}
-            <GeoMap signals={filteredSignals} onSelectSignal={handleMapSelectSignal} />
-
-            {/* 1. Barras de señales (MetricsBar) */}
-            <MetricsBar allSignals={demoSignals} filteredCount={filteredSignals.length} selectedRelevances={selectedRelevances} onToggleRelevance={toggleRelevance} onClearRelevance={() => setSelectedRelevances(new Set())} />
+            {/* 0.5 Mapa Geopolítico + Severidad (integrado) */}
+            <GeoMap
+              signals={filteredSignals}
+              allSignals={demoSignals}
+              filteredCount={filteredSignals.length}
+              selectedRelevances={selectedRelevances}
+              onSelectSignal={handleMapSelectSignal}
+              onToggleRelevance={toggleRelevance}
+              onClearRelevance={() => setSelectedRelevances(new Set())}
+            />
 
             {/* 2. Buscador */}
             <SearchBar value={searchQuery} onChange={setSearchQuery} />

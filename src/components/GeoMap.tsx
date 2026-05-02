@@ -7,10 +7,16 @@ import type { Signal } from '@/types';
 import { relevanceColors, regionLabels } from '@/data/signals';
 import { COUNTRY_REGION_MAP, regionChoroplethColors } from '@/data/countryRegionMap';
 import type { Region, Relevance } from '@/types';
+import { X } from 'lucide-react';
 
 interface GeoMapProps {
   signals: Signal[];
+  allSignals: Signal[];
+  filteredCount: number;
+  selectedRelevances: Set<Relevance>;
   onSelectSignal: (signal: Signal) => void;
+  onToggleRelevance: (s: Relevance) => void;
+  onClearRelevance: () => void;
 }
 
 const LEGEND_ITEMS: { relevance: Relevance; label: string }[] = [
@@ -42,7 +48,9 @@ const DEFAULT_CENTROIDS: Record<Region, [number, number]> = {
   'ASIA': [720, 190],
 };
 
-export default function GeoMap({ signals, onSelectSignal }: GeoMapProps) {
+const SEVERITY_LEVELS: Relevance[] = ['CRÍTICA', 'ALTA', 'MEDIA', 'BAJA', 'INFORMATIVA'];
+
+export default function GeoMap({ signals, allSignals, filteredCount, selectedRelevances, onSelectSignal, onToggleRelevance, onClearRelevance }: GeoMapProps) {
   const [hoveredSignal, setHoveredSignal] = useState<Signal | null>(null);
   const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
@@ -419,6 +427,78 @@ export default function GeoMap({ signals, onSelectSignal }: GeoMapProps) {
             </div>
           </div>
         )}
+      </div>
+
+      {/* Severidad — barras interactivas integradas */}
+      <div className="px-4 pt-3 pb-3 border-t border-white/[0.06]">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-[9px] font-bold text-white/30 uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)]">
+            Severidad
+          </span>
+          <span className="text-[9px] text-white/25 font-[family-name:var(--font-jetbrains-mono)]">
+            {filteredCount}<span className="text-white/15">/{allSignals.length}</span>
+          </span>
+        </div>
+        <div className="flex items-end gap-2.5" role="group" aria-label="Filtros por nivel de severidad">
+          {SEVERITY_LEVELS.map((sev) => {
+            const count = allSignals.filter((s) => s.relevance === sev).length;
+            const color = relevanceColors[sev];
+            const isSelected = selectedRelevances.has(sev);
+            const maxCount = Math.max(...SEVERITY_LEVELS.map((s) => allSignals.filter((sig) => sig.relevance === s).length), 1);
+            const heightPct = maxCount > 0 ? (count / maxCount) * 100 : 0;
+
+            return (
+              <div
+                key={sev}
+                role="button"
+                tabIndex={0}
+                aria-label={`Filtrar por severidad ${sev}${isSelected ? ' (seleccionado)' : ''} — ${count} señales`}
+                aria-pressed={isSelected}
+                onClick={() => onToggleRelevance(sev)}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggleRelevance(sev); } }}
+                className="flex-1 flex flex-col items-center gap-1 transition-all duration-150 cursor-pointer"
+              >
+                {isSelected && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onClearRelevance(); }}
+                    className="px-1 py-px rounded text-[7px] font-bold font-[family-name:var(--font-jetbrains-mono)] transition-colors"
+                    style={{ backgroundColor: `${color}20`, color, border: `1px solid ${color}40` }}
+                    title="Limpiar filtro"
+                  >
+                    <X className="w-2 h-2 inline" /> <span className="ml-0.5">LIMPIAR</span>
+                  </button>
+                )}
+                <span
+                  className="text-[10px] font-bold font-[family-name:var(--font-jetbrains-mono)] leading-none"
+                  style={{ color }}
+                >
+                  {count}
+                </span>
+                <div
+                  className="w-full h-8 rounded-sm relative overflow-hidden transition-all duration-150"
+                  style={{
+                    backgroundColor: `${color}15`,
+                    border: isSelected ? `1.5px solid ${color}60` : '1px solid rgba(255,255,255,0.04)',
+                  }}
+                >
+                  <div
+                    className="absolute bottom-0 left-0 right-0 rounded-sm transition-all duration-400"
+                    style={{
+                      height: `${heightPct}%`,
+                      backgroundColor: color,
+                    }}
+                  />
+                </div>
+                <span
+                  className="text-[7px] font-bold uppercase tracking-wider font-[family-name:var(--font-jetbrains-mono)] text-center leading-none"
+                  style={{ color }}
+                >
+                  {sev}
+                </span>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Mobile legends */}
