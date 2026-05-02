@@ -38,10 +38,10 @@ sleep 10 && curl -s -o /dev/null -w "%{http_code}" http://localhost:3000
 ## 2. IDENTIDAD DEL PROYECTO
 
 Nombre: Monitor Geopolítico — News Connect
-Versión: 0.9.5-meridian
+Versión: 1.0.0-meridian (archivo estable — pre-rediseño de navegación)
 Repositorio: https://github.com/julioprado-dotcom/monitor-geopolitico
-Último commit: 2432ec9 — fix: remove unused Tv import — code audit cleanup
-Tags: v0.9.0-meridian, v0.9.1-meridian, v0.9.2-meridian, v0.9.3-meridian, v0.9.4-meridian, v0.9.5-meridian
+Último commit: pending — archive release v1.0.0-meridian
+Tags: v0.9.0-meridian, v0.9.1-meridian, v0.9.2-meridian, v0.9.3-meridian, v0.9.4-meridian, v0.9.5-meridian, v1.0.0-meridian
 Descripción: Plataforma de monitoreo geopolítico con óptica del Sur Global que recopila, clasifica y analiza señales de múltiples fuentes mediante IA. Combina un sistema de TV en vivo con análisis automatizado para ofrecer una perspectiva crítica y no hegemónica de la realidad internacional.
 
 ## 3. STACK TECNOLÓGICO
@@ -151,12 +151,43 @@ Principales gaps en Historial de Desarrollo: Subsistema TV completo no registrad
 
 ## 10. VERSIONES
 
-package.json: 0.9.5-meridian
+package.json: 1.0.0-meridian
 Historial_Desarrollo.pdf: referencia 0.8.0 DESACTUALIZADO (pendiente actualización)
 Marco Conceptual: v0.9.0
-Tags Git: v0.9.0-meridian, v0.9.1-meridian, v0.9.2-meridian, v0.9.3-meridian, v0.9.4-meridian, v0.9.5-meridian
+Tags Git: v0.9.0-meridian, v0.9.1-meridian, v0.9.2-meridian, v0.9.3-meridian, v0.9.4-meridian, v0.9.5-meridian, v1.0.0-meridian
 
-### Changelog v0.9.5-meridian (desde v0.9.4)
+### v1.0.0-meridian — VERSIÓN ARCHIVO ESTABLE
+**Hito**: Primera versión estable completa de la arquitectura Meridian. Contiene todo el desarrollo hasta la sesión del 2026-05-02, antes del rediseño de navegación horizontal. Esta versión se archiva como punto de restauración seguro.
+
+**Estado funcional al archivar:**
+- Dashboard Contexto/Foco con navegación horizontal grab-to-scroll
+- 3 tabs de contenido: Señales Geopolíticas, Análisis, Hilos Geopolíticos (Explorer)
+- Panel de Foco multi-slot (señal + análisis + hilo simultáneos)
+- Análisis IA persistente: resultados en Maps, sobreviven navegación entre paneles
+- Brain badges en tarjetas con análisis IA disponible + glow en GeoMap
+- AnalysisPipeline: componente animado 4 fases
+- GeoMap interactivo (D3-geo + TopoJSON) con filtros de severidad y marcadores con badge IA
+- KPIs dinámicos + Patrones Detectados en sección colapsable
+- HLSPlayer + YouTube LivePlayer + FloatingProjector + ProyectorWindow (14 canales)
+- SourceComparisonView integrada en Foco
+- SearchBar, SourceClassifier, MetricsBar (severidad exclusiva)
+- 57 señales con fullContent poblado
+- Sidebar MGSidebar (desktop inline, mobile offcanvas)
+- Fase 2 accesibilidad: skip-to-content, ARIA, focus-visible, reduced-motion
+- JSON-LD SEO ampliado, sitemap dinámico, robots.txt
+- MIG-01 + MIG-02: tipos centralizados, config unificada
+- Code audit limpio: 0 inconsistencias tras eliminación de import Tv no usado
+
+**Componentes (20 custom + 53 shadcn/ui):**
+SignalCard, AnalysisCard, AnalysisPipeline, AnalysisOverlay, SignalOverlay, GeoMap, SearchBar, SourceClassifier, SourceComparisonView, HLSPlayer, LivePlayer, FloatingProjector, ProyectorWindow, KpiDashboard, LatestSignals, MetricsBar, PatternList, MGSidebar, Explorer/ThreadCard, Explorer/ThreadDetail
+
+**Notas de archivo:**
+- v0.9.5-meridian permanece como tag de respaldo inmediato
+- La próxima versión iniciará el rediseño de navegación (Monitor Activo + Pizarra)
+- analysisPrompt.ts (207 líneas) es INMUTABLE
+- SignalOverlay.tsx y AnalysisOverlay.tsx existen en disco pero NO se importan
+
+### Changelog v0.9.5-meridian (desde v0.9.4) — MANTENIDO COMO REFERENCIA
 - Panel de Foco multi-slot (señal + análisis + hilo simultáneos) con scroll horizontal grab-to-scroll
 - Eliminación de overlays (SignalOverlay, AnalysisOverlay) — todo es inline en Contexto/Foco
 - Accordion inline en SignalCard y AnalysisCard (expandir sin abrir modal)

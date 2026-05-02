@@ -562,7 +562,7 @@ export default function Home() {
             <h1 className="text-base sm:text-2xl font-bold text-white tracking-tight font-[family-name:var(--font-space-grotesk)] truncate">Monitor Geopolítico</h1>
             <span className="text-slate-500 text-xs hidden sm:block">Traduciendo señales en patrones de poder.</span>
             <p className="text-[9px] sm:text-[11px] text-white/40 mt-0.5 font-[family-name:var(--font-space-grotesk)] hidden sm:block">
-              Inteligencia geopolítica de acceso libre · <span className="text-[#00E5A0]/50">Meridian</span> <span className="text-text-faint">v0.9.5</span>
+              Inteligencia geopolítica de acceso libre · <span className="text-[#00E5A0]/50">Meridian</span> <span className="text-text-faint">v1.0.0</span>
             </p>
           </div>
 
@@ -1256,7 +1256,7 @@ export default function Home() {
               GitHub
             </a>
             <span className="text-[9px] text-[#00E5A0]/30 font-[family-name:var(--font-jetbrains-mono)]">
-              v0.9.5-meridian
+              v1.0.0-meridian
             </span>
           </div>
         </div>
